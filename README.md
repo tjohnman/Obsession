@@ -13,6 +13,8 @@ Right now the client is capable of reading news (both old-style and threaded), d
 What doesn't work
 -----------------
 
+SHIFT-JIS support broke when the code switched to Qt5. It is one of the priorities.
+
 Uploading and posting news is not implemented. There's no account managing either, so the client is not good for server administration right now.
 
 Note this is an alpha build, it's pretty stable but may lack some features.
