@@ -183,7 +183,7 @@ void CUpload::startUploading() {
 
         socket.write(flatheader, 24);
 
-        unsigned short forksize = 72 + currentName.toAscii().length();  // We need to get the number of bytes, not the
+        unsigned short forksize = 72 + currentName.toLocal8Bit().length();  // We need to get the number of bytes, not the
                                                                         // number of characters. For Japanese chars.
         forksize = qToBigEndian(forksize);
 
@@ -193,15 +193,15 @@ void CUpload::startUploading() {
         memcpy(forkheader+12, &forksize, 4);
         socket.write(forkheader, 16);
 
-        char * infork = (char *) malloc(72 + currentName.toAscii().length());
+        char * infork = (char *) malloc(72 + currentName.toLocal8Bit().length());
         memcpy(infork, "MWIN", 4);
         memset(infork+4, '?', 8);
         memset(infork+12, 0, 58);
-        unsigned short namesize = currentName.toAscii().length();
+        unsigned short namesize = currentName.toLocal8Bit().length();
         namesize = qToBigEndian(namesize);
         memcpy(infork+70, &namesize, 2);
-        memcpy(infork+72, currentName.toAscii().data(), currentName.toAscii().length());
-        socket.write(infork, 72 + currentName.toAscii().length());
+        memcpy(infork+72, currentName.toLocal8Bit().data(), currentName.toLocal8Bit().length());
+        socket.write(infork, 72 + currentName.toLocal8Bit().length());
         socket.waitForBytesWritten();
         free(infork);
 

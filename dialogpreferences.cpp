@@ -89,10 +89,10 @@ void DialogPreferences::acceptSettings() {
     QSettings settings("mir", "Contra");
     settings.setValue(QString("nick"), ui->lineEdit->text());
     if(ui->checkBox->isChecked()) {
-        QTextCodec::setCodecForCStrings(QTextCodec::codecForName("Shift-JIS"));
+        //QTextCodec::setCodecForCStrings(QTextCodec::codecForName("Shift-JIS"));
         settings.setValue("JapaneseMode", true);
     } else {
-        QTextCodec::setCodecForCStrings(QTextCodec::codecForName("Apple Roman"));
+        //QTextCodec::setCodecForCStrings(QTextCodec::codecForName("Apple Roman"));
         settings.setValue("JapaneseMode", false);
     }
     settings.setValue("dlqueue", ui->dlQueueEdit->text().toInt());

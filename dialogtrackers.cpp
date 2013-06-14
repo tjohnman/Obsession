@@ -29,10 +29,6 @@ DialogTrackers::DialogTrackers(ConnectionController * c, QWidget *parent) :
     connect(ui->treeWidget, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(openConnectionWindow()));
     connect(pSocket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(socketError(QAbstractSocket::SocketError)));
     connect(ui->buttonRefresh, SIGNAL(clicked()), this, SLOT(updateCurrentList()));
-
-    ui->treeWidget->header()->setResizeMode(0, QHeaderView::ResizeToContents);
-    ui->treeWidget->header()->setResizeMode(1, QHeaderView::ResizeToContents);
-    ui->treeWidget->header()->setResizeMode(2, QHeaderView::ResizeToContents);
 }
 
 void DialogTrackers::connectToServer(QModelIndex model) {

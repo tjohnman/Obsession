@@ -1,8 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'widgetchat.ui'
 **
-** Created: Sat 23. Apr 02:30:56 2011
-**      by: Qt User Interface Compiler version 4.6.2
+** Created by: Qt User Interface Compiler version 5.0.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -11,16 +10,16 @@
 #define UI_WIDGETCHAT_H
 
 #include <QtCore/QVariant>
-#include <QtGui/QAction>
-#include <QtGui/QApplication>
-#include <QtGui/QButtonGroup>
-#include <QtGui/QGridLayout>
-#include <QtGui/QHBoxLayout>
-#include <QtGui/QHeaderView>
-#include <QtGui/QSpacerItem>
-#include <QtGui/QTextBrowser>
-#include <QtGui/QVBoxLayout>
-#include <QtGui/QWidget>
+#include <QtWidgets/QAction>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QButtonGroup>
+#include <QtWidgets/QGridLayout>
+#include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QHeaderView>
+#include <QtWidgets/QSpacerItem>
+#include <QtWidgets/QTextBrowser>
+#include <QtWidgets/QVBoxLayout>
+#include <QtWidgets/QWidget>
 #include "chatlineedit.h"
 #include "listwidgetusers.h"
 
@@ -41,17 +40,17 @@ public:
     void setupUi(QWidget *WidgetChat)
     {
         if (WidgetChat->objectName().isEmpty())
-            WidgetChat->setObjectName(QString::fromUtf8("WidgetChat"));
+            WidgetChat->setObjectName(QStringLiteral("WidgetChat"));
         WidgetChat->resize(780, 535);
         gridLayout = new QGridLayout(WidgetChat);
-        gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
+        gridLayout->setObjectName(QStringLiteral("gridLayout"));
         horizontalLayout = new QHBoxLayout();
-        horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
+        horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
         horizontalLayout->setContentsMargins(10, 10, 10, 0);
         verticalLayout = new QVBoxLayout();
-        verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
+        verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
         textEdit = new QTextBrowser(WidgetChat);
-        textEdit->setObjectName(QString::fromUtf8("textEdit"));
+        textEdit->setObjectName(QStringLiteral("textEdit"));
         textEdit->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
         textEdit->setOpenExternalLinks(true);
 
@@ -62,7 +61,7 @@ public:
         verticalLayout->addItem(verticalSpacer);
 
         lineEdit = new ChatLineEdit(WidgetChat);
-        lineEdit->setObjectName(QString::fromUtf8("lineEdit"));
+        lineEdit->setObjectName(QStringLiteral("lineEdit"));
 
         verticalLayout->addWidget(lineEdit);
 
@@ -74,7 +73,7 @@ public:
         horizontalLayout->addItem(horizontalSpacer);
 
         listWidget = new ListWidgetUsers(WidgetChat);
-        listWidget->setObjectName(QString::fromUtf8("listWidget"));
+        listWidget->setObjectName(QStringLiteral("listWidget"));
         QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
@@ -98,7 +97,7 @@ public:
 
     void retranslateUi(QWidget *WidgetChat)
     {
-        WidgetChat->setWindowTitle(QApplication::translate("WidgetChat", "Form", 0, QApplication::UnicodeUTF8));
+        WidgetChat->setWindowTitle(QApplication::translate("WidgetChat", "Form", 0));
     } // retranslateUi
 
 };

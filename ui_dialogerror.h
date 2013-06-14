@@ -1,8 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'dialogerror.ui'
 **
-** Created: Thu 21. Oct 04:13:21 2010
-**      by: Qt User Interface Compiler version 4.6.2
+** Created by: Qt User Interface Compiler version 5.0.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -11,15 +10,15 @@
 #define UI_DIALOGERROR_H
 
 #include <QtCore/QVariant>
-#include <QtGui/QAction>
-#include <QtGui/QApplication>
-#include <QtGui/QButtonGroup>
-#include <QtGui/QDialog>
-#include <QtGui/QGridLayout>
-#include <QtGui/QHeaderView>
-#include <QtGui/QLabel>
-#include <QtGui/QPushButton>
-#include <QtGui/QSpacerItem>
+#include <QtWidgets/QAction>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QButtonGroup>
+#include <QtWidgets/QDialog>
+#include <QtWidgets/QGridLayout>
+#include <QtWidgets/QHeaderView>
+#include <QtWidgets/QLabel>
+#include <QtWidgets/QPushButton>
+#include <QtWidgets/QSpacerItem>
 
 QT_BEGIN_NAMESPACE
 
@@ -35,7 +34,7 @@ public:
     void setupUi(QDialog *DialogError)
     {
         if (DialogError->objectName().isEmpty())
-            DialogError->setObjectName(QString::fromUtf8("DialogError"));
+            DialogError->setObjectName(QStringLiteral("DialogError"));
         DialogError->resize(230, 99);
         QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
         sizePolicy.setHorizontalStretch(0);
@@ -46,9 +45,9 @@ public:
         DialogError->setMaximumSize(QSize(230, 99));
         DialogError->setModal(true);
         gridLayout = new QGridLayout(DialogError);
-        gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
+        gridLayout->setObjectName(QStringLiteral("gridLayout"));
         label = new QLabel(DialogError);
-        label->setObjectName(QString::fromUtf8("label"));
+        label->setObjectName(QStringLiteral("label"));
         label->setAlignment(Qt::AlignCenter);
         label->setWordWrap(true);
 
@@ -59,7 +58,7 @@ public:
         gridLayout->addItem(horizontalSpacer, 1, 0, 1, 1);
 
         pushButton = new QPushButton(DialogError);
-        pushButton->setObjectName(QString::fromUtf8("pushButton"));
+        pushButton->setObjectName(QStringLiteral("pushButton"));
 
         gridLayout->addWidget(pushButton, 1, 1, 1, 1);
 
@@ -76,10 +75,10 @@ public:
 
     void retranslateUi(QDialog *DialogError)
     {
-        DialogError->setWindowTitle(QApplication::translate("DialogError", "Attention", 0, QApplication::UnicodeUTF8));
-        label->setText(QApplication::translate("DialogError", "Unknown error.", 0, QApplication::UnicodeUTF8));
-        pushButton->setText(QApplication::translate("DialogError", "OK", 0, QApplication::UnicodeUTF8));
-        pushButton->setShortcut(QApplication::translate("DialogError", "Return", 0, QApplication::UnicodeUTF8));
+        DialogError->setWindowTitle(QApplication::translate("DialogError", "Attention", 0));
+        label->setText(QApplication::translate("DialogError", "Unknown error.", 0));
+        pushButton->setText(QApplication::translate("DialogError", "OK", 0));
+        pushButton->setShortcut(QApplication::translate("DialogError", "Return", 0));
     } // retranslateUi
 
 };

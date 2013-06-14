@@ -21,7 +21,7 @@ void WidgetChat::printChat(QString s) {
         s = s.right(s.length()-1);
         qDebug() << "r";
     }
-    QStringList words = Qt::escape(s).split(" ");
+    QStringList words = s.split(" ");
     QStringList newWords;
     for(int i=0; i<words.size(); i++) {
         if(words.at(i).startsWith("www.")) {

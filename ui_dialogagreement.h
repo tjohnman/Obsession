@@ -1,8 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'dialogagreement.ui'
 **
-** Created: Thu 21. Oct 04:13:21 2010
-**      by: Qt User Interface Compiler version 4.6.2
+** Created by: Qt User Interface Compiler version 5.0.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -11,13 +10,13 @@
 #define UI_DIALOGAGREEMENT_H
 
 #include <QtCore/QVariant>
-#include <QtGui/QAction>
-#include <QtGui/QApplication>
-#include <QtGui/QButtonGroup>
-#include <QtGui/QDialog>
-#include <QtGui/QGridLayout>
-#include <QtGui/QHeaderView>
-#include <QtGui/QPlainTextEdit>
+#include <QtWidgets/QAction>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QButtonGroup>
+#include <QtWidgets/QDialog>
+#include <QtWidgets/QGridLayout>
+#include <QtWidgets/QHeaderView>
+#include <QtWidgets/QPlainTextEdit>
 
 QT_BEGIN_NAMESPACE
 
@@ -30,12 +29,12 @@ public:
     void setupUi(QDialog *DialogAgreement)
     {
         if (DialogAgreement->objectName().isEmpty())
-            DialogAgreement->setObjectName(QString::fromUtf8("DialogAgreement"));
+            DialogAgreement->setObjectName(QStringLiteral("DialogAgreement"));
         DialogAgreement->resize(589, 450);
         gridLayout = new QGridLayout(DialogAgreement);
-        gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
+        gridLayout->setObjectName(QStringLiteral("gridLayout"));
         plainTextEdit = new QPlainTextEdit(DialogAgreement);
-        plainTextEdit->setObjectName(QString::fromUtf8("plainTextEdit"));
+        plainTextEdit->setObjectName(QStringLiteral("plainTextEdit"));
         plainTextEdit->setReadOnly(true);
 
         gridLayout->addWidget(plainTextEdit, 0, 0, 1, 1);
@@ -48,7 +47,7 @@ public:
 
     void retranslateUi(QDialog *DialogAgreement)
     {
-        DialogAgreement->setWindowTitle(QApplication::translate("DialogAgreement", "Server Agreement", 0, QApplication::UnicodeUTF8));
+        DialogAgreement->setWindowTitle(QApplication::translate("DialogAgreement", "Server Agreement", 0));
     } // retranslateUi
 
 };

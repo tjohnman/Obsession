@@ -1,8 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'dialogprivatemessaging.ui'
 **
-** Created: Thu 21. Oct 04:13:21 2010
-**      by: Qt User Interface Compiler version 4.6.2
+** Created by: Qt User Interface Compiler version 5.0.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -11,15 +10,15 @@
 #define UI_DIALOGPRIVATEMESSAGING_H
 
 #include <QtCore/QVariant>
-#include <QtGui/QAction>
-#include <QtGui/QApplication>
-#include <QtGui/QButtonGroup>
-#include <QtGui/QDialog>
-#include <QtGui/QGridLayout>
-#include <QtGui/QHeaderView>
-#include <QtGui/QLabel>
-#include <QtGui/QLineEdit>
-#include <QtGui/QTextBrowser>
+#include <QtWidgets/QAction>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QButtonGroup>
+#include <QtWidgets/QDialog>
+#include <QtWidgets/QGridLayout>
+#include <QtWidgets/QHeaderView>
+#include <QtWidgets/QLabel>
+#include <QtWidgets/QLineEdit>
+#include <QtWidgets/QTextBrowser>
 
 QT_BEGIN_NAMESPACE
 
@@ -34,23 +33,23 @@ public:
     void setupUi(QDialog *DialogPrivateMessaging)
     {
         if (DialogPrivateMessaging->objectName().isEmpty())
-            DialogPrivateMessaging->setObjectName(QString::fromUtf8("DialogPrivateMessaging"));
+            DialogPrivateMessaging->setObjectName(QStringLiteral("DialogPrivateMessaging"));
         DialogPrivateMessaging->resize(509, 382);
         DialogPrivateMessaging->setMinimumSize(QSize(400, 286));
         gridLayout = new QGridLayout(DialogPrivateMessaging);
-        gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
+        gridLayout->setObjectName(QStringLiteral("gridLayout"));
         label = new QLabel(DialogPrivateMessaging);
-        label->setObjectName(QString::fromUtf8("label"));
+        label->setObjectName(QStringLiteral("label"));
 
         gridLayout->addWidget(label, 0, 0, 1, 1);
 
         lineEdit = new QLineEdit(DialogPrivateMessaging);
-        lineEdit->setObjectName(QString::fromUtf8("lineEdit"));
+        lineEdit->setObjectName(QStringLiteral("lineEdit"));
 
         gridLayout->addWidget(lineEdit, 2, 0, 1, 1);
 
         textEdit = new QTextBrowser(DialogPrivateMessaging);
-        textEdit->setObjectName(QString::fromUtf8("textEdit"));
+        textEdit->setObjectName(QStringLiteral("textEdit"));
         textEdit->setOpenExternalLinks(true);
 
         gridLayout->addWidget(textEdit, 1, 0, 1, 1);
@@ -63,8 +62,8 @@ public:
 
     void retranslateUi(QDialog *DialogPrivateMessaging)
     {
-        DialogPrivateMessaging->setWindowTitle(QApplication::translate("DialogPrivateMessaging", "Dialog", 0, QApplication::UnicodeUTF8));
-        label->setText(QApplication::translate("DialogPrivateMessaging", "Private messages with: ", 0, QApplication::UnicodeUTF8));
+        DialogPrivateMessaging->setWindowTitle(QApplication::translate("DialogPrivateMessaging", "Dialog", 0));
+        label->setText(QApplication::translate("DialogPrivateMessaging", "Private messages with: ", 0));
     } // retranslateUi
 
 };

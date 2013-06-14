@@ -44,7 +44,7 @@ void DialogPrivateMessaging::sendMessage() {
         QSettings settings("mir", "contra");
         connection->sendPMToUser(uid, ui->lineEdit->text());
         ui->textEdit->moveCursor(QTextCursor::End);
-        QStringList words = Qt::escape(ui->lineEdit->text()).split(" ");
+        QStringList words = ui->lineEdit->text().split(" ");
         QStringList newWords;
         for(int i=0; i<words.size(); i++) {
             if(words.at(i).startsWith("www.")) {
@@ -73,7 +73,7 @@ void DialogPrivateMessaging::sendMessage() {
 
 void DialogPrivateMessaging::gotMessage(QString m) {
     ui->textEdit->moveCursor(QTextCursor::End);
-    QStringList words = Qt::escape(m).split(" ");
+    QStringList words = m.split(" ");
     QStringList newWords;
     for(int i=0; i<words.size(); i++) {
         if(words.at(i).startsWith("www.")) {

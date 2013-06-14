@@ -20,9 +20,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QSettings settings("mir", "Contra");
     if(settings.value("JapaneseMode", false).toBool()) {
-        QTextCodec::setCodecForCStrings(QTextCodec::codecForName("Shift-JIS"));
+        //QTextCodec::setCodecForCStrings(QTextCodec::codecForName("Shift-JIS"));
     } else {
-        QTextCodec::setCodecForCStrings(QTextCodec::codecForName("Apple Roman"));
+        //QTextCodec::setCodecForCStrings(QTextCodec::codecForName("Apple Roman"));
     }
 
     connection = new ConnectionController();

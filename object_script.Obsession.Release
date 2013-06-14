@@ -28,6 +28,7 @@ INPUT(
 ./release\dialoguploadsqueue.o
 ./release\widgetconsole.o
 ./release\dialoguserinfo.o
+./release\qrc_resources.o
 ./release\moc_mainwindow.o
 ./release\moc_connectioncontroller.o
 ./release\moc_dialogopenconnection.o
@@ -54,5 +55,4 @@ INPUT(
 ./release\moc_dialoguploadsqueue.o
 ./release\moc_widgetconsole.o
 ./release\moc_dialoguserinfo.o
-./release\qrc_resources.o
 );

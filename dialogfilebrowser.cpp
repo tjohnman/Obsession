@@ -2,6 +2,7 @@
 #include "ui_dialogfilebrowser.h"
 #include "CTransaction.h"
 #include <QTextStream>
+#include <QMimeData>
 #include <QFileDialog>
 #include <QUrl>
 
@@ -21,8 +22,6 @@ DialogFileBrowser::DialogFileBrowser(ConnectionController * c, QWidget *parent) 
     setAcceptDrops(true);
     setAcceptDrops(false);
     ui->treeWidget->setAcceptDrops(false);
-
-    ui->treeWidget->header()->setResizeMode(0, QHeaderView::ResizeToContents);
 }
 
 void DialogFileBrowser::dragEnterEvent(QDragEnterEvent *event){
@@ -86,8 +85,8 @@ void DialogFileBrowser::load() {
             unsigned char len = level.length();
             qDebug() << "Writing name length... " << (unsigned short) len;
             memcpy(pathdata+offset+4, &len, 1);
-            qDebug() << level.toAscii().data();
-            memcpy(pathdata+offset+5, level.toAscii().data(), len);
+            qDebug() << level.toLocal8Bit().data();
+            memcpy(pathdata+offset+5, level.toLocal8Bit().data(), len);
             offset += 3+len;
         }
 
@@ -343,7 +342,7 @@ void DialogFileBrowser::selectFileToUpload() {
 
 void DialogFileBrowser::requestUpload() {
     CTransaction * uploadRequest = connection->createTransaction(203);
-    uploadRequest->addParameter(201, uploadedFile.fileName().split("/").last().length(), uploadedFile.fileName().split("/").last().toAscii().data());
+    uploadRequest->addParameter(201, uploadedFile.fileName().split("/").last().length(), uploadedFile.fileName().split("/").last().toLocal8Bit().data());
 
     if(!path.endsWith("/")) {
         path.append("/");
@@ -374,8 +373,8 @@ void DialogFileBrowser::requestUpload() {
         unsigned char len = level.length();
         qDebug() << "Writing name length... " << (unsigned short) len;
         memcpy(pathdata+offset+4, &len, 1);
-        qDebug() << level.toAscii().data();
-        memcpy(pathdata+offset+5, level.toAscii().data(), len);
+        qDebug() << level.toLocal8Bit().data();
+        memcpy(pathdata+offset+5, level.toLocal8Bit().data(), len);
         offset += 3+len;
     }
     uploadRequest->addParameter(202, pathlen, pathdata);

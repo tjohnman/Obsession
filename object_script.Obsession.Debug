@@ -28,6 +28,7 @@ INPUT(
 ./debug\dialoguploadsqueue.o
 ./debug\widgetconsole.o
 ./debug\dialoguserinfo.o
+./debug\qrc_resources.o
 ./debug\moc_mainwindow.o
 ./debug\moc_connectioncontroller.o
 ./debug\moc_dialogopenconnection.o
@@ -54,5 +55,4 @@ INPUT(
 ./debug\moc_dialoguploadsqueue.o
 ./debug\moc_widgetconsole.o
 ./debug\moc_dialoguserinfo.o
-./debug\qrc_resources.o
 );

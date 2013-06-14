@@ -1,8 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'dialogabout.ui'
 **
-** Created: Sat 23. Apr 02:46:06 2011
-**      by: Qt User Interface Compiler version 4.6.2
+** Created by: Qt User Interface Compiler version 5.0.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -11,14 +10,14 @@
 #define UI_DIALOGABOUT_H
 
 #include <QtCore/QVariant>
-#include <QtGui/QAction>
-#include <QtGui/QApplication>
-#include <QtGui/QButtonGroup>
-#include <QtGui/QDialog>
-#include <QtGui/QGridLayout>
-#include <QtGui/QHeaderView>
-#include <QtGui/QLabel>
-#include <QtGui/QSpacerItem>
+#include <QtWidgets/QAction>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QButtonGroup>
+#include <QtWidgets/QDialog>
+#include <QtWidgets/QGridLayout>
+#include <QtWidgets/QHeaderView>
+#include <QtWidgets/QLabel>
+#include <QtWidgets/QSpacerItem>
 
 QT_BEGIN_NAMESPACE
 
@@ -38,7 +37,7 @@ public:
     void setupUi(QDialog *DialogAbout)
     {
         if (DialogAbout->objectName().isEmpty())
-            DialogAbout->setObjectName(QString::fromUtf8("DialogAbout"));
+            DialogAbout->setObjectName(QStringLiteral("DialogAbout"));
         DialogAbout->setWindowModality(Qt::ApplicationModal);
         DialogAbout->resize(400, 233);
         QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
@@ -59,13 +58,13 @@ public:
         palette.setBrush(QPalette::Disabled, QPalette::Window, brush);
         DialogAbout->setPalette(palette);
         gridLayout = new QGridLayout(DialogAbout);
-        gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
+        gridLayout->setObjectName(QStringLiteral("gridLayout"));
         horizontalSpacer = new QSpacerItem(107, 123, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
         gridLayout->addItem(horizontalSpacer, 0, 0, 1, 1);
 
         label_5 = new QLabel(DialogAbout);
-        label_5->setObjectName(QString::fromUtf8("label_5"));
+        label_5->setObjectName(QStringLiteral("label_5"));
         sizePolicy.setHeightForWidth(label_5->sizePolicy().hasHeightForWidth());
         label_5->setSizePolicy(sizePolicy);
         label_5->setMinimumSize(QSize(150, 70));
@@ -79,9 +78,9 @@ public:
         gridLayout->addItem(horizontalSpacer_2, 0, 2, 1, 1);
 
         label = new QLabel(DialogAbout);
-        label->setObjectName(QString::fromUtf8("label"));
+        label->setObjectName(QStringLiteral("label"));
         QFont font;
-        font.setFamily(QString::fromUtf8("Calibri"));
+        font.setFamily(QStringLiteral("Calibri"));
         font.setPointSize(11);
         font.setBold(false);
         font.setWeight(50);
@@ -91,9 +90,9 @@ public:
         gridLayout->addWidget(label, 1, 0, 1, 3);
 
         label_2 = new QLabel(DialogAbout);
-        label_2->setObjectName(QString::fromUtf8("label_2"));
+        label_2->setObjectName(QStringLiteral("label_2"));
         QFont font1;
-        font1.setFamily(QString::fromUtf8("Calibri"));
+        font1.setFamily(QStringLiteral("Calibri"));
         font1.setPointSize(8);
         font1.setBold(false);
         font1.setWeight(50);
@@ -107,9 +106,9 @@ public:
         gridLayout->addItem(verticalSpacer, 3, 0, 1, 3);
 
         label_3 = new QLabel(DialogAbout);
-        label_3->setObjectName(QString::fromUtf8("label_3"));
+        label_3->setObjectName(QStringLiteral("label_3"));
         QFont font2;
-        font2.setFamily(QString::fromUtf8("Calibri"));
+        font2.setFamily(QStringLiteral("Calibri"));
         font2.setPointSize(9);
         font2.setBold(false);
         font2.setWeight(50);
@@ -119,7 +118,7 @@ public:
         gridLayout->addWidget(label_3, 4, 0, 1, 3);
 
         label_4 = new QLabel(DialogAbout);
-        label_4->setObjectName(QString::fromUtf8("label_4"));
+        label_4->setObjectName(QStringLiteral("label_4"));
         label_4->setFont(font2);
         label_4->setAlignment(Qt::AlignCenter);
 
@@ -133,15 +132,15 @@ public:
 
     void retranslateUi(QDialog *DialogAbout)
     {
-        DialogAbout->setWindowTitle(QApplication::translate("DialogAbout", "About Obsession", 0, QApplication::UnicodeUTF8));
+        DialogAbout->setWindowTitle(QApplication::translate("DialogAbout", "About Obsession", 0));
 #ifndef QT_NO_TOOLTIP
-        label_5->setToolTip(QApplication::translate("DialogAbout", "Images in dialogs are so 90s!", 0, QApplication::UnicodeUTF8));
+        label_5->setToolTip(QApplication::translate("DialogAbout", "Images in dialogs are so 90s!", 0));
 #endif // QT_NO_TOOLTIP
         label_5->setText(QString());
-        label->setText(QApplication::translate("DialogAbout", "Obsession Hotline Client a106.2", 0, QApplication::UnicodeUTF8));
-        label_2->setText(QApplication::translate("DialogAbout", "by mir", 0, QApplication::UnicodeUTF8));
-        label_3->setText(QApplication::translate("DialogAbout", "Special thanks to Cap n' Hack, Epo, tre. and all the people", 0, QApplication::UnicodeUTF8));
-        label_4->setText(QApplication::translate("DialogAbout", "at Digital Obsession for their help and support.", 0, QApplication::UnicodeUTF8));
+        label->setText(QApplication::translate("DialogAbout", "Obsession Hotline Client a106.2", 0));
+        label_2->setText(QApplication::translate("DialogAbout", "by mir", 0));
+        label_3->setText(QApplication::translate("DialogAbout", "Special thanks to Cap n' Hack, Epo, tre. and all the people", 0));
+        label_4->setText(QApplication::translate("DialogAbout", "at Digital Obsession for their help and support.", 0));
     } // retranslateUi
 
 };

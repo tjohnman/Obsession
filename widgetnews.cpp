@@ -79,8 +79,8 @@ void WidgetNews::getNews() {
                 unsigned char len = level.length();
                 qDebug() << "Writing name length... " << (unsigned short) len;
                 memcpy(pathdata+offset+4, &len, 1);
-                qDebug() << level.toAscii().data();
-                memcpy(pathdata+offset+5, level.toAscii().data(), len);
+                qDebug() << level.toLocal8Bit().data();
+                memcpy(pathdata+offset+5, level.toLocal8Bit().data(), len);
                 offset += 3+len;
             }
 

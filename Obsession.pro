@@ -1,7 +1,8 @@
 # -------------------------------------------------
 # Project created by QtCreator 2010-03-23T06:24:26
 # -------------------------------------------------
-QT += network
+QT += core gui network
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets multimedia
 TARGET = Obsession
 TEMPLATE = app
 SOURCES += main.cpp \

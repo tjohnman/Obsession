@@ -1,8 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'dialogtrackers.ui'
 **
-** Created: Thu 21. Oct 04:13:21 2010
-**      by: Qt User Interface Compiler version 4.6.2
+** Created by: Qt User Interface Compiler version 5.0.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -11,17 +10,17 @@
 #define UI_DIALOGTRACKERS_H
 
 #include <QtCore/QVariant>
-#include <QtGui/QAction>
-#include <QtGui/QApplication>
-#include <QtGui/QButtonGroup>
-#include <QtGui/QComboBox>
-#include <QtGui/QDialog>
-#include <QtGui/QGridLayout>
-#include <QtGui/QHeaderView>
-#include <QtGui/QLabel>
-#include <QtGui/QPushButton>
-#include <QtGui/QSpacerItem>
-#include <QtGui/QTreeWidget>
+#include <QtWidgets/QAction>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QButtonGroup>
+#include <QtWidgets/QComboBox>
+#include <QtWidgets/QDialog>
+#include <QtWidgets/QGridLayout>
+#include <QtWidgets/QHeaderView>
+#include <QtWidgets/QLabel>
+#include <QtWidgets/QPushButton>
+#include <QtWidgets/QSpacerItem>
+#include <QtWidgets/QTreeWidget>
 
 QT_BEGIN_NAMESPACE
 
@@ -41,14 +40,14 @@ public:
     void setupUi(QDialog *DialogTrackers)
     {
         if (DialogTrackers->objectName().isEmpty())
-            DialogTrackers->setObjectName(QString::fromUtf8("DialogTrackers"));
+            DialogTrackers->setObjectName(QStringLiteral("DialogTrackers"));
         DialogTrackers->setWindowModality(Qt::ApplicationModal);
         DialogTrackers->resize(691, 418);
         DialogTrackers->setMinimumSize(QSize(640, 337));
         gridLayout = new QGridLayout(DialogTrackers);
-        gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
+        gridLayout->setObjectName(QStringLiteral("gridLayout"));
         comboBox = new QComboBox(DialogTrackers);
-        comboBox->setObjectName(QString::fromUtf8("comboBox"));
+        comboBox->setObjectName(QStringLiteral("comboBox"));
         QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
@@ -58,7 +57,7 @@ public:
         gridLayout->addWidget(comboBox, 0, 0, 1, 3);
 
         label = new QLabel(DialogTrackers);
-        label->setObjectName(QString::fromUtf8("label"));
+        label->setObjectName(QStringLiteral("label"));
         label->setTextFormat(Qt::PlainText);
         label->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
 
@@ -68,7 +67,7 @@ public:
         QTreeWidgetItem *__qtreewidgetitem = new QTreeWidgetItem();
         __qtreewidgetitem->setTextAlignment(1, Qt::AlignHCenter|Qt::AlignVCenter|Qt::AlignCenter);
         treeWidget->setHeaderItem(__qtreewidgetitem);
-        treeWidget->setObjectName(QString::fromUtf8("treeWidget"));
+        treeWidget->setObjectName(QStringLiteral("treeWidget"));
         QFont font;
         font.setPointSize(8);
         treeWidget->setFont(font);
@@ -82,13 +81,13 @@ public:
         gridLayout->addWidget(treeWidget, 1, 0, 1, 7);
 
         pushButton = new QPushButton(DialogTrackers);
-        pushButton->setObjectName(QString::fromUtf8("pushButton"));
+        pushButton->setObjectName(QStringLiteral("pushButton"));
         pushButton->setMinimumSize(QSize(100, 0));
 
         gridLayout->addWidget(pushButton, 2, 0, 1, 1);
 
         pushButton_2 = new QPushButton(DialogTrackers);
-        pushButton_2->setObjectName(QString::fromUtf8("pushButton_2"));
+        pushButton_2->setObjectName(QStringLiteral("pushButton_2"));
         pushButton_2->setEnabled(true);
 
         gridLayout->addWidget(pushButton_2, 2, 1, 1, 1);
@@ -98,19 +97,19 @@ public:
         gridLayout->addItem(horizontalSpacer, 2, 2, 1, 4);
 
         pushButton_3 = new QPushButton(DialogTrackers);
-        pushButton_3->setObjectName(QString::fromUtf8("pushButton_3"));
+        pushButton_3->setObjectName(QStringLiteral("pushButton_3"));
 
         gridLayout->addWidget(pushButton_3, 2, 6, 1, 1);
 
         buttonRefresh = new QPushButton(DialogTrackers);
-        buttonRefresh->setObjectName(QString::fromUtf8("buttonRefresh"));
+        buttonRefresh->setObjectName(QStringLiteral("buttonRefresh"));
         QSizePolicy sizePolicy1(QSizePolicy::Fixed, QSizePolicy::Fixed);
         sizePolicy1.setHorizontalStretch(0);
         sizePolicy1.setVerticalStretch(0);
         sizePolicy1.setHeightForWidth(buttonRefresh->sizePolicy().hasHeightForWidth());
         buttonRefresh->setSizePolicy(sizePolicy1);
         QIcon icon;
-        icon.addFile(QString::fromUtf8(":/general/interfaceIcons/generalRefresh.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon.addFile(QStringLiteral(":/general/interfaceIcons/generalRefresh.png"), QSize(), QIcon::Normal, QIcon::Off);
         buttonRefresh->setIcon(icon);
         buttonRefresh->setIconSize(QSize(16, 16));
 
@@ -124,15 +123,15 @@ public:
 
     void retranslateUi(QDialog *DialogTrackers)
     {
-        DialogTrackers->setWindowTitle(QApplication::translate("DialogTrackers", "Trackers", 0, QApplication::UnicodeUTF8));
-        label->setText(QApplication::translate("DialogTrackers", "0 servers", 0, QApplication::UnicodeUTF8));
+        DialogTrackers->setWindowTitle(QApplication::translate("DialogTrackers", "Trackers", 0));
+        label->setText(QApplication::translate("DialogTrackers", "0 servers", 0));
         QTreeWidgetItem *___qtreewidgetitem = treeWidget->headerItem();
-        ___qtreewidgetitem->setText(2, QApplication::translate("DialogTrackers", "Description", 0, QApplication::UnicodeUTF8));
-        ___qtreewidgetitem->setText(1, QApplication::translate("DialogTrackers", "Users", 0, QApplication::UnicodeUTF8));
-        ___qtreewidgetitem->setText(0, QApplication::translate("DialogTrackers", "Name", 0, QApplication::UnicodeUTF8));
-        pushButton->setText(QApplication::translate("DialogTrackers", "Add tracker...", 0, QApplication::UnicodeUTF8));
-        pushButton_2->setText(QApplication::translate("DialogTrackers", "Remove", 0, QApplication::UnicodeUTF8));
-        pushButton_3->setText(QApplication::translate("DialogTrackers", "Connect...", 0, QApplication::UnicodeUTF8));
+        ___qtreewidgetitem->setText(2, QApplication::translate("DialogTrackers", "Description", 0));
+        ___qtreewidgetitem->setText(1, QApplication::translate("DialogTrackers", "Users", 0));
+        ___qtreewidgetitem->setText(0, QApplication::translate("DialogTrackers", "Name", 0));
+        pushButton->setText(QApplication::translate("DialogTrackers", "Add tracker...", 0));
+        pushButton_2->setText(QApplication::translate("DialogTrackers", "Remove", 0));
+        pushButton_3->setText(QApplication::translate("DialogTrackers", "Connect...", 0));
         buttonRefresh->setText(QString());
     } // retranslateUi
 
