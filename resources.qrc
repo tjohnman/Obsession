@@ -1,0 +1,40 @@
+<RCC>
+    <qresource prefix="/files">
+        <file>interfaceIcons/filesDelete.png</file>
+        <file>interfaceIcons/filesDownload.png</file>
+        <file>interfaceIcons/filesUp.png</file>
+        <file>interfaceIcons/filesUpload.png</file>
+        <file>interfaceIcons/filesFolder.png</file>
+        <file>interfaceIcons/filesText.png</file>
+        <file>interfaceIcons/filesUnknown.png</file>
+        <file>interfaceIcons/filesArchive.png</file>
+        <file>interfaceIcons/filesExe.png</file>
+        <file>interfaceIcons/filesImage.png</file>
+        <file>interfaceIcons/filesDocument.png</file>
+        <file>interfaceIcons/filesVideo.png</file>
+        <file>interfaceIcons/filesAudio.png</file>
+        <file>interfaceIcons/filesIso.png</file>
+        <file>interfaceIcons/filesPartial.png</file>
+    </qresource>
+    <qresource prefix="/general">
+        <file>interfaceIcons/generalRefresh.png</file>
+        <file>interfaceIcons/filesDiskImage.png</file>
+        <file>interfaceIcons/filesPartial.png</file>
+        <file>interfaceIcons/generalStop.png</file>
+        <file>interfaceIcons/generalClean.png</file>
+        <file>interfaceIcons/generalGo.png</file>
+        <file>interfaceIcons/generalQueue.png</file>
+    </qresource>
+    <qresource prefix="/main">
+        <file>interfaceIcons/mainClose.png</file>
+        <file>interfaceIcons/mainConnect.png</file>
+        <file>interfaceIcons/mainDisconnect.png</file>
+        <file>interfaceIcons/mainNew.png</file>
+        <file>interfaceIcons/mainTrackers.png</file>
+        <file>interfaceIcons/eye.png</file>
+    </qresource>
+    <qresource prefix="/news">
+        <file>interfaceIcons/newsCategory.png</file>
+        <file>interfaceIcons/newsItem.png</file>
+    </qresource>
+</RCC>

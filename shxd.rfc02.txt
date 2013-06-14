@@ -1,0 +1,165 @@
+UPDATE: The following feature has been implemented accurately in Heidrun
+(Gyran's Hotline Client programmed in Cocoa for Mac OS X).
+
+
+
+Synapse Hotline X Daemon                                     Devin Teske
+Request for Comments: 2                                       Revision 2
+Category: Informational                                         Re: shxd
+                                                            October 2001
+
+
+                      Guidelines for 8-bit Colors
+                          in Client User List
+
+Status of this Memo
+
+   This memo provides information for the Internet community.  This memo
+   does not specify an Internet standard of any kind.  Distribution of
+   this memo is unlimited.
+
+Abstract
+
+   This memo specifies guidelines for implementors and users of the
+   hotline protocol and how to add support in hotline clients for 8-bit
+   color names in the user list.
+
+Acknowledgements
+
+   This memo is the result of thinking straight.
+
+1.  Introduction
+
+   The support for colored names in hotline clients and servers is very
+   limited now and could use an update. I propose a very intuitive,
+   backwards compatible solution that will add 8-bit color support to
+   user nicknames in the user list of hotline clients.
+
+2.  Summary of Recommendations
+
+   Colored user names should be rendered by the client and more colors
+   should be supported by the server (ie. blue for a user that cannot be
+   disconnected).
+
+3.  Implementing 8-bit color names over hotline clients
+
+   When hotline 1.0 protocol debuted there was support for 4 color
+   names. Derived from a set of 2 bits used in a 16 bit integer. The
+   first bit from the right denoted the persons away status. The second
+   bit from the right denoted the admin status of the person.
+
+   When the hotline 1.5 protocol debuted, the number of colors expanded
+   to 16 colors. Derived from a set of 4 bits used in a 16 bit integer.
+   The first bit from the right denotes the away status of the person,
+   the second bit from the right denotes the admin status of the person,
+   the third bit from the right denotes whether the person is accepting
+   private messages, and the fourth bit from the right denotes whether
+   the person is accepting private chat invitations.
+
+   Currently the 1.5 protocol has not been expanded upon and color
+   remains a set of 4 used bits and 12 unused bits (far left).
+
+   Clients of the 1.5 protocol ignore all the bits to the left of the
+   first 4 and all clients using the 1.0 protocol ignore all bits to the
+   left of the first 2.
+
+   Since the color is a 16 bit integer there is room for additions. the
+   far left bits are unused by both the protocol and clients. All
+   servers currently retain all bits of the color property so there is
+   no risk of losing outer bits.
+
+   To add 8-bit color support to the client we utilize the outer 8 bits
+   of the color. This leaves the first byte of color designated to be
+   the color information with support for up to 256 colors and the other
+   byte for boolean bits used for tracking special features.
+
+   When the server passes a color with 0's for the first left 8 bits,
+   the client should render the color of the username based on the right
+   2 bits if using the 1.0 protocol or the right 4 bits if using the 1.5
+   protocol. This is because there is a chance that the client is on a
+   server that does not support the color bits and passes nothing for
+   the first 8 or so left bits. 
+
+4.  Detailed information
+
+   In order to implement an 8-bit color system, I suggest using the mac-
+   intosh clut resource structure. On the Macintosh, simply create a
+   resource of type `clut' with 256 colors in the program's resource
+   tree. Then you simple, grab the left 8 (out of 16) bits of the color,
+   convert it into decimal, then map it to the clut resource, decipher
+   the color value as it appears in the clut resource (by default they
+   are stored as 16-bit RGB colors).
+
+   When it comes time to draw the name in the color, there are a few
+   things you need to take into consideration. First, if the color is
+   zero then you should draw the name black when the admin bit is zero
+   and red if the admin bit is one (basically ignoring clut mapping).
+   This is because older servers that do not support 8-bit color names
+   will send the left-most 8 bits as all zeroes. So when you encounter
+   such a scenario, you should rely on the right 4 bits (no private-
+   chat, no private-message, admin and away) to draw the user's name.
+
+   When the color has a non-zero decimal value you should store the
+   clut-mapped color in a variable associated in some way with the user.
+   In this case, you should always ignore the admin bit when drawing the
+   name. If the away bit is false then you should simply draw the user's
+   name in the specified color. If the user's away bit is true, then you
+   should do an 8-bit mask with white over the color at 50% alpha trans-
+   parency. The easiest way to do this is by manipulating the RGB
+   values.
+
+   For example: if the color for non-away users is black (0x000000),
+   take the difference of each bit in the hexadecimal array and the
+   equivalent white counterpart. Divide the difference by two, and add
+   it back to the original hexadecimal.
+
+   Example A: (8-bit masking)   0x000000 (black)
+                                0xFFFFFF (white) <constant>
+                                --------
+                                0xFFFFFF (8-bit difference)
+                                --------
+                                0x777777 (8-bit quotient) (round down)
+                                0x000000 (add back to original)
+                                --------
+                                0x777777 (result) (away color)
+
+
+   Example B: (8-bit masking)   0xA7D5B3
+                                0xFFFFFF (white) <constant>
+                                --------
+                                0x582A4C (8-bit difference)
+                                --------
+                                0x241526 (8-bit quotient)
+                                0xA7D5B3 (add back to original)
+                                --------
+                                0xCBEAD9 (result) (away color)
+
+
+   The formula is `f(x) = x + floor((0xF - x) / 2)' where x is a single
+   byte and `0xF' is 15 in decimal. The function produces another RGB
+   set that achieves the look of being `greyed out' by blending it with
+   a fifty percent mixture of white. So that's how you calculate the
+   color the person is when they are away.
+
+   This method for calculating the away color works on the normal colors
+   too. This is how the official client calculates it. It uses this same
+   method for turning black into gray and red into what some would call
+   a `pink'.
+
+   It would also benefit the users of your client if you do not include
+   the same color that appears behind the user list in your color table
+   (clut resource) for color names. That way, it is not possible to have
+   a user name blend in perfectly with the background giving him the
+   affect of having no name.
+
+   One more note: that the away color can either be calculated on the
+   fly or stored in a variable, but if it's stored in a variable don't
+   forget to update it when the user's color is changed via a
+   USER_CHANGE transaction being sent to the client.
+
+5.  Conclusion
+
+   This is completely backwards compatible and capable of still being
+   expanded upon. After this is in effect, 12 out of 16 bits of the
+   integer will be in use, leaving the 5th thry 8th bits from the right
+   unused and capable of being expanded upon.

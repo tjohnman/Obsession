@@ -1,0 +1,40 @@
+  Cap'n Hack  . ok
+          mir . I'm all ears, as we say in here
+  Cap'n Hack  . so, in the user change event we do a check for a new users icon number. if its 3520 then that means it can do CET
+  Cap'n Hack  . 
+  Cap'n Hack  . 
+  Cap'n Hack  . bug in my priv chat window bah
+  Cap'n Hack  . now, once we know theres a user we have to store that info. i just stick it in a new hidden column in the userlist listbox cos thats easiest. then we send a priv msg to that user
+  Cap'n Hack  . the priv msg has to consist of CETi in string form, then a short of 1, then a short for the length of your ip addie, then the ip addie as a string
+          mir . "CETi", is that right?
+  Cap'n Hack  . yuea
+  Cap'n Hack  . *yea
+          mir . k please continue
+  Cap'n Hack  . ok so then you have each new CET users ip addie
+  Cap'n Hack  . now, to avoid messaging everyone on the server, any CET client will message any other CET client as soon as it joins so we get a kinda mesh of private msgs going
+  Cap'n Hack  . 
+  Cap'n Hack  . so when your client gets the CETi msg it grabs the ip addie from it and matches it with the senders user id (socket id, whatever you wanna call it). then we send a msg back containing CETr and a short of 1 and a short for ip length and the ip
+          mir . ok
+  Cap'n Hack  . 
+  Cap'n Hack  . so the first msg is always the CETi one, the reply to that is always the CETr one. if you get a CETi msg you need to reply, if you get a CETr one you dont reply
+          mir . what about that short before the ip length?
+  Cap'n Hack  . theres another set of messages used to set up file transfers, and the first one is..
+  Cap'n Hack  . thats just an identifier so we dont accidentally try to parse a msg that innocently begins with CETi/r/u/etc
+  Cap'n Hack  . 
+  Cap'n Hack  . 
+          mir . does it have a value in particular?
+  Cap'n Hack  . just a value of 1
+          mir . k
+  Cap'n Hack  . now it gets a bit complex
+  Cap'n Hack  . clicking the CET upload button in xcc will open a socket thats waiting to send to the ip of the user you have selected. it then sends a priv msg containing CETu, a short of 1 again, a short containing a window id number to differentiate transfers, a short of the filename length, the filename, and a uint64 of the files length
+  Cap'n Hack  . these transfers use port 13520
+ <<< mir is now known as mir - test >>>
+ <<< mir - test is now known as mir >>>
+          mir . yes?
+  Cap'n Hack  . once you get a CETu message, you parse it to get all the data out and put up a prompt to tell the user that someones requesting to upload a file to them. if they accept, you also open a socket thats listening on that port and you send another private msg containing CETd, short of 1, short of the same window id you were sent, and another short of 1
+  Cap'n Hack  . 
+  Cap'n Hack  . when the uploading client receives the CETd msg they connect their socket and the transfer starts. if the last short of 1 in there is a 0 it means the other person denied it and you need to shut down
+  Cap'n Hack  . 
+  Cap'n Hack  . and from there the sockets take over just sending data as usual until the transfer is completed. you can have it autoresume if a file with the same name exists already and whatever else
+          mir . genius
+  Cap'n Hack  . oh and you might wanna introduce a delay of a second or so between sending priv msgs so the server doesnt think youre spamming
