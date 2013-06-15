@@ -295,6 +295,10 @@ void DialogFileBrowser::onGotFileList(std::vector<s_hotlineFile *> list) {
     }
     ui->label->setText(QString::number(list.size())+" items");
     ui->treeWidget->setEnabled(true);
+    for(int i=0; i<ui->treeWidget->columnCount(); ++i)
+    {
+        ui->treeWidget->resizeColumnToContents(i);
+    }
 }
 
 void DialogFileBrowser::goDirectoryUp() {
