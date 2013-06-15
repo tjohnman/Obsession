@@ -12,7 +12,7 @@ Make sure to also grab the [executable file](http://www.sumamimasen.com/obsessio
 
 Getting updates
 ---------------
-Normally you want to get the [executable file](http://www.sumamimasen.com/obsession/Obsession.exe) and copy it over the older version. Should a version require a redownload of the directory structure a special notice will be posted here.
+The client will connect to the Internet and check for updates on launch. If there is a new update you will be prompted and sent here if desired. Normally you want to get the [executable file](http://www.sumamimasen.com/obsession/Obsession.exe) and copy it over the older version. Should a version require a redownload of the directory structure a special notice will be posted here.
 
 What works
 ----------
