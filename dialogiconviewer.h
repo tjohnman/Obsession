@@ -3,6 +3,12 @@
 
 #include <QDialog>
 #include <QModelIndex>
+#include <QDir>
+#include <QImage>
+#include <QListWidgetItem>
+#include <QDebug>
+#include <QThread>
+#include <QSettings>
 
 namespace Ui {
     class DialogIconViewer;
@@ -13,6 +19,10 @@ class DialogIconViewer : public QDialog {
 public:
     DialogIconViewer(QWidget *parent = 0);
     ~DialogIconViewer();
+
+public slots:
+    void updateProgress(int n, QListWidgetItem * item);
+    void startIconCount(int);
 
 protected:
     void changeEvent(QEvent *e);

@@ -1,33 +1,6 @@
 #include "dialogiconviewer.h"
 #include "ui_dialogiconviewer.h"
-#include <QDir>
-#include <QImage>
-#include <QListWidgetItem>
-#include <QDebug>
-#include <QThread>
-#include <QSettings>
-
-
-class LoaderThread : public QThread {
-public:
-    Ui::DialogIconViewer * ui;
-    void run() {
-        QDir iconsFolder = QDir("icons");
-        qDebug() << QDir::currentPath();
-        qDebug() << "Loading" << iconsFolder.count() << "icons...";
-        QFileInfoList fileList = iconsFolder.entryInfoList();
-        ui->progressBar->setMaximum(iconsFolder.count()-2);
-        ui->progressBar->setValue(0);
-        for(unsigned int i=2; i<iconsFolder.count(); i++) {
-            QListWidgetItem * item = new QListWidgetItem();
-            item->setSizeHint(QSize(232, 18));
-            item->setIcon(QIcon(QPixmap::fromImage(QImage(fileList[i].absoluteFilePath()))));
-            item->setData(Qt::DisplayRole, fileList[i].fileName());
-            ui->listWidget->addItem(item);
-            ui->progressBar->setValue(i);
-        }
-    }
-};
+#include "threadiconloader.h"
 
 DialogIconViewer::DialogIconViewer(QWidget *parent) :
     QDialog(parent),
@@ -36,11 +9,13 @@ DialogIconViewer::DialogIconViewer(QWidget *parent) :
     ui->setupUi(this);
     ui->listWidget->setIconSize(QSize(232, 18));
 
-    LoaderThread * loaderThread = new LoaderThread();
-    loaderThread->ui = ui;
-    loaderThread->start();
+    ThreadIconLoader * loaderThread = new ThreadIconLoader();
 
+    connect(loaderThread, SIGNAL(startIconCount(int)), this, SLOT(startIconCount(int)));
+    connect(loaderThread, SIGNAL(loadedItem(int, QListWidgetItem *)), this, SLOT(updateProgress(int, QListWidgetItem *)));
     connect(ui->listWidget, SIGNAL(clicked(QModelIndex)), this, SLOT(onClicked(QModelIndex)));
+
+    loaderThread->start();
 }
 
 void DialogIconViewer::onClicked(QModelIndex model) {
@@ -52,6 +27,18 @@ void DialogIconViewer::onClicked(QModelIndex model) {
     settings.setValue("icon", name);
     qDebug() << name.toShort();
     emit iconChanged();
+}
+
+void DialogIconViewer::updateProgress(int n, QListWidgetItem * item)
+{
+    ui->listWidget->addItem(item);
+    ui->progressBar->setValue(n);
+}
+
+void DialogIconViewer::startIconCount(int n)
+{
+    ui->progressBar->setMaximum(n);
+    ui->progressBar->setValue(0);
 }
 
 DialogIconViewer::~DialogIconViewer()

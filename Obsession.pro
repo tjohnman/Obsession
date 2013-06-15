@@ -33,7 +33,8 @@ SOURCES += main.cpp \
     cupload.cpp \
     dialoguploadsqueue.cpp \
     widgetconsole.cpp \
-    dialoguserinfo.cpp
+    dialoguserinfo.cpp \
+    threadiconloader.cpp
 HEADERS += mainwindow.h \
     ctransaction.h \
     defines.h \
@@ -62,7 +63,8 @@ HEADERS += mainwindow.h \
     cupload.h \
     dialoguploadsqueue.h \
     widgetconsole.h \
-    dialoguserinfo.h
+    dialoguserinfo.h \
+    threadiconloader.h
 FORMS += mainwindow.ui \
     dialogopenconnection.ui \
     dialogpreferences.ui \
