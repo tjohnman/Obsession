@@ -51,7 +51,7 @@ void DialogOpenConnection::clear() {
     ui->lineEdit->setText("");
     ui->lineEdit_2->setText("");
     ui->lineEdit_3->setText("");
-    setFocusOnLogin();
+    ui->lineEdit->setFocus();
 }
 
 void DialogOpenConnection::setFocusOnLogin() {
@@ -84,6 +84,7 @@ void DialogOpenConnection::choseBookmark() {
     ui->lineEdit->setText(settings.value("bookmarkaddress"+QString::number(current)).toString());
     ui->lineEdit_2->setText(settings.value("bookmarklogin"+QString::number(current)).toString());
     ui->lineEdit_3->setText(settings.value("bookmarkpassword"+QString::number(current)).toString());
+    setFocusOnLogin();
 }
 
 void DialogOpenConnection::updateBookmarkList() {
