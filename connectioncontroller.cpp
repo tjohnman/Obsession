@@ -74,8 +74,8 @@ int ConnectionController::connectToServer(QString address, QString login, QStrin
 
 void ConnectionController::sendTransaction(CTransaction * t, bool expectReply) {
     if(isConnected()) {
-        pSocket.write(t->bytes(), t->length());
-        pSocket.waitForBytesWritten(2000);
+        qint64 written = pSocket.write(t->bytes(), t->length());
+        qDebug() << "Wrote " << written << " bytes.";
         if(expectReply) {
             pPendingTransactions.push_back(t);
         } else {
@@ -93,7 +93,6 @@ void ConnectionController::sendChatText(QString text) {
     CTransaction * chatTransaction = new CTransaction(105, pTaskIDCounter++);
     chatTransaction->addParameter(101, strlen(text.toLocal8Bit().data()), text.toLocal8Bit().data());
     sendTransaction(chatTransaction);
-    delete chatTransaction;
 }
 
 void ConnectionController::sendEmote(QString text) {
@@ -101,7 +100,6 @@ void ConnectionController::sendEmote(QString text) {
     chatTransaction->addParameter(101, text.length(), text.toLocal8Bit().data());
     chatTransaction->addParameter(109, 1);
     sendTransaction(chatTransaction);
-    delete chatTransaction;
 }
 
 void ConnectionController::toggleAFK() {
