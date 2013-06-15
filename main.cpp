@@ -1,23 +1,11 @@
+#define _CRT_SECURE_NO_WARNINGS
+
 #include <QtWidgets/QApplication>
 #include "mainwindow.h"
 #include <QThreadPool>
 #include <iostream>
 
 void kill_threads( void );
-
-void messageOutput(QtMsgType type, const char *msg) {
-    QSettings settings("mir", "Contra");
-    if(settings.value("debugging", false).toBool()) {
-        FILE *debugLog;
-        debugLog = fopen("log.txt", "a");
-        fwrite(QTime::currentTime().toString("hh:mm:ss:zzz' - '").toLocal8Bit(), 15, 1, debugLog);
-        fwrite(msg, 1, strlen(msg), debugLog);
-        fwrite("\n", 1, 1, debugLog);
-        fclose(debugLog);
-    } else {
-        std::cout << msg << "\n";
-    }
-}
 
 int main(int argc, char *argv[])
 {
@@ -28,7 +16,7 @@ int main(int argc, char *argv[])
 
     QApplication a(argc, argv);
     MainWindow w;
-    //qInstallMsgHandler(&messageOutput);
+
     w.show();
     w.openNewConnectionDialog();
     int r = a.exec();

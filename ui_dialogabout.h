@@ -137,7 +137,7 @@ public:
         label_5->setToolTip(QApplication::translate("DialogAbout", "Images in dialogs are so 90s!", 0));
 #endif // QT_NO_TOOLTIP
         label_5->setText(QString());
-        label->setText(QApplication::translate("DialogAbout", "Obsession Hotline Client a106.2", 0));
+        label->setText(QApplication::translate("DialogAbout", "Obsession Hotline Client a107", 0));
         label_2->setText(QApplication::translate("DialogAbout", "by mir", 0));
         label_3->setText(QApplication::translate("DialogAbout", "Special thanks to Cap n' Hack, Epo, tre. and all the people", 0));
         label_4->setText(QApplication::translate("DialogAbout", "at Digital Obsession for their help and support.", 0));

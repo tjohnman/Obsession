@@ -439,7 +439,7 @@ void ConnectionController::onSocketData() {
                                 memcpy(file->name, parameterBuffer->data+20, file->nameSize);
                                 file->name[file->nameSize] = '\0';
 
-                                qDebug() << "Got file " << QString::fromUtf8(file->name) << " (" << file->type << ", " << file->size << "bytes)";
+                                qDebug() << "Got file " << QString(file->name).toLocal8Bit() << " (" << file->type << ", " << file->size << "bytes)";
 
                                 fileList.push_back(file);
                             }
@@ -722,8 +722,8 @@ void ConnectionController::onSocketData() {
 
                             bool isLeap;
 
-                            if(!year%4) {
-                                if(!year%100 && year%400) {
+                            if(year%4 == 0) {
+                                if(year%100 == 0 && year%400 != 0) {
                                     isLeap = false;
                                 } else {
                                     isLeap = true;
