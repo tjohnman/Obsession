@@ -10,6 +10,10 @@ Downloading and installing
 First get the [directory structure](http://www.sumamimasen.com/obsession/ObsessionAlpha-a107.zip). This contains all the dll files needed. It's a big package, but you won't have to download it more than once.
 Make sure to also grab the [executable file](http://www.sumamimasen.com/obsession/Obsession.exe). Place this in the directory you downloaded above and you are good to go. Note that this may be not up to date with the latest code from the repo. I upload regular builds though.
 
+Getting updates
+---------------
+Normally you want to get the [executable file](http://www.sumamimasen.com/obsession/Obsession.exe) and copy it over the older version. Should a version require a redownload of the directory structure a special notice will be posted here.
+
 What works
 ----------
 
