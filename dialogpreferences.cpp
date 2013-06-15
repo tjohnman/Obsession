@@ -17,6 +17,15 @@ DialogPreferences::DialogPreferences(QWidget *parent) :
         ui->checkBox->setChecked(false);
     }
 
+    /*
+     *  TODO: Sort out Japanese support
+     */
+
+    ui->checkBox->setChecked(false);
+    ui->checkBox->setDisabled(true);
+
+    /****/
+
     QFont font;
     font.setFamily(settings.value("fontFamily", "MS Shell Dlg2").toString());
     int style = settings.value("fontStyle", 0).toInt();

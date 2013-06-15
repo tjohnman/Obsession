@@ -88,6 +88,9 @@
    <property name="text">
     <string>Enable Japanese support (Shift-JIS)</string>
    </property>
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
   </widget>
   <widget class="QLabel" name="label_2">
    <property name="geometry">
@@ -146,7 +149,7 @@
     </rect>
    </property>
    <property name="inputMask">
-    <string>0000; </string>
+    <string>0000</string>
    </property>
    <property name="text">
     <string>0</string>
@@ -178,7 +181,7 @@
     </rect>
    </property>
    <property name="inputMask">
-    <string>0000; </string>
+    <string>0000</string>
    </property>
    <property name="text">
     <string>0</string>
@@ -210,7 +213,7 @@
     </rect>
    </property>
    <property name="inputMask">
-    <string>0000; </string>
+    <string>0000</string>
    </property>
    <property name="text">
     <string>0</string>
@@ -229,7 +232,7 @@
     </rect>
    </property>
    <property name="inputMask">
-    <string>0000; </string>
+    <string>0000</string>
    </property>
    <property name="text">
     <string>0</string>
