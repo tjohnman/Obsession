@@ -5,8 +5,11 @@
 #include "DialogPrivateMessaging.h"
 #include "DialogUserInfo.h"
 #include "DialogTrackers.h"
+#include "version.h"
+#include <QDesktopServices>
+#include <QMessageBox>
 
-MainWindow::MainWindow(QWidget *parent) :
+MainWindow::MainWindow(QWidget *parent, bool checkForUpdates) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
@@ -100,6 +103,17 @@ MainWindow::MainWindow(QWidget *parent) :
     chatWidget->connection = connection;
 
     onPreferencesSaved();
+
+    // Check for updates
+    pUpdateCheckReply = NULL;
+    pNetworkAccessManager = new QNetworkAccessManager(this);
+    pUpdateCheckRequest = NULL;
+    if(checkForUpdates)
+    {
+        pUpdateCheckRequest = new QNetworkRequest(QUrl("http://www.sumamimasen.com/obsession/version"));
+        pUpdateCheckReply = pNetworkAccessManager->get(*pUpdateCheckRequest);
+        connect(pUpdateCheckReply, SIGNAL(finished()), this, SLOT(onVersionReady()));
+    }
 }
 
 MainWindow::~MainWindow()
@@ -455,4 +469,34 @@ void MainWindow::onOpenUserInfo(unsigned int order) {
         }
         user->infoWindow->show();
     }
+}
+
+void MainWindow::onVersionReady()
+{
+    if(pUpdateCheckReply->error() != QNetworkReply::NoError)
+    {
+        qDebug() << "Error retrieving last version number";
+        pUpdateCheckReply->deleteLater();
+        return;
+    }
+
+    QByteArray versionArray = pUpdateCheckReply->readAll();
+    qDebug() << "Current version: " << QString("%1.%2").arg(VERSION_MAJOR).arg(VERSION_MINOR);
+    qDebug() << "Latest version: " << versionArray;
+
+    QList<QByteArray> splitArray = versionArray.split('.');
+    if(splitArray[0].toInt() > VERSION_MAJOR || splitArray[1].toInt() > VERSION_MINOR)
+    {
+        qDebug() << "Update needed.";
+        switch(QMessageBox::information(this, "Update available",
+                                        "There is a new version of Obsession ready for download."
+                                        " Do you want to launch your web browser to download it?", "Yes", "No"))
+        {
+            case 0:
+            QDesktopServices::openUrl(QUrl("https://github.com/tjohnman/Obsession/blob/master/README.md"));
+            break;
+        }
+    }
+
+    pUpdateCheckReply->deleteLater();
 }

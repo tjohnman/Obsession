@@ -20,6 +20,9 @@
 #include "dialogabout.h"
 #include <QtWidgets/QListWidgetItem>
 #include <QTextStream>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <QNetworkRequest>
 
 #include "WidgetChat.h"
 #include "WidgetNews.h"
@@ -32,7 +35,7 @@ namespace Ui {
 class MainWindow : public QMainWindow {
     Q_OBJECT
 public:
-    MainWindow(QWidget *parent = 0);
+    MainWindow(QWidget *parent = 0, bool checkForUpdates = false);
     ~MainWindow();
     ConnectionController *connection;
     void log(QString);
@@ -71,6 +74,7 @@ public slots:
     void playPMSound();
     void onPreferencesSaved();
     void onConnected();
+    void onVersionReady();
 
 protected:
     void changeEvent(QEvent *e);
@@ -80,6 +84,10 @@ private:
     bool altPressed;
 
     void setStatus(QString s);
+
+    QNetworkReply * pUpdateCheckReply;
+    QNetworkAccessManager * pNetworkAccessManager;
+    QNetworkRequest * pUpdateCheckRequest;
 
     Ui::MainWindow *ui;
     DialogOpenConnection * openConnectionDialog;

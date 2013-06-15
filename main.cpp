@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
     }
 
     QApplication a(argc, argv);
-    MainWindow w;
+    MainWindow w(0, true);
 
     w.show();
     w.openNewConnectionDialog();
