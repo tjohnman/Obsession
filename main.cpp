@@ -9,10 +9,12 @@ void kill_threads( void );
 
 int main(int argc, char *argv[])
 {
-    FILE *debugLog;
-    debugLog = fopen("log.txt", "a");
-    fwrite("\n", 1, 1, debugLog);
-    fclose(debugLog);
+    FILE * debugLog = fopen("log.txt", "a");
+    if(debugLog)
+    {
+        fwrite("\n", 1, 1, debugLog);
+        fclose(debugLog);
+    }
 
     QApplication a(argc, argv);
     MainWindow w;
