@@ -168,7 +168,6 @@ void ConnectionController::sendPMToUser(int uid, QString message, bool automatic
     }
     PMTransaction->addParameter(101, message.length(), message.toLocal8Bit().data());
     sendTransaction(PMTransaction);
-    delete PMTransaction;
 }
 
 void ConnectionController::closeConnection() {
