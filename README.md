@@ -19,15 +19,15 @@ The client will connect to the Internet and check for updates on launch. If ther
 What works
 ----------
 
-Right now the client is capable of reading news (both old-style and threaded), downloading files with a completely functional download queue (pause, resume, etc.), trackers and bookmarks and of course chatting (including crude private messages). The first stages of sound notification are implemented and the chat font can be changed from the preferences dialog, among other things.
+Right now the client is capable of reading news (both old-style and threaded), downloading files with a completely functional download queue (pause, resume, etc.) and uploading, trackers and bookmarks and of course chatting (including crude private messages). The first stages of sound notification are implemented and the chat font can be changed from the preferences dialog, among other things.
 
 What doesn't work
 -----------------
 
-SHIFT-JIS support broke when the code switched to Qt5. It is one of the priorities. UTF-8 works fine as an alternative though.
+Shift-JIS support broke when the code switched to Qt5. It is one of the priorities. UTF-8 works fine as an alternative though.
 
-Uploading and posting news is not implemented. There's no account managing either, so the client is not good for server administration right now.
+Posting news is not implemented. There's no account managing either, so the client is not good for server administration right now.
 
 Note this is an alpha build, it's pretty stable but may lack some features.
-Use this program at your own risk. Should you find any bugs, please activate the debugging log (in the preferences dialog) and reproduce the bug (so that it gets registered in the log). The post a bug report.
+Use this program at your own risk. Should you find any bugs, please activate the debugging log (in the preferences dialog) and reproduce the bug (so that it gets registered in the log). Then post a bug report.
 
