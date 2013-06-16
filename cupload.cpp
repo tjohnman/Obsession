@@ -82,9 +82,10 @@ void CUpload::updateSpeed() {
 
     // Actual upload
 
-    if(socket.state() == !QAbstractSocket::ConnectedState) {
+   if(socket.state() != QAbstractSocket::ConnectedState) {
         qDebug() << "Server closed the connection";
         widget->infoLabel()->setText("Error: the server closed the connection.");
+        qDebug() << "Error: " << socket.errorString() << " socket state " << socket.state();
         uploadTimer->stop();
         finished = true;
         uploadInProgress = false;
@@ -107,19 +108,29 @@ void CUpload::updateSpeed() {
         emit uploadFinished();
         return;
     } else {
-        quint32 sent;
-
+        qint64 sent;
+        qDebug() << "Sending...";
         if(dataSize - bytesSent < 4096) {
-            sent = socket.write(file->read((dataSize - bytesSent)), (dataSize - bytesSent));
+            QByteArray readData = file->read(dataSize - bytesSent);
+            sent = socket.write(readData);
         } else {
-            if((dataSize - bytesSent) < packetSize) {
-                sent = socket.write(file->read((dataSize - bytesSent)), (dataSize - bytesSent));
-            } else {
-                sent = socket.write(file->read(packetSize), packetSize);
-            }
+            QByteArray readData = file->read(4096);
+            sent = socket.write(readData);
         }
 
-        socket.waitForBytesWritten(30000);
+        if(sent == -1)
+        {
+            qDebug() << "Data sending failed. Bailing out.";
+            qDebug() << socket.errorString();
+            widget->infoLabel()->setText("Error: transfer failed.");
+            uploadTimer->stop();
+            finished = true;
+            uploadInProgress = false;
+            return;
+        }
+
+        socket.waitForBytesWritten();
+
         bytesSent += sent;
     }
 
@@ -147,8 +158,8 @@ void CUpload::startUploading() {
         qDebug() << "Connecting...";
         socket.connectToHost(connection->pSocket.peerAddress(), connection->pSocket.peerPort()+1, QIODevice::ReadWrite);
         socket.waitForConnected();
-        if(socket.state() == !QAbstractSocket::ConnectedState) {
-            qDebug() << "DownloaderThread connection timed out";
+        if(socket.state() != QAbstractSocket::ConnectedState) {
+            qDebug() << "Upload connection timed out";
             return;
         }
 
@@ -159,63 +170,36 @@ void CUpload::startUploading() {
 
         uploadInProgress = true;
         qDebug() << "Sending magic...";
-        char magic[17] = {0x48, 0x54, 0x58, 0x46};
-        qDebug() << "Reference is "<<referenceNumber;
-        quint32 ref = qToBigEndian(referenceNumber);
-        memcpy(magic+4, &ref, 4);
-        qDebug() << "Size is "<<fileSize;
-        quint32 s = qToBigEndian(fileSize);
-        memcpy(magic+8, &s, 4);
-        memset(magic+12, 0, 4);
-        magic[16] = '\0';
-        bytesSent = 0;
-        socket.write(magic, 16);
 
-        char flatheader[24];
-        memcpy(flatheader, "FILP", 4);
-        qint16 version = 1;
-        version = qToBigEndian(version);
-        qint16 forkcount = 2;
-        forkcount = qToBigEndian(forkcount);
-        memcpy(flatheader+4, &version, 2);
-        memset(flatheader+6, 0, 16);
-        memcpy(flatheader+22, &forkcount, 2);
+        socket.write("HTXF");
+        quint32 revRef = qToBigEndian(referenceNumber);
+        socket.write((const char *)&revRef, 4);
+        socket.write("\0\0\0\0\0\0\0\0", 8);
+        socket.write("FILP\0\1\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\2INFO\0\0\0\0\0\0\0\0", 36);
+        quint16 nameSize = currentName.toLocal8Bit().length();
+        quint32 infoForkSize = 72 + nameSize;
+        quint32 revInfoForkSize = qToBigEndian(infoForkSize);
+        socket.write((const char *)&revInfoForkSize, 4);
+        socket.write("MWIN????????\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0", 70);
+        quint16 revNameSize = qToBigEndian(nameSize);
+        socket.write((const char *)&revNameSize, 2);
+        qDebug() << "Name size is " << nameSize;
+        socket.write(currentName.toLocal8Bit().data(), nameSize);
+        socket.write("DATA\0\0\0\0\0\0\0\0", 12);
+        quint32 revDataSize = qToBigEndian(dataSize);
+        socket.write((const char *)&revDataSize, 4);
+        qDebug() << "Data size is " << dataSize;
 
-        socket.write(flatheader, 24);
-
-        quint16 forksize = 72 + currentName.toLocal8Bit().length();  // We need to get the number of bytes, not the
-                                                                        // number of characters. For Japanese chars.
-        forksize = qToBigEndian(forksize);
-
-        char forkheader[16];
-        memcpy(forkheader, "INFO", 4);
-        memset(forkheader+4, 0, 8);
-        memcpy(forkheader+12, &forksize, 4);
-        socket.write(forkheader, 16);
-
-        char * infork = (char *) malloc(72 + currentName.toLocal8Bit().length());
-        memcpy(infork, "MWIN", 4);
-        memset(infork+4, '?', 8);
-        memset(infork+12, 0, 58);
-        quint16 namesize = currentName.toLocal8Bit().length();
-        namesize = qToBigEndian(namesize);
-        memcpy(infork+70, &namesize, 2);
-        memcpy(infork+72, currentName.toLocal8Bit().data(), currentName.toLocal8Bit().length());
-        socket.write(infork, 72 + currentName.toLocal8Bit().length());
         socket.waitForBytesWritten();
-        free(infork);
 
-        char header[16] = {0x44, 0x41, 0x54, 0x41};
-        memset(header+4, 0, 8);
-        qDebug() << "Data size : " << dataSize;
-        quint32 siz = qToBigEndian(dataSize);
-        memcpy(header+12, &siz, 4);
-        socket.write(header, 16);
-        socket.flush();
+        if(socket.state() != QAbstractSocket::ConnectedState) {
+            qDebug() << "Server closed the connection after receiving header";
+            return;
+        }
 
         qDebug() << "Starting actual upload";
 
-        //uploadTimer->start(1);
+        uploadTimer->start(100);
 
     } else {
         qDebug() << "Warning: Must connect to upload files";
