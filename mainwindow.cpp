@@ -15,7 +15,7 @@ MainWindow::MainWindow(QWidget *parent, bool checkForUpdates) :
 {
     ui->setupUi(this);
 
-    connect(ui->tabWidget, SIGNAL(tabCloseRequested(int)), this, SLOT(removeTab(int)));
+    connect(ui->tabWidget, SIGNAL(tabCloseRequested(qint32)), this, SLOT(removeTab(qint32)));
 
     altPressed = false;
 
@@ -46,11 +46,11 @@ MainWindow::MainWindow(QWidget *parent, bool checkForUpdates) :
     downloadsDialog = new DialogDownloadQueue(downloadManager, this);
     uploadsDialog = new DialogUploadsQueue(uploadManager);
 
-    connect(fileBrowserDialog, SIGNAL(requestedFile(QString, int, QString)), downloadManager, SLOT(onRequestedFile(QString, int, QString)));
-    connect(fileBrowserDialog, SIGNAL(requestedFile(QString, int, QString)), this, SLOT(openDownloads()));
+    connect(fileBrowserDialog, SIGNAL(requestedFile(QString, qint32, QString)), downloadManager, SLOT(onRequestedFile(QString, qint32, QString)));
+    connect(fileBrowserDialog, SIGNAL(requestedFile(QString, qint32, QString)), this, SLOT(openDownloads()));
 
-    connect(fileBrowserDialog, SIGNAL(requestedUpload(QString, int)), uploadManager, SLOT(onRequestedFile(QString, int)));
-    connect(fileBrowserDialog, SIGNAL(requestedUpload(QString, int)), this, SLOT(openUploads()));
+    connect(fileBrowserDialog, SIGNAL(requestedUpload(QString, qint32)), uploadManager, SLOT(onRequestedFile(QString, qint32)));
+    connect(fileBrowserDialog, SIGNAL(requestedUpload(QString, qint32)), this, SLOT(openUploads()));
 
     connect(ui->actionOpen_Connection, SIGNAL(triggered()), this, SLOT(openNewConnectionDialog()));
     connect(ui->actionNew_Window, SIGNAL(triggered()), this, SLOT(openNewWindow()));
@@ -67,9 +67,9 @@ MainWindow::MainWindow(QWidget *parent, bool checkForUpdates) :
     //connect(ui->actionDebug_console, SIGNAL(triggered()), this, SLOT(openConsole()));
 
     connect(connection, SIGNAL(gotServerName()), this, SLOT(onGotServerName()));
-    connect(connection, SIGNAL(gotChatMessage(char *, short)), this, SLOT(onGotChatMessage(char *, short)));
+    connect(connection, SIGNAL(gotChatMessage(char *, qint16)), this, SLOT(onGotChatMessage(char *, qint16)));
     connect(connection, SIGNAL(userListChanged()), this, SLOT(onUserListChanged()));
-    connect(connection, SIGNAL(gotPM(short, QString)), this, SLOT(onGotPM(short,QString)));
+    connect(connection, SIGNAL(gotPM(qint16, QString)), this, SLOT(onGotPM(qint16,QString)));
 
     connect(connection, SIGNAL(serverError(QString)), this, SLOT(onError(QString)));
     connect(connection, SIGNAL(socketError(QString)), this, SLOT(onError(QString)));
@@ -84,12 +84,12 @@ MainWindow::MainWindow(QWidget *parent, bool checkForUpdates) :
     connect(connection, SIGNAL(connecting()), this, SLOT(onConnecting()));
     connect(connection, SIGNAL(connected()), this, SLOT(onConnected()));
 
-    connect(connection, SIGNAL(gotFile(unsigned int, unsigned int, unsigned int)), downloadManager, SLOT(addDownload(unsigned int, unsigned int, unsigned int)));
-    connect(connection, SIGNAL(gotUpload(unsigned int)), uploadManager, SLOT(addUpload(unsigned int)));
+    connect(connection, SIGNAL(gotFile(quint32, quint32, quint32)), downloadManager, SLOT(addDownload(quint32, quint32, quint32)));
+    connect(connection, SIGNAL(gotUpload(quint32)), uploadManager, SLOT(addUpload(quint32)));
 
-    connect(chatWidget, SIGNAL(messagingWindowSignal(uint)), this, SLOT(onOpenMessagingWindow(uint)));
-    connect(chatWidget, SIGNAL(userInfoSignal(uint)), this, SLOT(onOpenUserInfo(uint)));
-    connect(ui->tabWidget, SIGNAL(currentChanged(int)), this, SLOT(changedTab()));
+    connect(chatWidget, SIGNAL(messagingWindowSignal(quint32)), this, SLOT(onOpenMessagingWindow(quint32)));
+    connect(chatWidget, SIGNAL(userInfoSignal(quint32)), this, SLOT(onOpenUserInfo(quint32)));
+    connect(ui->tabWidget, SIGNAL(currentChanged(qint32)), this, SLOT(changedTab()));
 
     statusLabel = new QLabel(ui->statusBar);
     ui->statusBar->addWidget(statusLabel);
@@ -184,7 +184,7 @@ void MainWindow::onDownloadQueueUpdated() {
     }
 }
 
-void MainWindow::removeTab(int i) {
+void MainWindow::removeTab(qint32 i) {
     qDebug() << "Clicked on tab close " << i;
     if(i != 0) {
         ui->tabWidget->removeTab(i);
@@ -193,7 +193,7 @@ void MainWindow::removeTab(int i) {
 
 void MainWindow::openDownloads() {
     bool isThere = false;
-    for(int i=0; i<ui->tabWidget->count(); i++) {
+    for(qint32 i=0; i<ui->tabWidget->count(); i++) {
         if(ui->tabWidget->widget(i) == downloadsDialog) {
             isThere = true;
         }
@@ -206,7 +206,7 @@ void MainWindow::openDownloads() {
 
 void MainWindow::openUploads() {
     bool isThere = false;
-    for(int i=0; i<ui->tabWidget->count(); i++) {
+    for(qint32 i=0; i<ui->tabWidget->count(); i++) {
         if(ui->tabWidget->widget(i) == uploadsDialog) {
             isThere = true;
         }
@@ -328,7 +328,7 @@ void MainWindow::onGotServerName() {
     setStatus(QString("Connected to ") + connection->serverName());
 }
 
-void MainWindow::onGotChatMessage(char * t, short l) {
+void MainWindow::onGotChatMessage(char * t, qint16 l) {
     char * temp = (char *) malloc(sizeof(char)*l+1);
     playChatSound();
     memcpy(temp, t, l);
@@ -345,7 +345,7 @@ void MainWindow::onUserListChanged() {
     qDebug() << "Updating QListWidget...";
     std::vector<s_user*> * users = connection->getUserList();
     clearUserList();
-    for(unsigned int i=0; i<users->size(); i++) {
+    for(quint32 i=0; i<users->size(); i++) {
         users->at(i)->orderInList = i;
         QString name = QString(users->at(i)->name);
         QListWidgetItem * item = new QListWidgetItem("           "+name);
@@ -383,7 +383,7 @@ void MainWindow::onPreferencesSaved() {
     QFont font;
     QSettings settings("mir", "Contra");
     font.setFamily(settings.value("fontFamily", "MS Shell Dlg2").toString());
-    int style = settings.value("fontStyle", 0).toInt();
+    qint32 style = settings.value("fontStyle", 0).toInt();
     switch(style) {
     case 0:
         font.setStyle(QFont::StyleNormal);
@@ -409,7 +409,7 @@ void MainWindow::openPreferencesDialog() {
     dialog->open();
 }
 
-void MainWindow::onGotPM(short uid, QString s) {
+void MainWindow::onGotPM(qint16 uid, QString s) {
     s_user * user = connection->getUserByUid(uid);
     if(user) {
         if(user->messagingWindow == NULL || !user->messagingWindow) {
@@ -426,10 +426,10 @@ void MainWindow::onGotPM(short uid, QString s) {
     }
 }
 
-void MainWindow::onOpenMessagingWindow(unsigned int order) {
+void MainWindow::onOpenMessagingWindow(quint32 order) {
     std::vector<s_user *> * users = connection->getUserList();
-    unsigned short uid = 0;
-    for(unsigned int i=0; i<users->size(); i++) {
+    quint16 uid = 0;
+    for(quint32 i=0; i<users->size(); i++) {
         if(users->at(i)->orderInList == order) {
             uid = users->at(i)->id;
         }
@@ -449,10 +449,10 @@ void MainWindow::onOpenMessagingWindow(unsigned int order) {
     }
 }
 
-void MainWindow::onOpenUserInfo(unsigned int order) {
+void MainWindow::onOpenUserInfo(quint32 order) {
     std::vector<s_user *> * users = connection->getUserList();
-    unsigned short uid = 0;
-    for(unsigned int i=0; i<users->size(); i++) {
+    quint16 uid = 0;
+    for(quint32 i=0; i<users->size(); i++) {
         if(users->at(i)->orderInList == order) {
             uid = users->at(i)->id;
         }

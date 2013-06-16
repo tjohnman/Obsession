@@ -28,7 +28,7 @@ DialogPreferences::DialogPreferences(QWidget *parent) :
 
     QFont font;
     font.setFamily(settings.value("fontFamily", "MS Shell Dlg2").toString());
-    int style = settings.value("fontStyle", 0).toInt();
+    qint32 style = settings.value("fontStyle", 0).toInt();
     switch(style) {
     case 0:
         font.setStyle(QFont::StyleNormal);

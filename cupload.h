@@ -16,25 +16,25 @@ class CUpload : public QObject
 public:
     bool uploadInProgress;
     bool finished;
-    unsigned int referenceNumber;
-    unsigned int fileSize;
-    unsigned int packetSize;
+    quint32 referenceNumber;
+    quint32 fileSize;
+    quint32 packetSize;
     QTcpSocket socket;
     QFile * file;
     QString currentName;
-    unsigned int bytesSent;
-    unsigned int dataSize;
-    int bytesWritten;
+    quint32 bytesSent;
+    quint32 dataSize;
+    qint32 bytesWritten;
     ConnectionController * connection;
-    unsigned int lastSent;
+    quint32 lastSent;
     QTimer * uploadTimer;
-    unsigned int downloadSpeed;
-    unsigned int queuePosition;
+    quint32 downloadSpeed;
+    quint32 queuePosition;
     WidgetDownloadItem * widget;
     QListWidgetItem * itemPlaceholder;
     bool pending;
 
-    int init();
+    qint32 init();
 
     CUpload();
 

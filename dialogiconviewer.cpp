@@ -11,8 +11,8 @@ DialogIconViewer::DialogIconViewer(QWidget *parent) :
 
     ThreadIconLoader * loaderThread = new ThreadIconLoader();
 
-    connect(loaderThread, SIGNAL(startIconCount(int)), this, SLOT(startIconCount(int)));
-    connect(loaderThread, SIGNAL(loadedItem(int, QListWidgetItem *)), this, SLOT(updateProgress(int, QListWidgetItem *)));
+    connect(loaderThread, SIGNAL(startIconCount(qint32)), this, SLOT(startIconCount(qint32)));
+    connect(loaderThread, SIGNAL(loadedItem(qint32, QListWidgetItem *)), this, SLOT(updateProgress(qint32, QListWidgetItem *)));
     connect(ui->listWidget, SIGNAL(clicked(QModelIndex)), this, SLOT(onClicked(QModelIndex)));
 
     loaderThread->start();
@@ -29,13 +29,13 @@ void DialogIconViewer::onClicked(QModelIndex model) {
     emit iconChanged();
 }
 
-void DialogIconViewer::updateProgress(int n, QListWidgetItem * item)
+void DialogIconViewer::updateProgress(qint32 n, QListWidgetItem * item)
 {
     ui->listWidget->addItem(item);
     ui->progressBar->setValue(n);
 }
 
-void DialogIconViewer::startIconCount(int n)
+void DialogIconViewer::startIconCount(qint32 n)
 {
     ui->progressBar->setMaximum(n);
     ui->progressBar->setValue(0);

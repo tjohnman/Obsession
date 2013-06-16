@@ -22,32 +22,32 @@ class UploadManager : public QObject
     Q_OBJECT
 public:
     bool downloadInProgress;
-    unsigned int referenceNumber;
-    unsigned int fileSize;
+    quint32 referenceNumber;
+    quint32 fileSize;
     QTcpSocket socket;
     QProgressBar * progressBar;
     QFile * file;
     QString currentName;
-    unsigned int bytesRead;
-    unsigned int dataSize;
-    int bytesWritten;
+    quint32 bytesRead;
+    quint32 dataSize;
+    qint32 bytesWritten;
     ConnectionController * connection;
-    unsigned int lastRead;
+    quint32 lastRead;
     QTimer * downloadsTimer;
-    unsigned int downloadSpeed;
+    quint32 downloadSpeed;
     QListWidget * listWidget;
 
     std::vector<CUpload *> uploads;
 
-    int init(unsigned int reference, unsigned int size);
+    qint32 init(quint32 reference, quint32 size);
 
     UploadManager(ConnectionController * c);
 
 private slots:
 
 public slots:
-    void addUpload(unsigned int);
-    void onRequestedFile(QString name, int size);
+    void addUpload(quint32);
+    void onRequestedFile(QString name, qint32 size);
     uint cleanIdle();
 
 signals:

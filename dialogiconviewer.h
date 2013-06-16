@@ -21,8 +21,8 @@ public:
     ~DialogIconViewer();
 
 public slots:
-    void updateProgress(int n, QListWidgetItem * item);
-    void startIconCount(int);
+    void updateProgress(qint32 n, QListWidgetItem * item);
+    void startIconCount(qint32);
 
 protected:
     void changeEvent(QEvent *e);

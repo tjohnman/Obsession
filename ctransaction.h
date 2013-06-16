@@ -8,36 +8,36 @@ class CTransaction
 {
 public:
     CTransaction(char * headerData);
-    CTransaction(short tranID, int taskID);
+    CTransaction(qint16 tranID, qint32 taskID);
 
     void addData(char * data);
 
     char * bytes();
-    void addParameter(short parameterID, short parameterLength, char * parameterData);
-    void addParameter(short parameterID, int parameterData);
+    void addParameter(qint16 parameterID, qint16 parameterLength, char * parameterData);
+    void addParameter(qint16 parameterID, qint32 parameterData);
 
-    unsigned short isReply();
-    unsigned short transactionID();
-    unsigned int taskID();
-    int errorCode();
-    unsigned int dataLength();
-    unsigned short numberOfParameters();
+    quint16 isReply();
+    quint16 transactionID();
+    quint32 taskID();
+    qint32 errorCode();
+    quint32 dataLength();
+    quint16 numberOfParameters();
     bool done;
 
-    void setDataLength(int l);
+    void setDataLength(qint32 l);
 
-    unsigned int length();
+    quint32 length();
 
-    s_parameter * getParameterById(short parameterID);
-    s_parameter * getParameter(unsigned int i);
+    s_parameter * getParameterById(qint16 parameterID);
+    s_parameter * getParameter(quint32 i);
 
 private:
-    unsigned short pIsReply;
-    unsigned short pTransactionID;
-    unsigned int pTaskID;
-    int pErrorCode;
-    unsigned int pDataLength;
-    unsigned short pNumberOfParameters;
+    quint16 pIsReply;
+    quint16 pTransactionID;
+    quint32 pTaskID;
+    qint32 pErrorCode;
+    quint32 pDataLength;
+    quint16 pNumberOfParameters;
 
     std::vector<s_parameter *> pParameters;
 };

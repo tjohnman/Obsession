@@ -18,7 +18,7 @@ ConnectionController::ConnectionController()
     // TODO: Preferences
     QSettings settings("mir", "contra");
     pNickname = settings.value("nick", "unnamed").toString();
-    pIconID = (unsigned short) settings.value("icon", 25096).toString().toShort();
+    pIconID = (quint16) settings.value("icon", 25096).toString().toShort();
     qDebug() << "Loaded icon ID: " << pIconID;
     qDebug() << "Icon is :" << pIconID;
 
@@ -38,10 +38,10 @@ bool ConnectionController::isConnected() {
     return false;
 }
 
-int ConnectionController::connectToServer(QString address, QString login, QString password) {
+qint32 ConnectionController::connectToServer(QString address, QString login, QString password) {
     emit connecting();
     pServerAddress = address;
-    int semicolonIndex = address.lastIndexOf(":");
+    qint32 semicolonIndex = address.lastIndexOf(":");
     QString addr;
     quint16 port;
 
@@ -55,13 +55,13 @@ int ConnectionController::connectToServer(QString address, QString login, QStrin
 
     pLogin = login.toLocal8Bit();
 
-    for(int i=0; i<pLogin.length(); i++) {
+    for(qint32 i=0; i<pLogin.length(); i++) {
         pLogin[i] = 255 - pLogin[i];
     }
 
     pPassword = password.toLocal8Bit();
 
-    for(int i=0; i<pPassword.length(); i++) {
+    for(qint32 i=0; i<pPassword.length(); i++) {
         pPassword[i] = 255 - pPassword[i];
     }
 
@@ -132,8 +132,8 @@ void ConnectionController::sendUserInfo() {
     sendTransaction(uinfoTransaction);
 }
 
-s_user * ConnectionController::getUserByUid(short uid) {
-    for(unsigned int i=0; i<pUsers.size(); i++) {
+s_user * ConnectionController::getUserByUid(qint16 uid) {
+    for(quint32 i=0; i<pUsers.size(); i++) {
         if(pUsers[i]->id == uid) {
             return pUsers[i];
         }
@@ -142,7 +142,7 @@ s_user * ConnectionController::getUserByUid(short uid) {
 }
 
 s_user * ConnectionController::getUserByName(QString name) {
-    for(unsigned int i=0; i<pUsers.size(); i++) {
+    for(quint32 i=0; i<pUsers.size(); i++) {
         if(name.contains(QString(pUsers[i]->name))) {
             return pUsers[i];
         }
@@ -158,7 +158,7 @@ QString ConnectionController::serverAgreement() {
     return pServerAgreement;
 }
 
-void ConnectionController::sendPMToUser(int uid, QString message, bool automatic) {
+void ConnectionController::sendPMToUser(qint32 uid, QString message, bool automatic) {
     CTransaction * PMTransaction = new CTransaction(108, pTaskIDCounter++);
     PMTransaction->addParameter(103, uid);
     if(automatic) {
@@ -178,7 +178,7 @@ void ConnectionController::closeConnection() {
     pSocket.disconnect(SIGNAL(readyRead()));
 }
 
-CTransaction * ConnectionController::createTransaction(short id) {
+CTransaction * ConnectionController::createTransaction(qint16 id) {
     qDebug() << "Connection controller: Creating new CTransaction (" << id << ")";
     return new CTransaction(id, pTaskIDCounter++);
 }
@@ -200,13 +200,13 @@ void ConnectionController::onSocketConnected() {
     char clientMagicBytes[12] = {0x54, 0x52, 0x54, 0x50, 0x48, 0x4f, 0x54, 0x4c, 0x00, 0x01, 0x00, 0x02};
     char serverMagicBytes[8] = {0x54, 0x52, 0x54, 0x50, 0x00, 0x00, 0x00, 0x00};
 
-    int bytes = pSocket.write(clientMagicBytes, 12);
+    qint32 bytes = pSocket.write(clientMagicBytes, 12);
     qDebug() << "Sent magic (" << bytes << " bytes)";
     pSocket.waitForReadyRead(30000);
     QByteArray response = pSocket.readAll();
     qDebug() << "Got magic: " << response.size() << " bytes";
 
-    for(unsigned int i=0; i<8; i++) {
+    for(quint32 i=0; i<8; i++) {
         if(response.data()[i] != serverMagicBytes[i]) {
             qDebug() << "Handshake failed";
             return;
@@ -229,8 +229,8 @@ void ConnectionController::onSocketConnected() {
     }
     loginTransaction->addParameter(102, pNickname.length(), pNickname.toLocal8Bit().data());
 
-    unsigned short iconID = qToBigEndian((unsigned short)3520);
-    unsigned short ver = qToBigEndian(pClientVersion);
+    quint16 iconID = qToBigEndian((quint16)3520);
+    quint16 ver = qToBigEndian(pClientVersion);
 
     loginTransaction->addParameter(104, iconID);
     loginTransaction->addParameter(160, ver);
@@ -317,7 +317,7 @@ void ConnectionController::onSocketData() {
 
     if(receivedTransaction == NULL) {
         qDebug() << "--------------------------------------";
-        int available = pSocket.bytesAvailable();
+        qint32 available = pSocket.bytesAvailable();
         qDebug() << "Got " << available << " bytes";
 
         qDebug() << "Getting data from socket...";
@@ -366,7 +366,7 @@ void ConnectionController::onSocketData() {
     }
 
     if(receivedTransaction->isReply()) {
-        for(unsigned int i=0; i<pPendingTransactions.size(); i++) {
+        for(quint32 i=0; i<pPendingTransactions.size(); i++) {
             if(receivedTransaction->taskID() == pPendingTransactions[i]->taskID()) {
                 qDebug() << "Got response for " << pPendingTransactions[i]->transactionID();
                 switch(pPendingTransactions[i]->transactionID()) {
@@ -415,7 +415,7 @@ void ConnectionController::onSocketData() {
                 case 200:
                     {
                     std::vector<s_hotlineFile *> fileList;
-                    for(unsigned int i=0; i<receivedTransaction->numberOfParameters(); i++) {
+                    for(quint32 i=0; i<receivedTransaction->numberOfParameters(); i++) {
                         parameterBuffer = receivedTransaction->getParameter(i);
                         if(parameterBuffer) {
                             if(parameterBuffer->id == 200) {
@@ -448,8 +448,8 @@ void ConnectionController::onSocketData() {
                     break;
                 case 202:
                     {
-                    unsigned int transferSize = 0;
-                    unsigned int referenceNumber = 0;
+                    quint32 transferSize = 0;
+                    quint32 referenceNumber = 0;
 
                     parameterBuffer = receivedTransaction->getParameterById(207);
                     if(parameterBuffer) {
@@ -469,10 +469,10 @@ void ConnectionController::onSocketData() {
                     }
 
                     parameterBuffer = receivedTransaction->getParameterById(116);
-                    unsigned int queuePosition = 0;
+                    quint32 queuePosition = 0;
                     if(parameterBuffer) {
-                        unsigned short squeue = 0;
-                        unsigned int iqueue = 0;
+                        quint16 squeue = 0;
+                        quint32 iqueue = 0;
                         if(parameterBuffer->type == TYPE_SHORT) {
                             squeue = parameterBuffer->shortValue;
                             squeue = qFromBigEndian(squeue);
@@ -497,7 +497,7 @@ void ConnectionController::onSocketData() {
                     {
                         parameterBuffer = receivedTransaction->getParameterById(107);
                         if(parameterBuffer) {
-                            unsigned int reference;
+                            quint32 reference;
                             memcpy(&reference, &parameterBuffer->intValue, 4);
                             reference = qFromBigEndian(reference);
                             qDebug() << "Server is ready for the upload (" << reference << ")";
@@ -513,7 +513,7 @@ void ConnectionController::onSocketData() {
                         free(u);
                     }
 
-                    for(unsigned int i=0; i<receivedTransaction->numberOfParameters(); i++) {
+                    for(quint32 i=0; i<receivedTransaction->numberOfParameters(); i++) {
                         parameterBuffer = receivedTransaction->getParameter(i);
                         if(parameterBuffer) {
                             if(parameterBuffer->id == 300) {
@@ -556,7 +556,7 @@ void ConnectionController::onSocketData() {
                     case 370:
                     case 371:
                     {
-                        for(unsigned int i=0; i<receivedTransaction->numberOfParameters(); i++) {
+                        for(quint32 i=0; i<receivedTransaction->numberOfParameters(); i++) {
                             parameterBuffer = receivedTransaction->getParameter(i);
                             if(parameterBuffer) {
                                 if(parameterBuffer->id == 320) {
@@ -570,7 +570,7 @@ void ConnectionController::onSocketData() {
                                     QString _description = "";
                                     QString _article = "";
 
-                                    unsigned int count;
+                                    quint32 count;
                                     memcpy(&count, parameterBuffer->data+4, 4);
                                     count = qFromBigEndian(count);
                                     qDebug() << count << " articles in category.";
@@ -581,17 +581,17 @@ void ConnectionController::onSocketData() {
                                     char size2;
                                     memcpy(&size2, parameterBuffer->data+9+size, 1);
 
-                                    int offset = 10+size+size2;
-                                    for(unsigned int j=0; j<count; j++) {
-                                        unsigned int articleID;
+                                    qint32 offset = 10+size+size2;
+                                    for(quint32 j=0; j<count; j++) {
+                                        quint32 articleID;
                                         memcpy(&articleID, parameterBuffer->data+offset, 4);
                                         articleID = qFromBigEndian(articleID);
 
-                                        unsigned int parentArticleID;
+                                        quint32 parentArticleID;
                                         memcpy(&parentArticleID, parameterBuffer->data+offset+12, 4);
                                         parentArticleID = qFromBigEndian(parentArticleID);
 
-                                        unsigned short fcount;
+                                        quint16 fcount;
                                         memcpy(&fcount, parameterBuffer->data+offset+20, 2);
                                         fcount = qFromBigEndian(fcount);
 
@@ -599,7 +599,7 @@ void ConnectionController::onSocketData() {
                                         memcpy(&tsize, parameterBuffer->data+offset+22, 1);
                                         char * atitle = (char *) malloc(tsize+1);
                                         memcpy(atitle, parameterBuffer->data+offset+23, tsize);
-                                        atitle[(unsigned short)tsize] = '\0';
+                                        atitle[(quint16)tsize] = '\0';
                                         _name = QString(atitle);
                                         free(atitle);
 
@@ -607,22 +607,22 @@ void ConnectionController::onSocketData() {
                                         memcpy(&psize, parameterBuffer->data+offset+23+tsize, 1);
                                         char * aposter = (char *) malloc(psize+1);
                                         memcpy(aposter, parameterBuffer->data+offset+24+tsize, psize);
-                                        aposter[(unsigned short)psize] = '\0';
+                                        aposter[(quint16)psize] = '\0';
                                         _poster = QString(aposter);
                                         free(aposter);
 
-                                        int offset2 = offset+24+tsize+psize;
+                                        qint32 offset2 = offset+24+tsize+psize;
                                         qDebug() << fcount << "Flavors";
-                                        for(unsigned int f=0; f<fcount; f++) {
+                                        for(quint32 f=0; f<fcount; f++) {
                                             char fsize;
                                             memcpy(&fsize, parameterBuffer->data+offset2, 1);
                                             offset2 += 1;
                                             char * mime = (char *) malloc(fsize+1);
                                             memcpy(mime, parameterBuffer->data+offset2, fsize);
-                                            mime[(unsigned short)fsize] = '\0';
+                                            mime[(quint16)fsize] = '\0';
                                             qDebug() << "MIME: " << mime;
                                             offset2+= fsize;
-                                            unsigned short asize;
+                                            quint16 asize;
                                             memcpy(&asize, parameterBuffer->data+offset2, 2);
                                             asize = qFromBigEndian(asize);
                                             qDebug() << "Article is " << asize << " bytes";
@@ -639,7 +639,7 @@ void ConnectionController::onSocketData() {
                                     unsigned char _type = 0;
                                     QString _name = "";
 
-                                    unsigned short _typeshort;
+                                    quint16 _typeshort;
                                     memcpy(&_typeshort, parameterBuffer->data, 2);
                                     _typeshort = qFromBigEndian(_typeshort);
                                     _type = (unsigned char) _typeshort;
@@ -666,7 +666,7 @@ void ConnectionController::onSocketData() {
                                         free(buffer);
                                     }
 
-                                    qDebug() << "New news category (" << (unsigned short)_type << "): " << _name;
+                                    qDebug() << "New news category (" << (quint16)_type << "): " << _name;
 
                                     emit gotNewsCategory(_type, _name);
                                 }
@@ -697,20 +697,20 @@ void ConnectionController::onSocketData() {
                         }
                         parameterBuffer = receivedTransaction->getParameterById(330);
                         if(parameterBuffer) {
-                            unsigned short year;
+                            quint16 year;
                             memcpy(&year, parameterBuffer->data, 2);
                             year = qFromBigEndian(year);
-                            unsigned short millis;
+                            quint16 millis;
                             memcpy(&millis, parameterBuffer->data+2, 2);
                             millis = qFromBigEndian(millis);
-                            unsigned int seconds;
+                            quint32 seconds;
                             memcpy(&seconds, parameterBuffer->data+4, 4);
                             seconds = qFromBigEndian(seconds);
 
-                            unsigned int d = 1, M = 1, h = 0, m = 0, s = 0;
+                            quint32 d = 1, M = 1, h = 0, m = 0, s = 0;
                             s = seconds + millis/1000;
 
-                            unsigned int secondsInDay = 86400;
+                            quint32 secondsInDay = 86400;
 
                             while(s > secondsInDay) {
                                 d++;
@@ -729,9 +729,9 @@ void ConnectionController::onSocketData() {
                                 isLeap = false;
                             }
 
-                            unsigned int daysInMonth;
+                            quint32 daysInMonth;
 
-                            for(int i=0; i<12 ; i++) {
+                            for(qint32 i=0; i<12 ; i++) {
                                 if(i==0 || i==2 || i==4 || i==6 || i==7 || i==9 || i==11) {
                                     daysInMonth = 31;
                                 } else {
@@ -836,7 +836,7 @@ void ConnectionController::onSocketData() {
             }
         }
 
-        for(unsigned int i=0; i<pPendingTransactions.size(); i++) {
+        for(quint32 i=0; i<pPendingTransactions.size(); i++) {
             if(pPendingTransactions[i]->done) {
                 CTransaction * t = pPendingTransactions[i];
                 pPendingTransactions[i] = pPendingTransactions.back();
@@ -849,12 +849,12 @@ void ConnectionController::onSocketData() {
         case 104:
             parameterBuffer = receivedTransaction->getParameterById(103);
             if(parameterBuffer && receivedTransaction->getParameterById(101)) {
-                unsigned short uid;
+                quint16 uid;
                 memcpy(&uid, &parameterBuffer->shortValue, parameterBuffer->length);
                 uid = qFromBigEndian(uid);
 
                 qDebug() << "Retreiving message...";
-                unsigned short len = receivedTransaction->getParameterById(101)->length;
+                quint16 len = receivedTransaction->getParameterById(101)->length;
                 qDebug() << "Length: " << len;
                 char * m = (char *) malloc(sizeof(char)*len+2);
                 memcpy(m, receivedTransaction->getParameterById(101)->data, receivedTransaction->getParameterById(101)->length);
@@ -892,7 +892,7 @@ void ConnectionController::onSocketData() {
 
         case 211:
             {
-                unsigned int referenceNumber = -1;
+                quint32 referenceNumber = -1;
                 parameterBuffer = receivedTransaction->getParameterById(107);
                 if(parameterBuffer) {
                     memcpy(&referenceNumber, &parameterBuffer->intValue, 4);
@@ -900,10 +900,10 @@ void ConnectionController::onSocketData() {
                 }
 
                 parameterBuffer = receivedTransaction->getParameterById(116);
-                unsigned int queuePosition = 0;
+                quint32 queuePosition = 0;
                 if(parameterBuffer) {
-                    unsigned short squeue = 0;
-                    unsigned int iqueue = 0;
+                    quint16 squeue = 0;
+                    quint32 iqueue = 0;
                     if(parameterBuffer->type == TYPE_SHORT) {
                         squeue = parameterBuffer->shortValue;
                         squeue = qFromBigEndian(squeue);
@@ -926,7 +926,7 @@ void ConnectionController::onSocketData() {
         case 113:
             parameterBuffer = receivedTransaction->getParameterById(103);
             if(parameterBuffer) {
-                unsigned short uid = 0;
+                quint16 uid = 0;
                 memcpy(&uid, &parameterBuffer->shortValue, parameterBuffer->length);
                 uid = qFromBigEndian(uid);
                 if(uid) {
@@ -937,7 +937,7 @@ void ConnectionController::onSocketData() {
 
         case 301:
             if(receivedTransaction->getParameterById(103)) {
-                unsigned short uid = 0;
+                quint16 uid = 0;
                 qDebug() << "Looking for uid...";
                 parameterBuffer = receivedTransaction->getParameterById(103);
                 if(!parameterBuffer) {
@@ -954,7 +954,7 @@ void ConnectionController::onSocketData() {
                     if(parameterBuffer) {
                         qDebug() << "Updating user icon";
 
-                        unsigned short newIcon = 0;
+                        quint16 newIcon = 0;
                         memcpy(&newIcon, &parameterBuffer->shortValue, parameterBuffer->length);
                         newIcon = qFromBigEndian(newIcon);
 
@@ -1033,7 +1033,7 @@ void ConnectionController::onSocketData() {
         case 302:
             parameterBuffer = receivedTransaction->getParameterById(103);
             if(parameterBuffer) {
-                unsigned short uid;
+                quint16 uid;
                 memcpy(&uid, &parameterBuffer->shortValue, parameterBuffer->length);
                 uid = qFromBigEndian(uid);
                 qDebug() << "User " << uid << " left";
@@ -1044,7 +1044,7 @@ void ConnectionController::onSocketData() {
                 }
                 QString message = QString("               -- ") + QString(user->name) + QString(" left --");
                 emit gotChatMessage(message.toLocal8Bit().data(), message.length());
-                for(unsigned int i=0; i<pUsers.size(); i++) {
+                for(quint32 i=0; i<pUsers.size(); i++) {
                     if(pUsers[i]->id == uid) {
                         pUsers[i] = pUsers.back();
                         pUsers.pop_back();

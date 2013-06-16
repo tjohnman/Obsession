@@ -3,7 +3,7 @@
 #include <string.h>
 
 CTransaction::CTransaction(char * headerData) {
-    unsigned int dataLengthCheck;
+    quint32 dataLengthCheck;
 
     memcpy(&pIsReply, headerData, 2);
     memcpy(&pTransactionID, headerData + 2, 2);
@@ -31,7 +31,7 @@ CTransaction::CTransaction(char * headerData) {
     done = false;
 }
 
-CTransaction::CTransaction(short tranID, int taskID) {
+CTransaction::CTransaction(qint16 tranID, qint32 taskID) {
     pIsReply = 0;
     pTransactionID = tranID;
     pTaskID = taskID;
@@ -41,7 +41,7 @@ CTransaction::CTransaction(short tranID, int taskID) {
     done = false;
 }
 
-void CTransaction::setDataLength(int l) {
+void CTransaction::setDataLength(qint32 l) {
     pDataLength = l;
 }
 
@@ -50,10 +50,10 @@ void CTransaction::addData(char * data) {
         qDebug() << "Warning: Tried to read data, but reported data length is zero.";
     }
 
-    int offset = 0;
+    qint32 offset = 0;
 
-    for(int i=0; i<pNumberOfParameters; i++) {
-        unsigned short id, size;
+    for(qint32 i=0; i<pNumberOfParameters; i++) {
+        quint16 id, size;
 
         memcpy(&id, data + offset, 2);
         memcpy(&size, data + 2 + offset, 2);
@@ -63,8 +63,8 @@ void CTransaction::addData(char * data) {
 
         qDebug() << "Parameter no." << i << " is id: " << id << " (" << size << " bytes)";
 
-        unsigned short pshort = 0;
-        unsigned int pint = 0;
+        quint16 pshort = 0;
+        quint32 pint = 0;
 
         s_parameter * newParameter = (s_parameter *) malloc(sizeof(s_parameter));
         newParameter->type = -1;
@@ -264,38 +264,38 @@ char * CTransaction::bytes() {
 
     qDebug() << "Transaction is " << length() << " bytes";
 
-    short reply = qToBigEndian(pIsReply);
+    qint16 reply = qToBigEndian(pIsReply);
     memcpy(b, &reply, 2);
 
-    short tranid = qToBigEndian(pTransactionID);
+    qint16 tranid = qToBigEndian(pTransactionID);
     memcpy(b+2, &tranid, 2);
 
-    int taskid = qToBigEndian(pTaskID);
+    qint32 taskid = qToBigEndian(pTaskID);
     memcpy(b+4, &taskid, 4);
 
-    int error = qToBigEndian(pErrorCode);
+    qint32 error = qToBigEndian(pErrorCode);
     memcpy(b+8, &error, 4);
 
-    int len = qToBigEndian(pDataLength);
+    qint32 len = qToBigEndian(pDataLength);
     memcpy(b+12, &len, 4);
     memcpy(b+16, &len, 4);
 
-    short paramNum = qToBigEndian((short)pParameters.size());
+    qint16 paramNum = qToBigEndian((qint16)pParameters.size());
     memcpy(b+20, &paramNum, 2);
 
-    int offset = 0;
+    qint32 offset = 0;
 
-    for(unsigned int i=0; i<pParameters.size(); i++) {
-        short id = qToBigEndian(pParameters[i]->id);
+    for(quint32 i=0; i<pParameters.size(); i++) {
+        qint16 id = qToBigEndian(pParameters[i]->id);
         memcpy(b+22+offset, &id, 2);
 
-        short plen = qToBigEndian(pParameters[i]->length);
+        qint16 plen = qToBigEndian(pParameters[i]->length);
         memcpy(b+24+offset, &plen, 2);
 
-        short sval, ival;
+        qint16 sval, ival;
         switch(pParameters[i]->type) {
         case TYPE_STRING:
-            for(int j=0; j<pParameters[i]->length; j++) {
+            for(qint32 j=0; j<pParameters[i]->length; j++) {
                 b[26+j + offset] = pParameters[i]->data[j];
             }
             break;
@@ -314,7 +314,7 @@ char * CTransaction::bytes() {
     return b;
 }
 
-void CTransaction::addParameter(short parameterID, short parameterLength, char * parameterData) {
+void CTransaction::addParameter(qint16 parameterID, qint16 parameterLength, char * parameterData) {
     s_parameter * newParameter = (s_parameter *) malloc(sizeof(s_parameter));
     newParameter->type = TYPE_STRING;
     newParameter->id = parameterID;
@@ -326,7 +326,7 @@ void CTransaction::addParameter(short parameterID, short parameterLength, char *
     pDataLength += parameterLength + 4;
 }
 
-void CTransaction::addParameter(short parameterID, int parameterData) {
+void CTransaction::addParameter(qint16 parameterID, qint32 parameterData) {
     s_parameter * newParameter = (s_parameter *) malloc(sizeof(s_parameter));
     newParameter->id = parameterID;
     if(parameterData > 65535) {
@@ -346,41 +346,41 @@ void CTransaction::addParameter(short parameterID, int parameterData) {
 }
 
 
-unsigned short CTransaction::isReply() {
+quint16 CTransaction::isReply() {
     return pIsReply;
 }
 
-unsigned short CTransaction::transactionID() {
+quint16 CTransaction::transactionID() {
     return pTransactionID;
 }
 
-unsigned int CTransaction::taskID() {
+quint32 CTransaction::taskID() {
     return pTaskID;
 }
 
-int CTransaction::errorCode() {
+qint32 CTransaction::errorCode() {
     return pErrorCode;
 }
 
-unsigned int CTransaction::dataLength() {
+quint32 CTransaction::dataLength() {
     return pDataLength;
 }
 
-unsigned short CTransaction::numberOfParameters() {
+quint16 CTransaction::numberOfParameters() {
     return pNumberOfParameters;
 }
 
-unsigned int CTransaction::length() {
-    int len = 22;
+quint32 CTransaction::length() {
+    qint32 len = 22;
 
-    for(unsigned int i=0; i<pParameters.size(); i++) {
+    for(quint32 i=0; i<pParameters.size(); i++) {
         len += pParameters[i]->length + 4;
     }
     return len;
 }
 
-s_parameter * CTransaction::getParameterById(short parameterID) {
-    for(unsigned int i=0; i<pParameters.size(); i++) {
+s_parameter * CTransaction::getParameterById(qint16 parameterID) {
+    for(quint32 i=0; i<pParameters.size(); i++) {
         if(pParameters[i]->id == parameterID) {
             return pParameters[i];
         }
@@ -389,7 +389,7 @@ s_parameter * CTransaction::getParameterById(short parameterID) {
 }
 
 
-s_parameter * CTransaction::getParameter(unsigned int i) {
+s_parameter * CTransaction::getParameter(quint32 i) {
     if(i < pParameters.size()) {
         return pParameters[i];
     }

@@ -42,7 +42,7 @@ void DialogFileBrowser::dropEvent(QDropEvent *event) {
 }
 
 QString DialogFileBrowser::getExtension(QString name) {
-    int last = name.lastIndexOf(".");
+    qint32 last = name.lastIndexOf(".");
     if(last == -1) {
         return "";
     }
@@ -64,9 +64,9 @@ void DialogFileBrowser::load() {
 
         qDebug() << "Calculating size for path data...";
         QStringList levels = path.split("/", QString::SkipEmptyParts);
-        unsigned short directorylevels = levels.count();
-        unsigned short pathlen = 2 + directorylevels * 3;
-        for(int i=0; i<levels.count(); i++) {
+        quint16 directorylevels = levels.count();
+        quint16 pathlen = 2 + directorylevels * 3;
+        for(qint32 i=0; i<levels.count(); i++) {
             QString level = levels.at(i);
             pathlen += level.length();
         }
@@ -77,13 +77,13 @@ void DialogFileBrowser::load() {
         directorylevels = qToBigEndian(directorylevels);
         memcpy(pathdata, &directorylevels, 2);
 
-        int offset = 0;
-        for(int i=0; i<levels.count(); i++) {
+        qint32 offset = 0;
+        for(qint32 i=0; i<levels.count(); i++) {
             qDebug() << "Writing zeros...";
             memset(pathdata+offset+2, 0, 2);
             QString level = levels.at(i);
             unsigned char len = level.length();
-            qDebug() << "Writing name length... " << (unsigned short) len;
+            qDebug() << "Writing name length... " << (quint16) len;
             memcpy(pathdata+offset+4, &len, 1);
             qDebug() << level.toLocal8Bit().data();
             memcpy(pathdata+offset+5, level.toLocal8Bit().data(), len);
@@ -110,11 +110,11 @@ void DialogFileBrowser::onDoubleClick(QModelIndex model) {
 
 void DialogFileBrowser::onGotFileList(std::vector<s_hotlineFile *> list) {
     ui->treeWidget->clear();
-    for(unsigned int i=0; i<list.size(); i++) {
+    for(quint32 i=0; i<list.size(); i++) {
         QTreeWidgetItem * item = new QTreeWidgetItem();
         QString _n = QString(list[i]->name);
         item->setData(0, 0, _n);
-        int size = list[i]->size;
+        qint32 size = list[i]->size;
         if(!strncmp(list[i]->type, "fldr", 4)) {
             item->setData(1, 0, QString::number(size) + (size == 1 ? " item" : " items"));
         } else {
@@ -295,7 +295,7 @@ void DialogFileBrowser::onGotFileList(std::vector<s_hotlineFile *> list) {
     }
     ui->label->setText(QString::number(list.size())+" items");
     ui->treeWidget->setEnabled(true);
-    for(int i=0; i<ui->treeWidget->columnCount(); ++i)
+    for(qint32 i=0; i<ui->treeWidget->columnCount(); ++i)
     {
         ui->treeWidget->resizeColumnToContents(i);
     }
@@ -356,9 +356,9 @@ void DialogFileBrowser::requestUpload() {
 
     qDebug() << "Calculating size for path data...";
     QStringList levels = path.split("/", QString::SkipEmptyParts);
-    unsigned short directorylevels = levels.count();
-    unsigned short pathlen = 2 + directorylevels * 3;
-    for(int i=0; i<levels.count(); i++) {
+    quint16 directorylevels = levels.count();
+    quint16 pathlen = 2 + directorylevels * 3;
+    for(qint32 i=0; i<levels.count(); i++) {
         QString level = levels.at(i);
         pathlen += level.length();
     }
@@ -369,20 +369,20 @@ void DialogFileBrowser::requestUpload() {
     directorylevels = qToBigEndian(directorylevels);
     memcpy(pathdata, &directorylevels, 2);
 
-    int offset = 0;
-    for(int i=0; i<levels.count(); i++) {
+    qint32 offset = 0;
+    for(qint32 i=0; i<levels.count(); i++) {
         qDebug() << "Writing zeros...";
         memset(pathdata+offset+2, 0, 2);
         QString level = levels.at(i);
         unsigned char len = level.length();
-        qDebug() << "Writing name length... " << (unsigned short) len;
+        qDebug() << "Writing name length... " << (quint16) len;
         memcpy(pathdata+offset+4, &len, 1);
         qDebug() << level.toLocal8Bit().data();
         memcpy(pathdata+offset+5, level.toLocal8Bit().data(), len);
         offset += 3+len;
     }
     uploadRequest->addParameter(202, pathlen, pathdata);
-    uploadRequest->addParameter(108, (unsigned int)uploadedFile.size());
+    uploadRequest->addParameter(108, (quint32)uploadedFile.size());
     connection->sendTransaction(uploadRequest, true);
 
     emit requestedUpload(uploadedFile.fileName(), uploadedFile.size());

@@ -15,22 +15,22 @@ class CDownload : public QObject
 public:
     bool downloadInProgress;
     bool finished;
-    unsigned int referenceNumber;
-    unsigned int fileSize;
-    unsigned int timeElapsed;
+    quint32 referenceNumber;
+    quint32 fileSize;
+    quint32 timeElapsed;
     QTcpSocket socket;
     QFile * file;
     QString currentName;
     QString pathOnServer;
-    unsigned int bytesRead;
-    unsigned int bytesReadThisSession;
-    int dataSize;
-    unsigned int bytesWritten;
+    quint32 bytesRead;
+    quint32 bytesReadThisSession;
+    qint32 dataSize;
+    quint32 bytesWritten;
     ConnectionController * connection;
-    unsigned int lastRead;
+    quint32 lastRead;
     QTimer * downloadTimer;
-    unsigned int downloadSpeed;
-    unsigned int queuePosition;
+    quint32 downloadSpeed;
+    quint32 queuePosition;
     WidgetDownloadItem * widget;
     QListWidgetItem * itemPlaceholder;
     bool inited;
@@ -40,7 +40,7 @@ public:
     bool gotForkSize;
     qint32 forkSize;
 
-    int init();
+    qint32 init();
 
     CDownload();
 

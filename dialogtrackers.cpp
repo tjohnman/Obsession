@@ -61,7 +61,7 @@ void DialogTrackers::addTracker() {
 
 void DialogTrackers::deleteTracker() {
     if(ui->comboBox->count() > 0) {
-        for(unsigned int i=0; i<pTrackerNames.size(); i++) {
+        for(quint32 i=0; i<pTrackerNames.size(); i++) {
             if(pTrackerNames[i] == ui->comboBox->currentText()) {
                 pTrackerAddresses[i] = pTrackerAddresses.back();
                 pTrackerAddresses.pop_back();
@@ -78,10 +78,10 @@ void DialogTrackers::deleteTracker() {
 
 void DialogTrackers::saveTrackerList() {
     QSettings settings("mir", "contra");
-    settings.setValue("numtrackers", (int)pTrackerAddresses.size());
-    int numTrackers = settings.value("numtrackers").toInt();
+    settings.setValue("numtrackers", (qint32)pTrackerAddresses.size());
+    qint32 numTrackers = settings.value("numtrackers").toInt();
     qDebug() << "Saving " << numTrackers << " trackers...";
-    for(int i=0; i<numTrackers; i++) {
+    for(qint32 i=0; i<numTrackers; i++) {
         settings.setValue(QString("tracker")+QString::number(i), pTrackerNames[i]);
         settings.setValue(QString("trackeradd")+QString::number(i), pTrackerAddresses[i]);
     }
@@ -89,12 +89,12 @@ void DialogTrackers::saveTrackerList() {
 
 void DialogTrackers::updateTrackerList() {
     QSettings settings("mir", "contra");
-    int numTrackers = settings.value("numtrackers").toInt();
+    qint32 numTrackers = settings.value("numtrackers").toInt();
     qDebug() << "Loading " << numTrackers << " trackers...";
     pTrackerNames.clear();
     pTrackerAddresses.clear();
     ui->comboBox->clear();
-    for(int i=0; i<numTrackers; i++) {
+    for(qint32 i=0; i<numTrackers; i++) {
         pTrackerNames.push_back(settings.value(QString("tracker")+QString::number(i)).toString());
         pTrackerAddresses.push_back(settings.value(QString("trackeradd")+QString::number(i)).toString());
         ui->comboBox->addItem(pTrackerNames.back());
@@ -115,7 +115,7 @@ void DialogTrackers::updateServerList(QString tracker) {
 
     ui->treeWidget->clear();
 
-    for(unsigned int i=0; i<pTrackerNames.size(); i++) {
+    for(quint32 i=0; i<pTrackerNames.size(); i++) {
         qDebug() << "Searching...";
         if(pTrackerNames[i] == tracker) {
             qDebug() << "Found address in list";
@@ -155,7 +155,7 @@ void DialogTrackers::sendRequest() {
 void DialogTrackers::onSocketData() {
     qDebug() << "Getting header...";
 
-    unsigned short confirm;
+    quint16 confirm;
     
     char * buffer;
     if(!gotHeader) {
@@ -199,14 +199,14 @@ void DialogTrackers::onSocketData() {
         QString name;
         QString description;
         QString address;
-        unsigned short port, users;
+        quint16 port, users;
 
         unsigned char len;
 
         buffer = (char *) malloc(5);
         memset(buffer, 0, 5);
 
-        unsigned short a, b, c, d;
+        quint16 a, b, c, d;
         QByteArray ipbuffer = pSocket->read(4).data();
 
         a = (unsigned char) ipbuffer[0];
@@ -242,7 +242,7 @@ void DialogTrackers::onSocketData() {
         buffer = pSocket->read(1).data();
         len = 0;
         memcpy(&len, buffer, 1);
-        qDebug() << "Name is " << (int)len << " bytes long";
+        qDebug() << "Name is " << (qint32)len << " bytes long";
 
         QTextStream stream(pSocket->read(len));
         stream.setCodec("Shift-JIS");
@@ -255,7 +255,7 @@ void DialogTrackers::onSocketData() {
         buffer = pSocket->read(1).data();
         len = 0;
         memcpy(&len, buffer, 1);
-        qDebug() << "Description is " << (int)len << " bytes long";
+        qDebug() << "Description is " << (qint32)len << " bytes long";
 
         QTextStream stream2(pSocket->read(len));
         stream2.setCodec("Shift-JIS");

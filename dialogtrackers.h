@@ -33,9 +33,9 @@ private:
     DialogAddTracker * addTrackerDialog;
     void saveTrackerList();
     bool gotHeader;
-    unsigned short totalBytes, dataLength, lastPassBytes;
-    int numServers;
-    unsigned short numberOfServers;;
+    quint16 totalBytes, dataLength, lastPassBytes;
+    qint32 numServers;
+    quint16 numberOfServers;;
 
 private slots:
     void updateServerList(QString);

@@ -12,8 +12,8 @@ public:
     void run();
 
 signals:
-    void loadedItem(int, QListWidgetItem *);
-    void startIconCount(int);
+    void loadedItem(qint32, QListWidgetItem *);
+    void startIconCount(qint32);
     
 public slots:
     

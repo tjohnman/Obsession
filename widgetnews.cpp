@@ -10,7 +10,7 @@ WidgetNews::WidgetNews(ConnectionController * c, QWidget *parent) :
     ui->setupUi(this);
     connection = c;
     connect(connection, SIGNAL(gotNewsCategory(unsigned char, QString)), this, SLOT(onNewsCategory(unsigned char,QString)));
-    connect(connection, SIGNAL(gotNewsItem(QString, unsigned int, unsigned int)), this, SLOT(onNewsItems(QString, unsigned int, unsigned int)));
+    connect(connection, SIGNAL(gotNewsItem(QString, quint32, quint32)), this, SLOT(onNewsItems(QString, quint32, quint32)));
     connect(connection, SIGNAL(gotNewsArticleText(QString, QString, QString)), this, SLOT(onNewsArticleText(QString, QString, QString)));
     connect(ui->treeWidget, SIGNAL(clicked(QModelIndex)), this, SLOT(getNews()));
 }
@@ -35,7 +35,7 @@ void WidgetNews::getNews() {
             font.setBold(false);
             ui->treeWidget->currentItem()->setFont(0, font);
             getTransaction = connection->createTransaction(400);
-            getTransaction->addParameter(326, (unsigned short)ui->treeWidget->currentItem()->data(2, 0).toInt());
+            getTransaction->addParameter(326, (quint16)ui->treeWidget->currentItem()->data(2, 0).toInt());
             getTransaction->addParameter(327, 10, (char *)"text/plain");
         }
         ui->treeWidget->currentItem()->takeChildren();
@@ -58,9 +58,9 @@ void WidgetNews::getNews() {
 
             qDebug() << "Calculating size for path data...";
             QStringList levels = path.split(":", QString::SkipEmptyParts);
-            unsigned short directorylevels = levels.count();
-            unsigned short pathlen = 2 + directorylevels * 3;
-            for(int i=0; i<levels.count(); i++) {
+            quint16 directorylevels = levels.count();
+            quint16 pathlen = 2 + directorylevels * 3;
+            for(qint32 i=0; i<levels.count(); i++) {
                 QString level = levels.at(i);
                 pathlen += level.length();
             }
@@ -71,13 +71,13 @@ void WidgetNews::getNews() {
             directorylevels = qToBigEndian(directorylevels);
             memcpy(pathdata, &directorylevels, 2);
 
-            int offset = 0;
-            for(int i=0; i<levels.count(); i++) {
+            qint32 offset = 0;
+            for(qint32 i=0; i<levels.count(); i++) {
                 qDebug() << "Writing zeros...";
                 memset(pathdata+offset+2, 0, 2);
                 QString level = levels.at(i);
                 unsigned char len = level.length();
-                qDebug() << "Writing name length... " << (unsigned short) len;
+                qDebug() << "Writing name length... " << (quint16) len;
                 memcpy(pathdata+offset+4, &len, 1);
                 qDebug() << level.toLocal8Bit().data();
                 memcpy(pathdata+offset+5, level.toLocal8Bit().data(), len);
@@ -145,7 +145,7 @@ void WidgetNews::onNewsArticleText(QString t, QString poster, QString timestamp)
     ui->treeWidget->setEnabled(true);
 }
 
-void WidgetNews::onNewsItems(QString _name, unsigned int id, unsigned int pid) {
+void WidgetNews::onNewsItems(QString _name, quint32 id, quint32 pid) {
     qDebug() << "Inserting news item in list...";
     QTreeWidgetItem * currentItem = NULL;
     if(ui->treeWidget->currentItem()) {
@@ -186,7 +186,7 @@ void WidgetNews::onNewsCategory(unsigned char _type, QString _name) {
     QTreeWidgetItem * newItem = new QTreeWidgetItem();
 
     newItem->setData(0, 0, _name);
-    newItem->setData(1, 0, (unsigned short) _type);
+    newItem->setData(1, 0, (quint16) _type);
 
     switch(_type) {
     case 2:

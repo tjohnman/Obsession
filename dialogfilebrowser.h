@@ -44,8 +44,8 @@ private slots:
     void selectFileToUpload();
 
 signals:
-    void requestedFile(QString, int, QString);
-    void requestedUpload(QString, int);
+    void requestedFile(QString, qint32, QString);
+    void requestedUpload(QString, qint32);
 };
 
 #endif // DIALOGFILEBROWSER_H

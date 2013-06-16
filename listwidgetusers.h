@@ -19,8 +19,8 @@ public:
     explicit ListWidgetUsers(QWidget *parent = 0);
 
 signals:
-    void openMessagingWindow(unsigned int);
-    void openUserInfo(unsigned int);
+    void openMessagingWindow(quint32);
+    void openUserInfo(quint32);
 
 public slots:
     void sendOpenRequest();

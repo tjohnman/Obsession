@@ -12,10 +12,10 @@ namespace Ui {
 class DialogPrivateMessaging : public QDialog {
     Q_OBJECT
 public:
-    DialogPrivateMessaging(short, ConnectionController *, QWidget *parent = 0);
+    DialogPrivateMessaging(qint16, ConnectionController *, QWidget *parent = 0);
     ~DialogPrivateMessaging();
 
-    short uid;
+    qint16 uid;
     ConnectionController * connection;
     s_user * user;
 

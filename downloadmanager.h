@@ -22,24 +22,24 @@ class DownloadManager : public QObject
     Q_OBJECT
 public:
     bool downloadInProgress;
-    unsigned int referenceNumber;
-    unsigned int fileSize;
+    quint32 referenceNumber;
+    quint32 fileSize;
     QTcpSocket socket;
     QProgressBar * progressBar;
     QFile * file;
     QString currentName;
-    unsigned int bytesRead;
-    unsigned int dataSize;
-    int bytesWritten;
+    quint32 bytesRead;
+    quint32 dataSize;
+    qint32 bytesWritten;
     ConnectionController * connection;
-    unsigned int lastRead;
+    quint32 lastRead;
     QTimer * downloadsTimer;
-    unsigned int downloadSpeed;
+    quint32 downloadSpeed;
     QListWidget * listWidget;
 
     std::vector<CDownload *> downloads;
 
-    int init(unsigned int reference, unsigned int size);
+    qint32 init(quint32 reference, quint32 size);
 
     void sendDownloadRequestToServer(CDownload *);
 
@@ -48,9 +48,9 @@ public:
 private slots:
 
 public slots:
-    void addDownload(unsigned int, unsigned int, unsigned int);
-    void onRequestedFile(QString name, int size, QString path);
-    void onQueueUpdate(unsigned int, unsigned int);
+    void addDownload(quint32, quint32, quint32);
+    void onRequestedFile(QString name, qint32 size, QString path);
+    void onQueueUpdate(quint32, quint32);
     uint cleanIdle();
     void onDownloadFinished();
     void onForcedDownload(CDownload *);

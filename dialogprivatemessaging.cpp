@@ -3,7 +3,7 @@
 #include <QSettings>
 
 
-DialogPrivateMessaging::DialogPrivateMessaging(short id, ConnectionController * c, QWidget *parent) :
+DialogPrivateMessaging::DialogPrivateMessaging(qint16 id, ConnectionController * c, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::DialogPrivateMessaging)
 {
@@ -46,7 +46,7 @@ void DialogPrivateMessaging::sendMessage() {
         ui->textEdit->moveCursor(QTextCursor::End);
         QStringList words = ui->lineEdit->text().split(" ");
         QStringList newWords;
-        for(int i=0; i<words.size(); i++) {
+        for(qint32 i=0; i<words.size(); i++) {
             if(words.at(i).startsWith("www.")) {
                 QString URL = "<a href=\"http://"+words.at(i)+"\">"+words.at(i)+"</a>";
                 newWords.append(URL);
@@ -75,7 +75,7 @@ void DialogPrivateMessaging::gotMessage(QString m) {
     ui->textEdit->moveCursor(QTextCursor::End);
     QStringList words = m.split(" ");
     QStringList newWords;
-    for(int i=0; i<words.size(); i++) {
+    for(qint32 i=0; i<words.size(); i++) {
         if(words.at(i).startsWith("www.")) {
             QString URL = "<a href=\"http://"+words.at(i)+"\">"+words.at(i)+"</a>";
             newWords.append(URL);

@@ -18,11 +18,11 @@ public:
     bool pAFK;
     QString serverName();
 
-    int connectToServer(QString address, QString login, QString password);
+    qint32 connectToServer(QString address, QString login, QString password);
     void sendTransaction(CTransaction *, bool expectReply = false);
     void sendChatText(QString);
     void sendEmote(QString);
-    void sendPMToUser(int, QString, bool automatic = false);
+    void sendPMToUser(qint32, QString, bool automatic = false);
 
     bool isConnected();
     void toggleAFK();
@@ -31,11 +31,11 @@ public:
 
     void closeConnection();
 
-    s_user * getUserByUid(short uid);
+    s_user * getUserByUid(qint16 uid);
     s_user * getUserByName(QString name);
     std::vector<s_user *> * getUserList();
 
-    CTransaction * createTransaction(short id);
+    CTransaction * createTransaction(qint16 id);
 
     QString serverIdent;
 
@@ -85,18 +85,18 @@ private:
 
     QByteArray pLogin;
     QByteArray pPassword;
-    unsigned short pIconID;
+    quint16 pIconID;
     QString pNickname;
-    short pClientVersion;
-    unsigned short ownUserID;
+    qint16 pClientVersion;
+    quint16 ownUserID;
 
     QString pServerAddress;
     quint16 pServerPort;
     QByteArray pServerName;
-    short pServerVersion;
+    qint16 pServerVersion;
     QString pServerAgreement;
 
-    int pTaskIDCounter;
+    qint32 pTaskIDCounter;
 
     void sendUserInfo();
 
@@ -112,21 +112,21 @@ public slots:
 
 signals:
     void gotServerName();
-    void gotChatMessage(char * t, short l);
+    void gotChatMessage(char * t, qint16 l);
     void userListChanged();
-    void gotPM(short, QString);
+    void gotPM(qint16, QString);
     void gotFileList(std::vector<s_hotlineFile *>);
     void serverError(QString);
     void socketError(QString);
     void connected();
     void gotLinearNews(QString);
     void connecting();
-    void gotFile(unsigned int, unsigned int, unsigned int);
-    void serverUpdatedQueue(unsigned int, unsigned int);
+    void gotFile(quint32, quint32, quint32);
+    void serverUpdatedQueue(quint32, quint32);
     void gotNewsCategory(unsigned char, QString);
-    void gotNewsItem(QString, unsigned int id, unsigned int pid);
+    void gotNewsItem(QString, quint32 id, quint32 pid);
     void gotNewsArticleText(QString, QString, QString);
-    void gotUpload(unsigned int);
+    void gotUpload(quint32);
 };
 
 #endif // CONNECTIONCONTROLLER_H

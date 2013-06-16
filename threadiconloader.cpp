@@ -11,7 +11,7 @@ void ThreadIconLoader::run() {
     QFileInfoList fileList = iconsFolder.entryInfoList();
     emit startIconCount(iconsFolder.count()-2);
 
-    for(unsigned int i=2; i<iconsFolder.count(); i++) {
+    for(quint32 i=2; i<iconsFolder.count(); i++) {
         QListWidgetItem * item = new QListWidgetItem();
         item->setSizeHint(QSize(232, 18));
         item->setIcon(QIcon(QPixmap::fromImage(QImage(fileList[i].absoluteFilePath()))));

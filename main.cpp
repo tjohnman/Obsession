@@ -7,7 +7,7 @@
 
 void kill_threads( void );
 
-int main(int argc, char *argv[])
+qint32 main(qint32 argc, char *argv[])
 {
     FILE * debugLog = fopen("log.txt", "a");
     if(debugLog)
@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
 
     w.show();
     w.openNewConnectionDialog();
-    int r = a.exec();
+    qint32 r = a.exec();
     QThreadPool::globalInstance()->waitForDone(); // Wait for all threads to close
     return r;
 }

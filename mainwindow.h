@@ -46,10 +46,10 @@ public slots:
     void slotCloseWindow();
     void disconnect();
     void onGotServerName();
-    void onGotChatMessage(char *, short);
-    void onGotPM(short, QString);
-    void onOpenMessagingWindow(unsigned int);
-    void onOpenUserInfo(unsigned int);
+    void onGotChatMessage(char *, qint16);
+    void onGotPM(qint16, QString);
+    void onOpenMessagingWindow(quint32);
+    void onOpenUserInfo(quint32);
     void onUserListChanged();
     void openPreferencesDialog();
     void showServerAgreement();
@@ -65,7 +65,7 @@ public slots:
     void onConnecting();
     void openDownloads();
     void openUploads();
-    void removeTab(int);
+    void removeTab(qint32);
     void slotCloseTab();
     void onDownloadQueueUpdated();
     void openThreadedNews();

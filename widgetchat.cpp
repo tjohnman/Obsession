@@ -23,7 +23,7 @@ void WidgetChat::printChat(QString s) {
     }
     QStringList words = s.split(" ");
     QStringList newWords;
-    for(int i=0; i<words.size(); i++) {
+    for(qint32 i=0; i<words.size(); i++) {
         if(words.at(i).startsWith("www.")) {
             QString URL = "<a href=\"http://"+words.at(i)+"\">"+words.at(i)+"</a>";
             newWords.append(URL);

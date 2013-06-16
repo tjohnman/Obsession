@@ -63,8 +63,8 @@ void DialogBookmarks::selectedBookmark() {
 void DialogBookmarks::loadBookmarks() {
     QSettings settings("mir", "Contra");
     ui->listWidget->clear();
-    int bookmarkCount = settings.value("bookmarkCount", 0).toInt();
-    for(int i=0; i<bookmarkCount; i++) {
+    qint32 bookmarkCount = settings.value("bookmarkCount", 0).toInt();
+    for(qint32 i=0; i<bookmarkCount; i++) {
         ui->listWidget->addItem(settings.value("bookmarkname"+QString::number(i)).toString());
     }
     ui->listWidget->setCurrentRow(0);
@@ -73,7 +73,7 @@ void DialogBookmarks::loadBookmarks() {
 
 void DialogBookmarks::newBookmark() {
     QSettings settings("mir", "Contra");
-    int bookmarkCount = settings.value("bookmarkCount", 0).toInt();
+    qint32 bookmarkCount = settings.value("bookmarkCount", 0).toInt();
     ui->lineEdit->setText("New bookmark");
     ui->lineEdit_2->clear();
     ui->lineEdit_3->clear();
@@ -93,13 +93,13 @@ void DialogBookmarks::newBookmark() {
 void DialogBookmarks::deleteBookmark() {
     QSettings settings("mir", "Contra");
     if(ui->listWidget->currentItem()) {
-        int row = ui->listWidget->currentRow();
-        int bookmarkCount = settings.value("bookmarkCount", 0).toInt();
+        qint32 row = ui->listWidget->currentRow();
+        qint32 bookmarkCount = settings.value("bookmarkCount", 0).toInt();
         settings.remove("bookmarkname"+QString::number(row));
         settings.remove("bookmarkaddress"+QString::number(row));
         settings.remove("bookmarklogin"+QString::number(row));
         settings.remove("bookmarkpassword"+QString::number(row));
-        for(int i=row; i<bookmarkCount-1; i++) {
+        for(qint32 i=row; i<bookmarkCount-1; i++) {
             settings.setValue("bookmarkname"+QString::number(i), settings.value("bookmarkname"+QString::number(i+1)).toString());
             settings.setValue("bookmarkaddress"+QString::number(i), settings.value("bookmarkaddress"+QString::number(i+1)).toString());
             settings.setValue("bookmarklogin"+QString::number(i), settings.value("bookmarklogin"+QString::number(i+1)).toString());

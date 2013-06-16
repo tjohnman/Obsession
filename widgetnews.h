@@ -21,7 +21,7 @@ public:
 
 public slots:
     void onNewsCategory(unsigned char, QString);
-    void onNewsItems(QString, unsigned int, unsigned int);
+    void onNewsItems(QString, quint32, quint32);
     void getNews();
     void onNewsArticleText(QString, QString, QString);
 

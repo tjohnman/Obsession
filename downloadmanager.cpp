@@ -15,11 +15,11 @@ DownloadManager::DownloadManager(ConnectionController * c)
 }
 
 uint DownloadManager::cleanIdle() {
-    unsigned int deleted = 1;
+    quint32 deleted = 1;
     CDownload * download = NULL;
     while(deleted) {
         deleted = 0;
-        for(unsigned int i=0; i<downloads.size(); i++) {
+        for(quint32 i=0; i<downloads.size(); i++) {
             download = downloads[i];
             if(download->finished) {
                 listWidget->removeItemWidget(download->itemPlaceholder);
@@ -41,10 +41,10 @@ uint DownloadManager::cleanIdle() {
 }
 
 void DownloadManager::onDownloadFinished() {
-    unsigned int active = 0;
+    quint32 active = 0;
     qDebug() << "Local queue updated";
 
-    for(unsigned int i=0; i<downloads.size(); i++) {
+    for(quint32 i=0; i<downloads.size(); i++) {
         CDownload * download;
         download = downloads[i];
         if(download->inited && !download->finished) {
@@ -53,11 +53,11 @@ void DownloadManager::onDownloadFinished() {
     }
 
     QSettings settings("mir", "Contra");
-    int dlqueue = settings.value("dlqueue", 0).toInt();
+    qint32 dlqueue = settings.value("dlqueue", 0).toInt();
 
-    int free;
+    qint32 free;
     if(dlqueue <= 0) {
-        for(unsigned int i=0; i<downloads.size(); i++) {
+        for(quint32 i=0; i<downloads.size(); i++) {
             CDownload * download;
             download = downloads[i];
             if(download->widget->infoLabel()->text() == "Queued") {
@@ -67,8 +67,8 @@ void DownloadManager::onDownloadFinished() {
         }
     } else {
         free = dlqueue - active;
-        for(int d=0; d<free; d++) {
-            for(unsigned int i=0; i<downloads.size(); i++) {
+        for(qint32 d=0; d<free; d++) {
+            for(quint32 i=0; i<downloads.size(); i++) {
                 CDownload * download;
                 download = downloads[i];
                 if(download->widget->infoLabel()->text() == "Queued") {
@@ -100,9 +100,9 @@ void DownloadManager::sendDownloadRequestToServer(CDownload * download) {
 
     qDebug() << "Calculating size for path data...";
     QStringList levels = path.split("/", QString::SkipEmptyParts);
-    unsigned short directorylevels = levels.count();
-    unsigned short pathlen = 2 + directorylevels * 3;
-    for(int i=0; i<levels.count(); i++) {
+    quint16 directorylevels = levels.count();
+    quint16 pathlen = 2 + directorylevels * 3;
+    for(qint32 i=0; i<levels.count(); i++) {
         QString level = levels.at(i);
         pathlen += level.length();
     }
@@ -113,13 +113,13 @@ void DownloadManager::sendDownloadRequestToServer(CDownload * download) {
     directorylevels = qToBigEndian(directorylevels);
     memcpy(pathdata, &directorylevels, 2);
 
-    int offset = 0;
-    for(int i=0; i<levels.count(); i++) {
+    qint32 offset = 0;
+    for(qint32 i=0; i<levels.count(); i++) {
         qDebug() << "Writing zeros...";
         memset(pathdata+offset+2, 0, 2);
         QString level = levels.at(i);
         unsigned char len = level.length();
-        qDebug() << "Writing name length... " << (unsigned short) len;
+        qDebug() << "Writing name length... " << (quint16) len;
         memcpy(pathdata+offset+4, &len, 1);
         qDebug() << level.toLocal8Bit().data();
         memcpy(pathdata+offset+5, level.toLocal8Bit().data(), len);
@@ -132,7 +132,7 @@ void DownloadManager::sendDownloadRequestToServer(CDownload * download) {
     QFile preFile;
     preFile.setFileName("Downloads/"+QString(download->currentName));
     if(preFile.exists()) {
-        unsigned int preSize = preFile.size();
+        quint32 preSize = preFile.size();
         qDebug() << "Existing file size is " << preSize;
         preSize = qToBigEndian(preSize);
         char resumeData[74];
@@ -147,9 +147,9 @@ void DownloadManager::sendDownloadRequestToServer(CDownload * download) {
     connection->sendTransaction(fileRequest, true);
 }
 
-void DownloadManager::onQueueUpdate(unsigned int ref, unsigned int pos) {
+void DownloadManager::onQueueUpdate(quint32 ref, quint32 pos) {
     CDownload * download = NULL;
-    for(unsigned int i=0; i<downloads.size(); i++) {
+    for(quint32 i=0; i<downloads.size(); i++) {
         if(downloads[i]->referenceNumber == ref) {
             download = downloads[i];
             qDebug() << "Got item";
@@ -161,7 +161,7 @@ void DownloadManager::onQueueUpdate(unsigned int ref, unsigned int pos) {
     qDebug() << "Got queue update but no download matches the reference number.";
 }
 
-void DownloadManager::onRequestedFile(QString name, int size, QString path) {
+void DownloadManager::onRequestedFile(QString name, qint32 size, QString path) {
     if(size < 0) {
         DialogError error("The Hotline protocol does not support files over 2GB in size.", 0);
         error.show();
@@ -176,7 +176,7 @@ void DownloadManager::onRequestedFile(QString name, int size, QString path) {
     QFile preFile;
     preFile.setFileName("Downloads/"+QString(newDownload->currentName));
     if(preFile.exists()) {
-        unsigned int preSize = preFile.size();
+        quint32 preSize = preFile.size();
         qDebug() << "Existing file size is " << preSize;
         newDownload->bytesRead = preSize;
         newDownload->dataSize = size - preSize;
@@ -210,10 +210,10 @@ void DownloadManager::onRequestedFile(QString name, int size, QString path) {
     onDownloadFinished();
 }
 
-void DownloadManager::addDownload(unsigned int ref, unsigned int size, unsigned int queuepos) {
+void DownloadManager::addDownload(quint32 ref, quint32 size, quint32 queuepos) {
     CDownload * newDownload = NULL;
     qDebug() << "Trying to match size: "<<size;
-    for(unsigned int i=0; i<downloads.size(); i++) {
+    for(quint32 i=0; i<downloads.size(); i++) {
         if(downloads[i]->fileSize == size) {
             newDownload = downloads[i];
         }
@@ -221,7 +221,7 @@ void DownloadManager::addDownload(unsigned int ref, unsigned int size, unsigned 
 
     if(newDownload == NULL) {
         qDebug() << "Server did not send size. Guessing...";
-        for(unsigned int i=0; i<downloads.size(); i++) {
+        for(quint32 i=0; i<downloads.size(); i++) {
             if(!downloads[i]->matched) {
                 newDownload = downloads[i];
                 break;

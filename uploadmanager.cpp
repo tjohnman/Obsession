@@ -12,11 +12,11 @@ UploadManager::UploadManager(ConnectionController * c)
 }
 
 uint UploadManager::cleanIdle() {
-    unsigned int deleted = 1;
+    quint32 deleted = 1;
     CUpload * upload = NULL;
     while(deleted) {
         deleted = 0;
-        for(unsigned int i=0; i<uploads.size(); i++) {
+        for(quint32 i=0; i<uploads.size(); i++) {
             upload = uploads[i];
             if(upload->finished) {
                 listWidget->removeItemWidget(upload->itemPlaceholder);
@@ -37,7 +37,7 @@ uint UploadManager::cleanIdle() {
     return deleted;
 }
 
-void UploadManager::onRequestedFile(QString name, int size) {
+void UploadManager::onRequestedFile(QString name, qint32 size) {
     CUpload * upload = new CUpload();
     upload->fileSize = size;
     qDebug() << "Got new item. Will use size "<<size<<" for matching";
@@ -59,11 +59,11 @@ void UploadManager::onRequestedFile(QString name, int size) {
     uploads.push_back(upload);
 }
 
-void UploadManager::addUpload(unsigned int ref) {
+void UploadManager::addUpload(quint32 ref) {
     qDebug() << "Got signal from connection controller";
     CUpload * upload = NULL;
     qDebug() << "Trying to find pending";
-    for(unsigned int i=0; i<uploads.size(); i++) {
+    for(quint32 i=0; i<uploads.size(); i++) {
         if(uploads[i]->pending) {
             upload = uploads[i];
             upload->pending = false;

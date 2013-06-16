@@ -1,7 +1,7 @@
 #include "dialoguserinfo.h"
 #include "ui_dialoguserinfo.h"
 
-DialogUserInfo::DialogUserInfo(short id, ConnectionController * c, QWidget *parent) :
+DialogUserInfo::DialogUserInfo(qint16 id, ConnectionController * c, QWidget *parent) :
         QDialog(parent),
         ui(new Ui::DialogUserInfo)
 {

@@ -24,9 +24,9 @@ void ListWidgetUsers::contextMenuEvent(QContextMenuEvent * event) {
 }
 
 void ListWidgetUsers::sendOpenRequest() {
-    emit openMessagingWindow((unsigned int)this->selectedIndexes().at(0).row());
+    emit openMessagingWindow((quint32)this->selectedIndexes().at(0).row());
 }
 
 void ListWidgetUsers::sendInfoRequest() {
-    emit openUserInfo((unsigned int)this->selectedIndexes().at(0).row());
+    emit openUserInfo((quint32)this->selectedIndexes().at(0).row());
 }

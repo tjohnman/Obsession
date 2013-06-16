@@ -11,7 +11,7 @@ namespace Ui {
 class DialogUserInfo : public QDialog {
     Q_OBJECT
 public:
-    DialogUserInfo(short, ConnectionController *, QWidget *parent = 0);
+    DialogUserInfo(qint16, ConnectionController *, QWidget *parent = 0);
     ~DialogUserInfo();
 
 protected:

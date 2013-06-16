@@ -96,22 +96,22 @@ void CDownload::updateSpeed() {
     timeElapsed++;
 
     float averageSecondsPerByte = (float)timeElapsed/(float)bytesReadThisSession;
-    unsigned int secondsRemaining = (fileSize - bytesRead)*averageSecondsPerByte;
+    quint32 secondsRemaining = (fileSize - bytesRead)*averageSecondsPerByte;
 
     if(secondsRemaining >= 60) {
-        unsigned int minutesRemaining = 0;
+        quint32 minutesRemaining = 0;
         while(secondsRemaining > 60) {
             minutesRemaining++;
             secondsRemaining -= 60;
         }
         if(minutesRemaining >= 60) {
-            unsigned int hoursRemaining = 0;
+            quint32 hoursRemaining = 0;
             while(minutesRemaining > 60) {
                 hoursRemaining++;
                 minutesRemaining -= 60;
             }
             if(hoursRemaining >= 24) {
-                unsigned int daysRemaining = 0;
+                quint32 daysRemaining = 0;
                 while(hoursRemaining > 24) {
                     daysRemaining++;
                     hoursRemaining -= 24;
@@ -164,7 +164,7 @@ void CDownload::forceDownload() {
     emit forcedDownload(this);
 }
 
-int CDownload::init() {
+qint32 CDownload::init() {
     matched = true;
     timeElapsed = 0;
     bytesReadThisSession = 1;
@@ -223,7 +223,7 @@ void CDownload::startDownloading() {
 
         char magic[17];
         memcpy(magic, "HTXF", 4);
-        unsigned int ref = qToBigEndian(referenceNumber);
+        quint32 ref = qToBigEndian(referenceNumber);
         memcpy(magic+4, &ref, 4);
         memset(magic+8, 0, 8);
         magic[16] = '\0';
@@ -342,7 +342,7 @@ void CDownload::serverReady() {
 
 void CDownload::gotData() {
     //qDebug() << "Got data (" << socket.bytesAvailable() << ")";
-    int read = socket.bytesAvailable();
+    qint32 read = socket.bytesAvailable();
     if(read <= 0) {
         // Still nothing to read.
         return;

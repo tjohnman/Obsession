@@ -107,7 +107,7 @@ void CUpload::updateSpeed() {
         emit uploadFinished();
         return;
     } else {
-        unsigned int sent;
+        quint32 sent;
 
         if(dataSize - bytesSent < 4096) {
             sent = socket.write(file->read((dataSize - bytesSent)), (dataSize - bytesSent));
@@ -131,7 +131,7 @@ void CUpload::updateName() {
     widget->nameLabel()->setText(currentName);
 }
 
-int CUpload::init() {
+qint32 CUpload::init() {
     uploadInProgress = false;
     dataSize = fileSize;
     widget->progressBar()->setMaximum(dataSize);
@@ -161,10 +161,10 @@ void CUpload::startUploading() {
         qDebug() << "Sending magic...";
         char magic[17] = {0x48, 0x54, 0x58, 0x46};
         qDebug() << "Reference is "<<referenceNumber;
-        unsigned int ref = qToBigEndian(referenceNumber);
+        quint32 ref = qToBigEndian(referenceNumber);
         memcpy(magic+4, &ref, 4);
         qDebug() << "Size is "<<fileSize;
-        unsigned int s = qToBigEndian(fileSize);
+        quint32 s = qToBigEndian(fileSize);
         memcpy(magic+8, &s, 4);
         memset(magic+12, 0, 4);
         magic[16] = '\0';
@@ -183,7 +183,7 @@ void CUpload::startUploading() {
 
         socket.write(flatheader, 24);
 
-        unsigned short forksize = 72 + currentName.toLocal8Bit().length();  // We need to get the number of bytes, not the
+        quint16 forksize = 72 + currentName.toLocal8Bit().length();  // We need to get the number of bytes, not the
                                                                         // number of characters. For Japanese chars.
         forksize = qToBigEndian(forksize);
 
@@ -197,7 +197,7 @@ void CUpload::startUploading() {
         memcpy(infork, "MWIN", 4);
         memset(infork+4, '?', 8);
         memset(infork+12, 0, 58);
-        unsigned short namesize = currentName.toLocal8Bit().length();
+        quint16 namesize = currentName.toLocal8Bit().length();
         namesize = qToBigEndian(namesize);
         memcpy(infork+70, &namesize, 2);
         memcpy(infork+72, currentName.toLocal8Bit().data(), currentName.toLocal8Bit().length());
@@ -208,7 +208,7 @@ void CUpload::startUploading() {
         char header[16] = {0x44, 0x41, 0x54, 0x41};
         memset(header+4, 0, 8);
         qDebug() << "Data size : " << dataSize;
-        unsigned int siz = qToBigEndian(dataSize);
+        quint32 siz = qToBigEndian(dataSize);
         memcpy(header+12, &siz, 4);
         socket.write(header, 16);
         socket.flush();
