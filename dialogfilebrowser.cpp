@@ -103,7 +103,7 @@ void DialogFileBrowser::load() {
             qDebug() << "Writing zeros...";
             memset(pathdata+offset+2, 0, 2);
             QString level = levels.at(i);
-            unsigned char len = level.length();
+            unsigned char len = level.toLocal8Bit().size();
             qDebug() << "Writing name length... " << (quint16) len;
             memcpy(pathdata+offset+4, &len, 1);
             qDebug() << level.toLocal8Bit().data();
@@ -122,7 +122,7 @@ void DialogFileBrowser::load() {
 void DialogFileBrowser::onDoubleClick(QModelIndex model) {
     QTreeWidgetItem * item = ui->treeWidget->currentItem();
     if(item->data(2, 0).toString() == "fldr") {
-        path = QString(path + item->data(0, 0).toString() + "/");
+        path = QString(path + rawNameList[model.row()] + "/");
         load();
     } else {
         requestFile();
@@ -131,9 +131,11 @@ void DialogFileBrowser::onDoubleClick(QModelIndex model) {
 
 void DialogFileBrowser::onGotFileList(std::vector<s_hotlineFile *> list) {
     ui->treeWidget->clear();
+    rawNameList.clear();
     for(quint32 i=0; i<list.size(); i++) {
         QTreeWidgetItem * item = new QTreeWidgetItem();
         QString _n = QString(list[i]->name);
+        rawNameList.push_back(QString::fromLocal8Bit(list[i]->name));
         item->setData(0, 0, _n);
         qint32 size = list[i]->size;
         if(!strncmp(list[i]->type, "fldr", 4)) {

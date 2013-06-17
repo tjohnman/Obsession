@@ -37,6 +37,7 @@ private:
     QString path;
     QString getExtension(QString name);
     QFile uploadedFile;
+    QList<QString> rawNameList;
 
 private slots:
     void onGotFileList(std::vector<s_hotlineFile *>);
