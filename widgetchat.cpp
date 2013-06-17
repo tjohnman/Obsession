@@ -33,9 +33,12 @@ void WidgetChat::printChat(QString s) {
         } else if(words.at(i) == "<")
         {
             newWords.append("&lt;");
+        } else if(words.at(i).endsWith("<"))
+        {
+            newWords.append(words.at(i).left(words.at(i).length()-1) + "&lt;");
         } else if(words.at(i).startsWith("<-"))
         {
-            newWords.append(QString("&lt;-%1").arg(words.at(i).right(words.at(i).length()-2)));
+            newWords.append(QString("&lt;-")+words.at(i).right(words.at(i).length()-2));
         }
         else
         {
@@ -89,20 +92,15 @@ void WidgetChat::setChatFont(QFont font) {
 void WidgetChat::slotSendChat() {
     QString text = ui->lineEdit->text();
     if(text.length()) {
-        if(text.startsWith("/") || ui->lineEdit->altPressed) {
-            if(text.startsWith("/em ") || text.startsWith("/me ")) {
-                connection->sendEmote(text.right(text.length()-4));
-            }
-            if(ui->lineEdit->altPressed) {
-                connection->sendEmote(text);
-            }
-            if(text.startsWith("/afk")) {
-                connection->toggleAFK();
-            }
-        } else {
+        if(ui->lineEdit->altPressed)
+        {
+            connection->sendEmote(text);
+        }
+        else
+        {
             connection->sendChatText(text);
         }
-    ui->lineEdit->clear();
+        ui->lineEdit->clear();
     }
 }
 
