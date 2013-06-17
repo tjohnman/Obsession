@@ -48,6 +48,7 @@ void DialogOpenConnection::changeEvent(QEvent *e)
 }
 
 void DialogOpenConnection::clear() {
+    ui->comboBox->setCurrentIndex(-1);
     ui->lineEdit->setText("");
     ui->lineEdit_2->setText("");
     ui->lineEdit_3->setText("");
