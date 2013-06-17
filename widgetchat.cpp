@@ -28,7 +28,7 @@ void WidgetChat::printChat(QString s) {
             QString URL = "<a href=\"http://"+words.at(i)+"\">"+words.at(i)+"</a>";
             newWords.append(URL);
         } else {
-            if(words.at(i).startsWith("http://")) {
+            if(words.at(i).startsWith("http://") || words.at(i).startsWith("https://")) {
                 QString URL = "<a href=\""+words.at(i)+"\">"+words.at(i)+"</a>";
                 newWords.append(URL);
             } else {
