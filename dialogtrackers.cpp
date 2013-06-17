@@ -141,15 +141,16 @@ void DialogTrackers::updateServerList(QString tracker) {
 void DialogTrackers::sendRequest() {
     qDebug() << "Connected to " << pSocket->peerAddress() << " on port " << pSocket->peerPort();
 
-    QByteArray magic;
-    magic.append("HTRK\x00\x01", 6);
-    qDebug() << "Sending magic " << pSocket->write(magic.data(), 6) << "bytes";
-    qDebug() << (qint8)magic[0] << " " << (qint8)magic[1] << " " << (qint8)magic[2] << " " << (qint8)magic[3] << " " << (qint8)magic[4] << " " << (qint8)magic[5];
+    char magic[6] = {0x48, 0x54, 0x52, 0x4b, 0x00, 0x01};
+    pSocket->write(magic, 6);
     pSocket->waitForBytesWritten();
     qDebug() << "Sent magic";
     pSocket->waitForReadyRead(10000);
-    char * response = pSocket->read(6).data();
-    if(strncmp(magic, response, 6) != 0) {
+    char response[6];
+    memset(response, 0, 6);
+    qint64 readBytes = pSocket->read(response, 6);
+    qDebug() << "Read " << readBytes << " from tracker";
+    if(readBytes != 6 || strncmp(magic, response, 6) != 0) {
         qDebug() << "Connecting to tracker failed";
         qDebug() << (quint8) response[0] << " " << (quint8) response[1] << " " << (quint8) response[2] << " " << (quint8) response[3] << " " << (quint8) response[4] << " " << (quint8) response[5];
         ui->label->setText("Connecting to tracker failed.");
@@ -165,25 +166,20 @@ void DialogTrackers::onSocketData() {
     qDebug() << "Getting header...";
 
     quint16 confirm;
-    
-    char * buffer;
+
     if(!gotHeader) {
         ui->label->setText("0 servers");
         numServers = 0;
 
-        buffer = (char *) malloc(2);
-        buffer = pSocket->read(2).data();
-        memcpy(&confirm, buffer, 2);
+        pSocket->read((char*)&confirm, 2);
         confirm = qFromBigEndian(confirm);
         qDebug() << "Server confirms: " << confirm;
 
-        buffer = pSocket->read(2).data();
-        memcpy(&dataLength, buffer, 2);
+        pSocket->read((char*)&dataLength, 2);
         dataLength = qFromBigEndian(dataLength);
         qDebug() << "Length of data: " << dataLength;
 
-        buffer = pSocket->read(2).data();
-        memcpy(&numberOfServers, buffer, 2);
+        pSocket->read((char*)&numberOfServers, 2);
         numberOfServers = qFromBigEndian(numberOfServers);
         qDebug() << "Number of servers: " << numberOfServers;
         gotHeader = true;
@@ -210,12 +206,9 @@ void DialogTrackers::onSocketData() {
         QString address;
         quint16 port, users;
 
-        unsigned char len;
+        quint8 len;
 
-        buffer = (char *) malloc(5);
-        memset(buffer, 0, 5);
-
-        quint16 a, b, c, d;
+        quint8 a, b, c, d;
         QByteArray ipbuffer = pSocket->read(4).data();
 
         a = (unsigned char) ipbuffer[0];
@@ -229,47 +222,35 @@ void DialogTrackers::onSocketData() {
 
         qDebug() << "Address: " << address;
 
-        char * portbuffer = (char *) malloc(2);
-        memset(portbuffer, 0, 2);
-
-        portbuffer = pSocket->read(2).data();
-        memcpy(&port, portbuffer, 2);
+        pSocket->read((char*)&port, 2);
         port = qFromBigEndian(port);
         qDebug() << "Port: " << port;
 
-        char * usersbuffer = (char *) malloc(2);
-        usersbuffer = pSocket->read(2).data();
-        memcpy(&users, usersbuffer, 2);
+        pSocket->read((char*)&users, 2);
         users = qFromBigEndian(users);
         qDebug() << "Users: " << users;
 
-        pSocket->read(2); // 2 bytes wasted in the protocol? WHY GOD WHY???
+        pSocket->read(2);
 
-        buffer = (char *) malloc(1);
-        memset(buffer, 0, 1);
+        pSocket->read((char*)&len, 1);
+        qDebug() << "Name is " << len << " bytes long";
 
-        buffer = pSocket->read(1).data();
-        len = 0;
-        memcpy(&len, buffer, 1);
-        qDebug() << "Name is " << (qint32)len << " bytes long";
+        char * nameBuffer = new char[len];
+        memset(nameBuffer, 0, len);
+        pSocket->read(nameBuffer, len);
+        name = QString::fromLocal8Bit(nameBuffer, len);
+        delete[] nameBuffer;
+        qDebug() << "Server name: " << name;
 
-        QTextStream stream(pSocket->read(len));
-        stream.setCodec("Shift-JIS");
-        name = stream.readAll();
-        //name = QString::fromLocal8Bit(pSocket->read(len).data(), len);
-        qDebug() << "Name: " << name;
+        pSocket->read((char*)&len, 1);
+        qDebug() << "Description is " << len << " bytes long";
 
-        memset(buffer, 0, 1);
-
-        buffer = pSocket->read(1).data();
-        len = 0;
-        memcpy(&len, buffer, 1);
-        qDebug() << "Description is " << (qint32)len << " bytes long";
-
-        QTextStream stream2(pSocket->read(len));
-        stream2.setCodec("Shift-JIS");
-        description = stream2.readAll();
-        qDebug() << "Description: " << description;
+        char * descBuffer = new char[len];
+        memset(descBuffer, 0, len);
+        pSocket->read(descBuffer, len);
+        description = QString::fromLocal8Bit(descBuffer, len);
+        delete[] descBuffer;
+        qDebug() << "Server description: " << description;
 
         QTreeWidgetItem * item = new QTreeWidgetItem(QStringList() << name << QString::number(users) << description << address << QString::number(port));
         item->setToolTip(0, name);
