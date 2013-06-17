@@ -33,7 +33,11 @@ void WidgetChat::printChat(QString s) {
         } else if(words.at(i) == "<")
         {
             newWords.append("&lt;");
-        } else
+        } else if(words.at(i).startsWith("<-"))
+        {
+            newWords.append(QString("&lt;-%1").arg(words.at(i).right(words.at(i).length()-2)));
+        }
+        else
         {
             newWords.append(words.at(i));
         }
