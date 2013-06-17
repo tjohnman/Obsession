@@ -333,7 +333,7 @@ void MainWindow::onGotChatMessage(char * t, qint16 l) {
     playChatSound();
     memcpy(temp, t, l);
     temp[l] = '\0';
-    QString msg = QString(temp);
+    QString msg = QString::fromLocal8Bit(temp);
     chatWidget->printChat(msg);
     delete temp;
     if(ui->tabWidget->currentWidget() != chatWidget) {

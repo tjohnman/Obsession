@@ -4,6 +4,7 @@
 #include <QtEndian>
 #include <QTextCodec>
 #include <QTextStream>
+#include <QHostAddress>
 
 DialogTrackers::DialogTrackers(ConnectionController * c, QWidget *parent) :
     QDialog(parent),
@@ -63,16 +64,20 @@ void DialogTrackers::deleteTracker() {
     if(ui->comboBox->count() > 0) {
         for(quint32 i=0; i<pTrackerNames.size(); i++) {
             if(pTrackerNames[i] == ui->comboBox->currentText()) {
+                pTrackerNames[i] = pTrackerNames.back();
+                pTrackerNames.pop_back();
+
                 pTrackerAddresses[i] = pTrackerAddresses.back();
                 pTrackerAddresses.pop_back();
-                pTrackerNames[i] = pTrackerAddresses.back();
-                pTrackerNames.pop_back();
                 break;
             }
         }
         saveTrackerList();
         updateTrackerList();
-        ui->comboBox->setCurrentIndex(ui->comboBox->count()-1);
+        if(ui->comboBox->count() > 0)
+        {
+            ui->comboBox->setCurrentIndex(ui->comboBox->count()-1);
+        }
     }
 }
 
@@ -134,16 +139,20 @@ void DialogTrackers::updateServerList(QString tracker) {
 }
 
 void DialogTrackers::sendRequest() {
-    qDebug() << "Connected on port " << pSocket->peerPort();
+    qDebug() << "Connected to " << pSocket->peerAddress() << " on port " << pSocket->peerPort();
 
-    char magic[6] = {0x48, 0x54, 0x52, 0x4b, 0x00, 0x01};
-    pSocket->write(magic, 6);
+    QByteArray magic;
+    magic.append("HTRK\x00\x01", 6);
+    qDebug() << "Sending magic " << pSocket->write(magic.data(), 6) << "bytes";
+    qDebug() << (qint8)magic[0] << " " << (qint8)magic[1] << " " << (qint8)magic[2] << " " << (qint8)magic[3] << " " << (qint8)magic[4] << " " << (qint8)magic[5];
     pSocket->waitForBytesWritten();
     qDebug() << "Sent magic";
     pSocket->waitForReadyRead(10000);
     char * response = pSocket->read(6).data();
     if(strncmp(magic, response, 6) != 0) {
         qDebug() << "Connecting to tracker failed";
+        qDebug() << (quint8) response[0] << " " << (quint8) response[1] << " " << (quint8) response[2] << " " << (quint8) response[3] << " " << (quint8) response[4] << " " << (quint8) response[5];
+        ui->label->setText("Connecting to tracker failed.");
         return;
     }
     qDebug() << "Handshake successful";

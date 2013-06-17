@@ -17,15 +17,6 @@ DialogPreferences::DialogPreferences(QWidget *parent) :
         ui->checkBox->setChecked(false);
     }
 
-    /*
-     *  TODO: Sort out Japanese support
-     */
-
-    ui->checkBox->setChecked(false);
-    ui->checkBox->setDisabled(true);
-
-    /****/
-
     QFont font;
     font.setFamily(settings.value("fontFamily", "MS Shell Dlg2").toString());
     qint32 style = settings.value("fontStyle", 0).toInt();
@@ -98,10 +89,10 @@ void DialogPreferences::acceptSettings() {
     QSettings settings("mir", "Contra");
     settings.setValue(QString("nick"), ui->lineEdit->text());
     if(ui->checkBox->isChecked()) {
-        //QTextCodec::setCodecForCStrings(QTextCodec::codecForName("Shift-JIS"));
+        QTextCodec::setCodecForLocale(QTextCodec::codecForName("Shift-JIS"));
         settings.setValue("JapaneseMode", true);
     } else {
-        //QTextCodec::setCodecForCStrings(QTextCodec::codecForName("Apple Roman"));
+        QTextCodec::setCodecForLocale(QTextCodec::codecForName("Apple Roman"));
         settings.setValue("JapaneseMode", false);
     }
     settings.setValue("dlqueue", ui->dlQueueEdit->text().toInt());
