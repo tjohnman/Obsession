@@ -34,7 +34,8 @@ SOURCES += main.cpp \
     dialoguploadsqueue.cpp \
     widgetconsole.cpp \
     dialoguserinfo.cpp \
-    threadiconloader.cpp
+    threadiconloader.cpp \
+    threaduploader.cpp
 HEADERS += mainwindow.h \
     ctransaction.h \
     defines.h \
@@ -65,7 +66,8 @@ HEADERS += mainwindow.h \
     widgetconsole.h \
     dialoguserinfo.h \
     threadiconloader.h \
-    version.h
+    version.h \
+    threaduploader.h
 FORMS += mainwindow.ui \
     dialogopenconnection.ui \
     dialogpreferences.ui \

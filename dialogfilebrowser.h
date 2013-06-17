@@ -18,10 +18,12 @@ public:
     DialogFileBrowser(ConnectionController * c, QWidget *parent = 0);
     ~DialogFileBrowser();
 
-    void load();
     void resetPath();
-
     void requestUpload();
+
+public slots:
+    void load();
+    void gotFileDeleteResponse(qint32 code);
 
 protected:
     void changeEvent(QEvent *e);
@@ -42,6 +44,8 @@ private slots:
     void goDirectoryUp();
     void requestFile();
     void selectFileToUpload();
+    void requestFileDelete();
+    void selectionChange();
 
 signals:
     void requestedFile(QString, qint32, QString);

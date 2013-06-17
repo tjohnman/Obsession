@@ -15,17 +15,38 @@ DialogFileBrowser::DialogFileBrowser(ConnectionController * c, QWidget *parent) 
     path = "/";
     connect(connection, SIGNAL(gotFileList(std::vector<s_hotlineFile *>)), this, SLOT(onGotFileList(std::vector<s_hotlineFile *>)));
     connect(ui->treeWidget, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(onDoubleClick(QModelIndex)));
+    connect(ui->treeWidget, SIGNAL(clicked(QModelIndex)), this, SLOT(selectionChange()));
+
     connect(ui->buttonUp, SIGNAL(clicked()), this, SLOT(goDirectoryUp()));
     connect(ui->buttonDownload, SIGNAL(clicked()), this, SLOT(requestFile()));
     connect(ui->buttonUpload, SIGNAL(clicked()), this, SLOT(selectFileToUpload()));
+    connect(ui->buttonDelete, SIGNAL(clicked()), this, SLOT(requestFileDelete()));
+    connect(ui->buttonRefresh, SIGNAL(clicked()), this, SLOT(load()));
 
-    setAcceptDrops(true);
+
+    ui->buttonDownload->setEnabled(false);
+    ui->buttonDelete->setEnabled(false);
+
     setAcceptDrops(false);
     ui->treeWidget->setAcceptDrops(false);
 }
 
 void DialogFileBrowser::dragEnterEvent(QDragEnterEvent *event){
     event->acceptProposedAction();
+}
+
+void DialogFileBrowser::selectionChange()
+{
+    if(ui->treeWidget->selectedItems().size() > 0)
+    {
+        ui->buttonDownload->setEnabled(true);
+        ui->buttonDelete->setEnabled(true);
+    }
+    else
+    {
+        ui->buttonDownload->setEnabled(false);
+        ui->buttonDelete->setEnabled(false);
+    }
 }
 
 void DialogFileBrowser::dropEvent(QDropEvent *event) {
@@ -334,14 +355,34 @@ void DialogFileBrowser::requestFile() {
     emit requestedFile(ui->treeWidget->currentItem()->data(0, 0).toString(), ui->treeWidget->currentItem()->data(3, 0).toInt(), path);
 }
 
+void DialogFileBrowser::requestFileDelete()
+{
+    CTransaction * transaction = connection->createTransaction(204);
+    transaction->addParameter(201, ui->treeWidget->currentItem()->data(0, 0).toString().toLocal8Bit().size(), ui->treeWidget->currentItem()->data(0, 0).toString().toLocal8Bit().data());
+    transaction->addParameter(202, path.toLocal8Bit().size(), path.toLocal8Bit().data());
+
+    connect(connection, SIGNAL(receivedFileDeleteResponse(qint32)), this, SLOT(gotFileDeleteResponse(qint32)));
+
+    connection->sendTransaction(transaction, true);
+}
+
+void DialogFileBrowser::gotFileDeleteResponse(qint32 code)
+{
+    if(code == 0)
+    {
+        disconnect(connection, SIGNAL(receivedFileDeleteResponse(qint32)), this, SLOT(gotFileDeleteResponse(qint32)));
+        load();
+    }
+}
+
 void DialogFileBrowser::selectFileToUpload() {
     QFileDialog dialog(this);
     dialog.setFileMode(QFileDialog::AnyFile);
-    if(dialog.exec()) {
+    if(dialog.exec() == QDialog::Accepted) {
         QStringList selectedFiles = dialog.selectedFiles();
         uploadedFile.setFileName(selectedFiles.at(0));
+        requestUpload();
     }
-    requestUpload();
 }
 
 void DialogFileBrowser::requestUpload() {

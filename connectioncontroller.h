@@ -127,6 +127,7 @@ signals:
     void gotNewsItem(QString, quint32 id, quint32 pid);
     void gotNewsArticleText(QString, QString, QString);
     void gotUpload(quint32);
+    void receivedFileDeleteResponse(qint32 code);
 };
 
 #endif // CONNECTIONCONTROLLER_H

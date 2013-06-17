@@ -15,12 +15,17 @@ CUpload::CUpload()
     bytesWritten = 0;
     lastSent = 0;
     uploadTimer = new QTimer();
-    connect(uploadTimer, SIGNAL(timeout()), this, SLOT(updateSpeed()));
     downloadSpeed = 0;
     queuePosition = -1;
     file = new QFile();
     pending = true;
-    packetSize = 204800;
+
+    connect(uploadTimer, SIGNAL(timeout()), this, SLOT(updateSpeed()));
+}
+
+void CUpload::updateByteCount(qint64 bytes)
+{
+    bytesSent = bytes;
 }
 
 void CUpload::stopUpload() {
@@ -42,7 +47,8 @@ void CUpload::stopUpload() {
 
 void CUpload::updateSpeed() {
     QString speedString;
-    float speed = (bytesSent - lastSent)/(uploadTimer->interval()/1000.f);
+    float speed;
+    speed = bytesSent - lastSent;
     lastSent = bytesSent;
     float size = dataSize, read = bytesSent;
     QString sizeString, readString;
@@ -79,63 +85,7 @@ void CUpload::updateSpeed() {
     }
 
     widget->infoLabel()->setText(readString+" of "+sizeString+" ("+speedString+")");
-
-    // Actual upload
-
-   if(socket.state() != QAbstractSocket::ConnectedState) {
-        qDebug() << "Server closed the connection";
-        widget->infoLabel()->setText("Error: the server closed the connection.");
-        qDebug() << "Error: " << socket.errorString() << " socket state " << socket.state();
-        uploadTimer->stop();
-        finished = true;
-        uploadInProgress = false;
-        return;
-    }
-
-    if(bytesSent >= dataSize) {
-        qDebug() << "Upload complete";
-        qDebug() << "Sent " << bytesSent << " bytes";
-        socket.close();
-        bytesSent = 0;
-        dataSize = 0;
-        widget->progressBar()->setValue(10);
-        widget->progressBar()->setMaximum(10);
-        widget->infoLabel()->setText("Completed");
-        uploadInProgress = false;
-        file->close();
-        uploadTimer->stop();
-        finished = true;
-        emit uploadFinished();
-        return;
-    } else {
-        qint64 sent;
-        qDebug() << "Sending...";
-        if(dataSize - bytesSent < 4096) {
-            QByteArray readData = file->read(dataSize - bytesSent);
-            sent = socket.write(readData);
-        } else {
-            QByteArray readData = file->read(4096);
-            sent = socket.write(readData);
-        }
-
-        if(sent == -1)
-        {
-            qDebug() << "Data sending failed. Bailing out.";
-            qDebug() << socket.errorString();
-            widget->infoLabel()->setText("Error: transfer failed.");
-            uploadTimer->stop();
-            finished = true;
-            uploadInProgress = false;
-            return;
-        }
-
-        socket.waitForBytesWritten();
-
-        bytesSent += sent;
-    }
-
     widget->progressBar()->setValue(bytesSent);
-    qDebug() << bytesSent << "/" << dataSize;
 }
 
 void CUpload::updateName() {
@@ -147,6 +97,7 @@ qint32 CUpload::init() {
     dataSize = fileSize;
     widget->progressBar()->setMaximum(dataSize);
     widget->progressBar()->setValue(0);
+    widget->stopButton()->setEnabled(true);
 
     startUploading();
 
@@ -199,10 +150,51 @@ void CUpload::startUploading() {
 
         qDebug() << "Starting actual upload";
 
-        uploadTimer->start(100);
+        timeElapsed = 0;
+        uploadTimer->start(1000);
+
+        connect(&thread, SIGNAL(sentBytes(qint64)), this, SLOT(updateByteCount(qint64)));
+        connect(&thread, SIGNAL(complete(int)), this, SLOT(threadFinished(int)));
+
+        socket.moveToThread(&thread);
+        thread.socket = &socket;
+        thread.file = file;
+        thread.bytesSent = 0;
+        thread.dataSize = dataSize;
+        thread.start();
+
+        qDebug() << "Upload thread started.";
 
     } else {
         qDebug() << "Warning: Must connect to upload files";
         return;
+    }
+}
+
+void CUpload::threadFinished(int code)
+{
+    switch(code)
+    {
+    case 0:
+        qDebug() << "Upload complete";
+        qDebug() << "Sent " << bytesSent << " bytes";
+        bytesSent = 0;
+        dataSize = 0;
+        widget->progressBar()->setValue(10);
+        widget->progressBar()->setMaximum(10);
+        widget->infoLabel()->setText("Completed");
+        uploadInProgress = false;
+        file->close();
+        uploadTimer->stop();
+        finished = true;
+        emit uploadFinished();
+        break;
+    case 1:
+        qDebug() << "Data sending failed. Bailing out.";
+        widget->infoLabel()->setText("Error: transfer failed.");
+        uploadTimer->stop();
+        finished = true;
+        uploadInProgress = false;
+        break;
     }
 }

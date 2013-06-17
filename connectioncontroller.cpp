@@ -505,6 +505,11 @@ void ConnectionController::onSocketData() {
                         }
                     }
                     break;
+                case 204:
+                    {
+                        emit receivedFileDeleteResponse(receivedTransaction->errorCode());
+                    }
+                    break;
                 case 300:
 
                     while(pUsers.size() > 0) {

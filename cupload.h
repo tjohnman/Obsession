@@ -9,6 +9,7 @@
 #include "ConnectionController.h"
 #include "widgetdownloaditem.h"
 #include <QListWidgetItem>
+#include "threaduploader.h"
 
 class CUpload : public QObject
 {
@@ -33,6 +34,8 @@ public:
     WidgetDownloadItem * widget;
     QListWidgetItem * itemPlaceholder;
     bool pending;
+    int timeElapsed;
+    ThreadUploader thread;
 
     qint32 init();
 
@@ -44,7 +47,9 @@ public:
 
 public slots:
     void updateSpeed();
+    void updateByteCount(qint64 bytes);
     void stopUpload();
+    void threadFinished(int code);
 
 signals:
     void gotError();
