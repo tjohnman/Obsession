@@ -21,6 +21,9 @@ void WidgetChat::printChat(QString s) {
         s = s.right(s.length()-1);
         qDebug() << "r";
     }
+    s.replace("\r", "\n");
+    s.replace("\n\n", "\n");
+    s.replace("\n", "<br>");
     QStringList words = s.split(" ");
     QStringList newWords;
     for(qint32 i=0; i<words.size(); i++) {
