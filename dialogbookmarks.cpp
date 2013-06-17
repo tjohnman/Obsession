@@ -8,6 +8,8 @@ DialogBookmarks::DialogBookmarks(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    //setWindowFlags(Qt::WindowTitleHint);
+
     connect(ui->listWidget, SIGNAL(clicked(QModelIndex)), this, SLOT(selectedBookmark()));
     connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(newBookmark()));
     connect(ui->pushButton_2, SIGNAL(clicked()), SLOT(deleteBookmark()));
@@ -17,8 +19,7 @@ DialogBookmarks::DialogBookmarks(QWidget *parent) :
     connect(ui->lineEdit_3, SIGNAL(textEdited(QString)), this, SLOT(saveBookmark()));
     connect(ui->lineEdit_4, SIGNAL(textEdited(QString)), this, SLOT(saveBookmark()));
 
-    connect(ui->buttonBox, SIGNAL(accepted()), this, SLOT(saveBookmark()));
-    connect(ui->buttonBox, SIGNAL(rejected()), this, SLOT(saveBookmark()));
+    connect(this, SIGNAL(finished(int)), this, SLOT(saveBookmark()));
 
     loadBookmarks();
 }

@@ -45,6 +45,7 @@ MainWindow::MainWindow(QWidget *parent, bool checkForUpdates) :
     linearNews = new DialogLinearNews(connection, this);
     downloadsDialog = new DialogDownloadQueue(downloadManager, this);
     uploadsDialog = new DialogUploadsQueue(uploadManager);
+    bookmarksDialog = new DialogBookmarks(this);
 
     connect(fileBrowserDialog, SIGNAL(requestedFile(QString, qint32, QString)), downloadManager, SLOT(onRequestedFile(QString, qint32, QString)));
     connect(fileBrowserDialog, SIGNAL(requestedFile(QString, qint32, QString)), this, SLOT(openDownloads()));
@@ -64,6 +65,7 @@ MainWindow::MainWindow(QWidget *parent, bool checkForUpdates) :
     connect(ui->actionLinear_News, SIGNAL(triggered()), this, SLOT(openLinearNews()));
     connect(ui->actionDownloads, SIGNAL(triggered()), this, SLOT(openDownloads()));
     connect(ui->actionThreaded_News, SIGNAL(triggered()), this, SLOT(openThreadedNews()));
+    connect(ui->actionBookmarks, SIGNAL(triggered()), this, SLOT(openBookmarksDialog()));
     //connect(ui->actionDebug_console, SIGNAL(triggered()), this, SLOT(openConsole()));
 
     connect(connection, SIGNAL(gotServerName()), this, SLOT(onGotServerName()));
@@ -122,6 +124,7 @@ MainWindow::~MainWindow()
     delete connection;
     delete chatSound;
     delete pmSound;
+    delete bookmarksDialog;
 }
 
 void MainWindow::changeEvent(QEvent *e)
@@ -269,6 +272,7 @@ void MainWindow::openTrackersDialog() {
 
 void MainWindow::openNewConnectionDialog() {
     openConnectionDialog->clear();
+    openConnectionDialog->updateBookmarkList();
     openConnectionDialog->open();
 }
 
@@ -377,6 +381,12 @@ void MainWindow::onUserListChanged() {
         }
         chatWidget->addUser(item);
     }
+}
+
+void MainWindow::openBookmarksDialog()
+{
+    bookmarksDialog->loadBookmarks();
+    bookmarksDialog->show();
 }
 
 void MainWindow::onPreferencesSaved() {

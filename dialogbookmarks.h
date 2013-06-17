@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include <QSettings>
+#include <QAbstractButton>
 
 namespace Ui {
     class DialogBookmarks;
@@ -18,8 +19,8 @@ public slots:
     void loadBookmarks();
     void newBookmark();
     void deleteBookmark();
-    void saveBookmark();
     void selectedBookmark();
+    void saveBookmark();
     void clearFields();
 
 protected:

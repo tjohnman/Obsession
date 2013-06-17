@@ -78,6 +78,7 @@
      <string>Options</string>
     </property>
     <addaction name="actionPreferences"/>
+    <addaction name="actionBookmarks"/>
     <addaction name="actionIcons"/>
    </widget>
    <widget class="QMenu" name="menuServer">
@@ -239,6 +240,11 @@
   <action name="actionDebug_console">
    <property name="text">
     <string>Debug console</string>
+   </property>
+  </action>
+  <action name="actionBookmarks">
+   <property name="text">
+    <string>Bookmarks...</string>
    </property>
   </action>
  </widget>

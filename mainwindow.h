@@ -23,6 +23,7 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
+#include "dialogbookmarks.h"
 
 #include "WidgetChat.h"
 #include "WidgetNews.h"
@@ -75,6 +76,7 @@ public slots:
     void onPreferencesSaved();
     void onConnected();
     void onVersionReady();
+    void openBookmarksDialog();
 
 protected:
     void changeEvent(QEvent *e);
@@ -103,6 +105,7 @@ private:
     DialogDownloadQueue * downloadsDialog;
     DialogUploadsQueue * uploadsDialog;
     DialogAbout * aboutDialog;
+    DialogBookmarks * bookmarksDialog;
 
     WidgetChat * chatWidget;
     WidgetNews * threadedNewsWidget;

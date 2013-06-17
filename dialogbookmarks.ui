@@ -49,7 +49,7 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="3">
+   <item row="1" column="3" colspan="2">
     <widget class="QLineEdit" name="lineEdit"/>
    </item>
    <item row="2" column="3">
@@ -59,7 +59,7 @@
      </property>
     </widget>
    </item>
-   <item row="3" column="3">
+   <item row="3" column="3" colspan="2">
     <widget class="QLineEdit" name="lineEdit_2"/>
    </item>
    <item row="4" column="3">
@@ -69,7 +69,7 @@
      </property>
     </widget>
    </item>
-   <item row="5" column="3">
+   <item row="5" column="3" colspan="2">
     <widget class="QLineEdit" name="lineEdit_3"/>
    </item>
    <item row="6" column="3">
@@ -79,7 +79,7 @@
      </property>
     </widget>
    </item>
-   <item row="7" column="3">
+   <item row="7" column="3" colspan="2">
     <widget class="QLineEdit" name="lineEdit_4">
      <property name="echoMode">
       <enum>QLineEdit::Password</enum>
@@ -152,17 +152,7 @@
      </property>
     </spacer>
    </item>
-   <item row="9" column="3">
-    <widget class="QDialogButtonBox" name="buttonBox">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="standardButtons">
-      <set>QDialogButtonBox::Ok</set>
-     </property>
-    </widget>
-   </item>
-   <item row="8" column="3">
+   <item row="8" column="4">
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -178,38 +168,5 @@
   </layout>
  </widget>
  <resources/>
- <connections>
-  <connection>
-   <sender>buttonBox</sender>
-   <signal>accepted()</signal>
-   <receiver>DialogBookmarks</receiver>
-   <slot>accept()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>248</x>
-     <y>254</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>157</x>
-     <y>274</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>buttonBox</sender>
-   <signal>rejected()</signal>
-   <receiver>DialogBookmarks</receiver>
-   <slot>reject()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>316</x>
-     <y>260</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>286</x>
-     <y>274</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>
