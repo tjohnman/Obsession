@@ -27,18 +27,19 @@ void WidgetChat::printChat(QString s) {
         if(words.at(i).startsWith("www.")) {
             QString URL = "<a href=\"http://"+words.at(i)+"\">"+words.at(i)+"</a>";
             newWords.append(URL);
-        } else {
-            if(words.at(i).startsWith("http://") || words.at(i).startsWith("https://")) {
+        } else if(words.at(i).startsWith("http://") || words.at(i).startsWith("https://")) {
                 QString URL = "<a href=\""+words.at(i)+"\">"+words.at(i)+"</a>";
                 newWords.append(URL);
-            } else {
-                newWords.append(words.at(i));
-            }
+        } else if(words.at(i) == "<")
+        {
+            newWords.append("&lt;");
+        } else
+        {
+            newWords.append(words.at(i));
         }
     }
     QString formatted = newWords.join("&nbsp; ");
-    //formatted.insert(15, "</div>");
-    //formatted.insert(0, QString("<div style=\"font-family:courier; font-weight:bold\">"));
+
     ui->textEdit->insertHtml(formatted+"<br />");
     ui->textEdit->moveCursor(QTextCursor::End);
     ui->textEdit->ensureCursorVisible();
