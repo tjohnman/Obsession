@@ -11,15 +11,16 @@ DialogPreferences::DialogPreferences(QWidget *parent) :
 
     QSettings settings("mir", "Contra");
     ui->lineEdit->setText(settings.value(QString("nick"), "unnamed").toString());
-    if(settings.value("JapaneseMode", true).toBool()) {
-        ui->checkBox->setChecked(true);
-    } else {
-        ui->checkBox->setChecked(false);
-    }
+
+    QString encoding = settings.value(QString::fromUtf8("Encoding"), "macintosh").toString();
+    if(encoding == "macintosh") ui->encodingCombo->setCurrentIndex(0);
+    if(encoding == "Shift_JIS") ui->encodingCombo->setCurrentIndex(1);
+    if(encoding == "ISO-8859-1") ui->encodingCombo->setCurrentIndex(2);
+    if(encoding == "UTF-8") ui->encodingCombo->setCurrentIndex(3);
 
     QFont font;
-    font.setFamily(settings.value("fontFamily", "MS Shell Dlg2").toString());
-    qint32 style = settings.value("fontStyle", 0).toInt();
+    font.setFamily(settings.value("fontFamily", "Consolas").toString());
+    qint32 style = settings.value("fontStyle", 10).toInt();
     switch(style) {
     case 0:
         font.setStyle(QFont::StyleNormal);
@@ -85,16 +86,33 @@ void DialogPreferences::changeEvent(QEvent *e)
     }
 }
 
+QString DialogPreferences::selectedEncoding()
+{
+    return ui->encodingCombo->currentText();
+}
+
 void DialogPreferences::acceptSettings() {
     QSettings settings("mir", "Contra");
     settings.setValue(QString("nick"), ui->lineEdit->text());
-    if(ui->checkBox->isChecked()) {
-        QTextCodec::setCodecForLocale(QTextCodec::codecForName("Shift-JIS"));
-        settings.setValue("JapaneseMode", true);
-    } else {
-        QTextCodec::setCodecForLocale(QTextCodec::codecForName("Apple Roman"));
-        settings.setValue("JapaneseMode", false);
+
+    switch(ui->encodingCombo->currentIndex())
+    {
+        default:
+        case 0:
+            settings.setValue("Encoding", "macintosh");
+        break;
+        case 1:
+            settings.setValue("Encoding", "Shift_JIS");
+        break;
+        case 2:
+            settings.setValue("Encoding", "ISO-8859-1");
+        break;
+        case 3:
+            settings.setValue("Encoding", "UTF-8");
+        break;
     }
+    settings.setValue("EncodingName", ui->encodingCombo->currentText());
+
     settings.setValue("dlqueue", ui->dlQueueEdit->text().toInt());
     settings.setValue("soundsEnabled", ui->soundCheckBox->isChecked());
     settings.setValue("debugging", ui->debugCheckBox->isChecked());

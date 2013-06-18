@@ -67,7 +67,8 @@ HEADERS += mainwindow.h \
     dialoguserinfo.h \
     threadiconloader.h \
     version.h \
-    threaduploader.h
+    threaduploader.h \
+    TextHelper.h
 FORMS += mainwindow.ui \
     dialogopenconnection.ui \
     dialogpreferences.ui \

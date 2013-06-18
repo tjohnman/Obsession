@@ -102,7 +102,7 @@ private:
 
     CTransaction * receivedTransaction;
 
-    void sendCETIdentification(s_user *);
+    //void sendCETIdentification(s_user *);
 
 public slots:
     void onSocketConnected();
@@ -112,9 +112,9 @@ public slots:
 
 signals:
     void gotServerName();
-    void gotChatMessage(char * t, qint16 l);
+    void gotChatMessage(QString str);
     void userListChanged();
-    void gotPM(qint16, QString);
+    void gotPM(QString, qint16);
     void gotFileList(std::vector<s_hotlineFile *>);
     void serverError(QString);
     void socketError(QString);

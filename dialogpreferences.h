@@ -15,6 +15,7 @@ public:
     DialogPreferences(QWidget *parent = 0);
     ~DialogPreferences();
     QString serverIdent;
+    QString selectedEncoding();
 
 protected:
     void changeEvent(QEvent *e);

@@ -78,35 +78,49 @@
       </spacer>
      </item>
      <item>
-      <widget class="ListWidgetUsers" name="listWidget">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>236</width>
-         <height>0</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>200</width>
-         <height>16777215</height>
-        </size>
-       </property>
-       <property name="iconSize">
-        <size>
-         <width>232</width>
-         <height>18</height>
-        </size>
-       </property>
-       <property name="resizeMode">
-        <enum>QListView::Adjust</enum>
-       </property>
-      </widget>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <widget class="ListWidgetUsers" name="listWidget">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>236</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>200</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="iconSize">
+          <size>
+           <width>232</width>
+           <height>18</height>
+          </size>
+         </property>
+         <property name="resizeMode">
+          <enum>QListView::Adjust</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="encodingLabel">
+         <property name="text">
+          <string>Using encoding &lt;b&gt;Mac OS Roman&lt;/b&gt;</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </item>
     </layout>
    </item>

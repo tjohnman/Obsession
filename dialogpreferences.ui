@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>300</width>
-    <height>444</height>
+    <height>416</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -64,7 +64,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>410</y>
+     <y>380</y>
      <width>156</width>
      <height>23</height>
     </rect>
@@ -76,48 +76,11 @@
     <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
    </property>
   </widget>
-  <widget class="QCheckBox" name="checkBox">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>70</y>
-     <width>195</width>
-     <height>17</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Enable Japanese support (Shift-JIS)</string>
-   </property>
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_2">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>90</y>
-     <width>281</width>
-     <height>31</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>7</pointsize>
-    </font>
-   </property>
-   <property name="text">
-    <string>This may cause accents and other diacritical marks to be rendered incorrectly in other languages such as French or Spanish.</string>
-   </property>
-   <property name="wordWrap">
-    <bool>true</bool>
-   </property>
-  </widget>
   <widget class="QPushButton" name="pushButton">
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>220</y>
+     <y>190</y>
      <width>121</width>
      <height>23</height>
     </rect>
@@ -130,9 +93,9 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>290</y>
+     <y>260</y>
      <width>91</width>
-     <height>16</height>
+     <height>20</height>
     </rect>
    </property>
    <property name="text">
@@ -143,7 +106,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>310</y>
+     <y>280</y>
      <width>71</width>
      <height>20</height>
     </rect>
@@ -159,9 +122,9 @@
    <property name="geometry">
     <rect>
      <x>140</x>
-     <y>290</y>
+     <y>260</y>
      <width>91</width>
-     <height>16</height>
+     <height>20</height>
     </rect>
    </property>
    <property name="text">
@@ -175,7 +138,7 @@
    <property name="geometry">
     <rect>
      <x>140</x>
-     <y>310</y>
+     <y>280</y>
      <width>71</width>
      <height>20</height>
     </rect>
@@ -191,9 +154,9 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>340</y>
+     <y>310</y>
      <width>91</width>
-     <height>16</height>
+     <height>20</height>
     </rect>
    </property>
    <property name="text">
@@ -207,7 +170,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>360</y>
+     <y>330</y>
      <width>71</width>
      <height>20</height>
     </rect>
@@ -226,7 +189,7 @@
    <property name="geometry">
     <rect>
      <x>140</x>
-     <y>360</y>
+     <y>330</y>
      <width>71</width>
      <height>20</height>
     </rect>
@@ -242,9 +205,9 @@
    <property name="geometry">
     <rect>
      <x>140</x>
-     <y>340</y>
+     <y>310</y>
      <width>91</width>
-     <height>16</height>
+     <height>20</height>
     </rect>
    </property>
    <property name="text">
@@ -255,7 +218,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>250</y>
+     <y>220</y>
      <width>121</width>
      <height>23</height>
     </rect>
@@ -268,7 +231,7 @@
    <property name="geometry">
     <rect>
      <x>150</x>
-     <y>250</y>
+     <y>220</y>
      <width>131</width>
      <height>20</height>
     </rect>
@@ -284,7 +247,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>130</y>
+     <y>100</y>
      <width>101</width>
      <height>17</height>
     </rect>
@@ -300,7 +263,7 @@
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>150</y>
+     <y>120</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -313,13 +276,56 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>190</y>
+     <y>160</y>
      <width>131</width>
      <height>17</height>
     </rect>
    </property>
    <property name="text">
     <string>Enable debug logging</string>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="encodingCombo">
+   <property name="geometry">
+    <rect>
+     <x>70</x>
+     <y>60</y>
+     <width>111</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <item>
+    <property name="text">
+     <string>Mac OS Roman</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Shift-JIS</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>ISO-8859-1</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>UTF-8</string>
+    </property>
+   </item>
+  </widget>
+  <widget class="QLabel" name="label_7">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>60</y>
+     <width>51</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Encoding:</string>
    </property>
   </widget>
  </widget>

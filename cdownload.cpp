@@ -2,6 +2,7 @@
 #include <QAbstractSocket>
 #include <QIODevice>
 #include <QHostAddress>
+#include "TextHelper.h"
 
 CDownload::CDownload()
 {

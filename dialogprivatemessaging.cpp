@@ -1,7 +1,7 @@
 #include "dialogprivatemessaging.h"
 #include "ui_dialogprivatemessaging.h"
 #include <QSettings>
-
+#include "TextHelper.h"
 
 DialogPrivateMessaging::DialogPrivateMessaging(qint16 id, ConnectionController * c, QWidget *parent) :
     QDialog(parent),
@@ -44,22 +44,7 @@ void DialogPrivateMessaging::sendMessage() {
         QSettings settings("mir", "contra");
         connection->sendPMToUser(uid, ui->lineEdit->text());
         ui->textEdit->moveCursor(QTextCursor::End);
-        QStringList words = ui->lineEdit->text().split(" ");
-        QStringList newWords;
-        for(qint32 i=0; i<words.size(); i++) {
-            if(words.at(i).startsWith("www.")) {
-                QString URL = "<a href=\"http://"+words.at(i)+"\">"+words.at(i)+"</a>";
-                newWords.append(URL);
-            } else {
-                if(words.at(i).startsWith("http://")) {
-                    QString URL = "<a href=\""+words.at(i)+"\">"+words.at(i)+"</a>";
-                    newWords.append(URL);
-                } else {
-                    newWords.append(words.at(i));
-                }
-            }
-        }
-        QString formatted = newWords.join("&nbsp; ");
+        QString formatted = TextHelper::FormatMessageToHTML(ui->lineEdit->text());
         ui->textEdit->moveCursor(QTextCursor::End);
         ui->textEdit->ensureCursorVisible();
         ui->lineEdit->setFocus();
@@ -73,22 +58,7 @@ void DialogPrivateMessaging::sendMessage() {
 
 void DialogPrivateMessaging::gotMessage(QString m) {
     ui->textEdit->moveCursor(QTextCursor::End);
-    QStringList words = m.split(" ");
-    QStringList newWords;
-    for(qint32 i=0; i<words.size(); i++) {
-        if(words.at(i).startsWith("www.")) {
-            QString URL = "<a href=\"http://"+words.at(i)+"\">"+words.at(i)+"</a>";
-            newWords.append(URL);
-        } else {
-            if(words.at(i).startsWith("http://")) {
-                QString URL = "<a href=\""+words.at(i)+"\">"+words.at(i)+"</a>";
-                newWords.append(URL);
-            } else {
-                newWords.append(words.at(i));
-            }
-        }
-    }
-    QString formatted = newWords.join("&nbsp; ");
+    QString formatted = TextHelper::FormatMessageToHTML(m);
     ui->textEdit->moveCursor(QTextCursor::End);
     ui->textEdit->ensureCursorVisible();
     ui->lineEdit->setFocus();

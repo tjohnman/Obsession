@@ -47,8 +47,8 @@ public slots:
     void slotCloseWindow();
     void disconnect();
     void onGotServerName();
-    void onGotChatMessage(char *, qint16);
-    void onGotPM(qint16, QString);
+    void onGotChatMessage(QString message);
+    void onGotPM(QString message, qint16 uid);
     void onOpenMessagingWindow(quint32);
     void onOpenUserInfo(quint32);
     void onUserListChanged();

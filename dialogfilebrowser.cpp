@@ -5,6 +5,7 @@
 #include <QMimeData>
 #include <QFileDialog>
 #include <QUrl>
+#include "TextHelper.h"
 
 DialogFileBrowser::DialogFileBrowser(ConnectionController * c, QWidget *parent) :
     QDialog(parent),
@@ -103,11 +104,11 @@ void DialogFileBrowser::load() {
             qDebug() << "Writing zeros...";
             memset(pathdata+offset+2, 0, 2);
             QString level = levels.at(i);
-            unsigned char len = level.toLocal8Bit().size();
+            unsigned char len = (unsigned char)TextHelper::EncodeText(level).size();
             qDebug() << "Writing name length... " << (quint16) len;
             memcpy(pathdata+offset+4, &len, 1);
-            qDebug() << level.toLocal8Bit().data();
-            memcpy(pathdata+offset+5, level.toLocal8Bit().data(), len);
+            qDebug() << TextHelper::EncodeText(level).data();
+            memcpy(pathdata+offset+5, TextHelper::EncodeText(level).data(), len);
             offset += 3+len;
         }
 
@@ -122,7 +123,7 @@ void DialogFileBrowser::load() {
 void DialogFileBrowser::onDoubleClick(QModelIndex model) {
     QTreeWidgetItem * item = ui->treeWidget->currentItem();
     if(item->data(2, 0).toString() == "fldr") {
-        path = QString(path + rawNameList[model.row()] + "/");
+        path = QString(path + item->data(0, 0).toString() + "/");
         load();
     } else {
         requestFile();
@@ -131,11 +132,9 @@ void DialogFileBrowser::onDoubleClick(QModelIndex model) {
 
 void DialogFileBrowser::onGotFileList(std::vector<s_hotlineFile *> list) {
     ui->treeWidget->clear();
-    rawNameList.clear();
     for(quint32 i=0; i<list.size(); i++) {
         QTreeWidgetItem * item = new QTreeWidgetItem();
-        QString _n = QString(list[i]->name);
-        rawNameList.push_back(QString::fromLocal8Bit(list[i]->name));
+        QString _n = TextHelper::DecodeText(list[i]->name, list[i]->nameSize);
         item->setData(0, 0, _n);
         qint32 size = list[i]->size;
         if(!strncmp(list[i]->type, "fldr", 4)) {
@@ -360,8 +359,9 @@ void DialogFileBrowser::requestFile() {
 void DialogFileBrowser::requestFileDelete()
 {
     CTransaction * transaction = connection->createTransaction(204);
-    transaction->addParameter(201, ui->treeWidget->currentItem()->data(0, 0).toString().toLocal8Bit().size(), ui->treeWidget->currentItem()->data(0, 0).toString().toLocal8Bit().data());
-    transaction->addParameter(202, path.toLocal8Bit().size(), path.toLocal8Bit().data());
+    transaction->addParameter(201, TextHelper::EncodeText(ui->treeWidget->currentItem()->data(0, 0).toString()).size(), TextHelper::EncodeText(ui->treeWidget->currentItem()->data(0, 0).toString()).data());
+    QByteArray pathData = TextHelper::EncodeText(path);
+    transaction->addParameter(202, pathData.size(), pathData.data());
 
     connect(connection, SIGNAL(receivedFileDeleteResponse(qint32)), this, SLOT(gotFileDeleteResponse(qint32)));
 
@@ -389,7 +389,7 @@ void DialogFileBrowser::selectFileToUpload() {
 
 void DialogFileBrowser::requestUpload() {
     CTransaction * uploadRequest = connection->createTransaction(203);
-    uploadRequest->addParameter(201, uploadedFile.fileName().split("/").last().length(), uploadedFile.fileName().split("/").last().toLocal8Bit().data());
+    uploadRequest->addParameter(201, TextHelper::EncodeText(uploadedFile.fileName().split("/").last()).size(), TextHelper::EncodeText(uploadedFile.fileName().split("/").last()).data());
 
     if(!path.endsWith("/")) {
         path.append("/");
@@ -417,11 +417,11 @@ void DialogFileBrowser::requestUpload() {
         qDebug() << "Writing zeros...";
         memset(pathdata+offset+2, 0, 2);
         QString level = levels.at(i);
-        unsigned char len = level.length();
+        unsigned char len = TextHelper::EncodeText(level).size();
         qDebug() << "Writing name length... " << (quint16) len;
         memcpy(pathdata+offset+4, &len, 1);
-        qDebug() << level.toLocal8Bit().data();
-        memcpy(pathdata+offset+5, level.toLocal8Bit().data(), len);
+        qDebug() << TextHelper::EncodeText(level).data();
+        memcpy(pathdata+offset+5, TextHelper::EncodeText(level), len);
         offset += 3+len;
     }
     uploadRequest->addParameter(202, pathlen, pathdata);

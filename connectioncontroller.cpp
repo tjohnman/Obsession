@@ -6,6 +6,7 @@
 #include <QHostAddress>
 #include <QNetworkAccessManager>
 #include <QTextCodec>
+#include "TextHelper.h"
 
 ConnectionController::ConnectionController()
 {
@@ -53,13 +54,13 @@ qint32 ConnectionController::connectToServer(QString address, QString login, QSt
         port = 5500;
     }
 
-    pLogin = login.toLocal8Bit();
+    pLogin = TextHelper::EncodeText(login);
 
     for(qint32 i=0; i<pLogin.length(); i++) {
         pLogin[i] = 255 - pLogin[i];
     }
 
-    pPassword = password.toLocal8Bit();
+    pPassword = TextHelper::EncodeText(password);
 
     for(qint32 i=0; i<pPassword.length(); i++) {
         pPassword[i] = 255 - pPassword[i];
@@ -91,13 +92,13 @@ QString ConnectionController::serverName() {
 
 void ConnectionController::sendChatText(QString text) {
     CTransaction * chatTransaction = new CTransaction(105, pTaskIDCounter++);
-    chatTransaction->addParameter(101, strlen(text.toLocal8Bit().data()), text.toLocal8Bit().data());
+    chatTransaction->addParameter(101, TextHelper::EncodeText(text).size(), TextHelper::EncodeText(text).data());
     sendTransaction(chatTransaction);
 }
 
 void ConnectionController::sendEmote(QString text) {
     CTransaction * chatTransaction = new CTransaction(105, pTaskIDCounter++);
-    chatTransaction->addParameter(101, text.length(), text.toLocal8Bit().data());
+    chatTransaction->addParameter(101, TextHelper::EncodeText(text).size(), TextHelper::EncodeText(text).data());
     chatTransaction->addParameter(109, 1);
     sendTransaction(chatTransaction);
 }
@@ -127,7 +128,7 @@ void ConnectionController::sendUserInfo() {
     pNickname = settings.value(QString("nick"), "unnamed").toString();
     pIconID = settings.value("icon", 25096).toString().toShort();
     CTransaction * uinfoTransaction = new CTransaction(304, pTaskIDCounter++);
-    uinfoTransaction->addParameter(102, pNickname.length(), pNickname.toLocal8Bit().data());
+    uinfoTransaction->addParameter(102, TextHelper::EncodeText(pNickname).size(), TextHelper::EncodeText(pNickname).data());
     uinfoTransaction->addParameter(104, pIconID);
     sendTransaction(uinfoTransaction);
 }
@@ -166,7 +167,7 @@ void ConnectionController::sendPMToUser(qint32 uid, QString message, bool automa
     } else {
         PMTransaction->addParameter(113, 1);
     }
-    PMTransaction->addParameter(101, message.length(), message.toLocal8Bit().data());
+    PMTransaction->addParameter(101, TextHelper::EncodeText(message).size(), TextHelper::EncodeText(message).data());
     sendTransaction(PMTransaction);
 }
 
@@ -183,9 +184,9 @@ CTransaction * ConnectionController::createTransaction(qint16 id) {
     return new CTransaction(id, pTaskIDCounter++);
 }
 
-void ConnectionController::sendCETIdentification(s_user * user) {
+/*void ConnectionController::sendCETIdentification(s_user * user) {
     // need to get IP
-}
+}*/
 
 /************
     SLOTS
@@ -227,7 +228,7 @@ void ConnectionController::onSocketConnected() {
     } else {
         qDebug() << "No password sent";
     }
-    loginTransaction->addParameter(102, pNickname.length(), pNickname.toLocal8Bit().data());
+    loginTransaction->addParameter(102, TextHelper::EncodeText(pNickname).size(), TextHelper::EncodeText(pNickname).data());
 
     quint16 iconID = qToBigEndian((quint16)3520);
     quint16 ver = qToBigEndian(pClientVersion);
@@ -384,11 +385,6 @@ void ConnectionController::onSocketData() {
                     {
                     QSettings settings("mir", "contra");
                     pNickname = settings.value(QString("nick"), "unnamed").toString();
-                    /*CTransaction * uinfoTransaction = new CTransaction(304, pTaskIDCounter++);
-                    uinfoTransaction->addParameter(102, pNickname.length(), pNickname.toLocal8Bit().data());
-                    uinfoTransaction->addParameter(104, 3520);
-                    sendTransaction(uinfoTransaction);
-                    delete uinfoTransaction;*/
 
                     sendUserInfo();
 
@@ -436,7 +432,7 @@ void ConnectionController::onSocketData() {
                                 memcpy(file->name, parameterBuffer->data+20, file->nameSize);
                                 file->name[file->nameSize] = '\0';
 
-                                qDebug() << "Got file " << QString(file->name).toLocal8Bit() << " (" << file->type << ", " << file->size << "bytes)";
+                                qDebug() << "Got file " << TextHelper::DecodeText(file->name, file->nameSize) << " (" << file->type << ", " << file->size << "bytes)";
 
                                 fileList.push_back(file);
                             }
@@ -861,13 +857,13 @@ void ConnectionController::onSocketData() {
                 qDebug() << "Retreiving message...";
                 quint16 len = receivedTransaction->getParameterById(101)->length;
                 qDebug() << "Length: " << len;
-                char * m = (char *) malloc(sizeof(char)*len+2);
+                char * m = (char *) malloc(sizeof(char)*len+1);
                 memcpy(m, receivedTransaction->getParameterById(101)->data, receivedTransaction->getParameterById(101)->length);
                 m[len] = '\0';
 
                 qDebug() << "Emitting PM signal...";
 
-                emit gotPM(uid, QString(m));
+                emit gotPM(QString::fromLocal8Bit(m, len), uid);
             } else {
                 parameterBuffer = receivedTransaction->getParameterById(101);
                 if(parameterBuffer) {
@@ -881,7 +877,7 @@ void ConnectionController::onSocketData() {
         case 106:
             parameterBuffer = receivedTransaction->getParameterById(101);
             if(parameterBuffer) {
-                emit gotChatMessage(parameterBuffer->data, parameterBuffer->length);
+                emit gotChatMessage(TextHelper::DecodeText(parameterBuffer->data, parameterBuffer->length));
             }
             break;
 
@@ -966,7 +962,7 @@ void ConnectionController::onSocketData() {
                         if(user->icon == 3520 && newIcon != 3520) {
                             user->doesCET = true;
                             qDebug() << "New user is CET-capable";
-                            sendCETIdentification(user);
+                            //sendCETIdentification(user);
                         } else {
                             user->doesCET = false;
                             qDebug() << "New user is not CET-capable";
@@ -1029,8 +1025,8 @@ void ConnectionController::onSocketData() {
 
                     pUsers.push_back(newUser);
 
-                    QString message = QString("               -- ") + QString(newUser->name) + QString(" joined --");
-                    emit gotChatMessage(message.toLocal8Bit().data(), message.length());
+                    QString message = QString::fromUtf8("               -- ") + TextHelper::DecodeText(newUser->name, parameterBuffer->length) + QString::fromUtf8(" joined --");
+                    emit gotChatMessage(message);
                 }
                 emit userListChanged();
             }
@@ -1047,8 +1043,8 @@ void ConnectionController::onSocketData() {
                     qDebug() << "But that user doesn't exist... ignoring";
                     break;
                 }
-                QString message = QString("               -- ") + QString(user->name) + QString(" left --");
-                emit gotChatMessage(message.toLocal8Bit().data(), message.length());
+                QString message = QString::fromUtf8("               -- ") + TextHelper::DecodeText(user->name, parameterBuffer->length) + QString::fromUtf8(" left --");
+                emit gotChatMessage(message);
                 for(quint32 i=0; i<pUsers.size(); i++) {
                     if(pUsers[i]->id == uid) {
                         pUsers[i] = pUsers.back();

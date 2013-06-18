@@ -22,6 +22,7 @@ public:
     void clearChat();
     void clearUserList();
     void setChatFont(QFont);
+    void setEncodingLabel(QString);
 
     void addUser(QListWidgetItem *);
 

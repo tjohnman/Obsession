@@ -69,9 +69,9 @@ MainWindow::MainWindow(QWidget *parent, bool checkForUpdates) :
     //connect(ui->actionDebug_console, SIGNAL(triggered()), this, SLOT(openConsole()));
 
     connect(connection, SIGNAL(gotServerName()), this, SLOT(onGotServerName()));
-    connect(connection, SIGNAL(gotChatMessage(char *, qint16)), this, SLOT(onGotChatMessage(char *, qint16)));
+    connect(connection, SIGNAL(gotChatMessage(QString)), this, SLOT(onGotChatMessage(QString)));
     connect(connection, SIGNAL(userListChanged()), this, SLOT(onUserListChanged()));
-    connect(connection, SIGNAL(gotPM(qint16, QString)), this, SLOT(onGotPM(qint16,QString)));
+    connect(connection, SIGNAL(gotPM(QString, qint16)), this, SLOT(onGotPM(QString, qint16)));
 
     connect(connection, SIGNAL(serverError(QString)), this, SLOT(onError(QString)));
     connect(connection, SIGNAL(socketError(QString)), this, SLOT(onError(QString)));
@@ -332,14 +332,9 @@ void MainWindow::onGotServerName() {
     setStatus(QString("Connected to ") + connection->serverName());
 }
 
-void MainWindow::onGotChatMessage(char * t, qint16 l) {
-    char * temp = (char *) malloc(sizeof(char)*l+1);
+void MainWindow::onGotChatMessage(QString message) {
     playChatSound();
-    memcpy(temp, t, l);
-    temp[l] = '\0';
-    QString msg = QString::fromLocal8Bit(temp);
-    chatWidget->printChat(msg);
-    delete temp;
+    chatWidget->printChat(message);
     if(ui->tabWidget->currentWidget() != chatWidget) {
         ui->tabWidget->setTabText(0, "*Public Chat*");
     }
@@ -409,6 +404,7 @@ void MainWindow::onPreferencesSaved() {
     font.setPointSize(settings.value("fontSize", 8).toInt());
     font.setBold(settings.value("fontBold", false).toBool());
     chatWidget->setChatFont(font);
+    chatWidget->setEncodingLabel(settings.value("EncodingName", "Mac OS Roman").toString());
 }
 
 void MainWindow::openPreferencesDialog() {
@@ -419,7 +415,7 @@ void MainWindow::openPreferencesDialog() {
     dialog->open();
 }
 
-void MainWindow::onGotPM(qint16 uid, QString s) {
+void MainWindow::onGotPM(QString message, qint16 uid) {
     s_user * user = connection->getUserByUid(uid);
     if(user) {
         if(user->messagingWindow == NULL || !user->messagingWindow) {
@@ -432,7 +428,7 @@ void MainWindow::onGotPM(qint16 uid, QString s) {
             playPMSound();
         }
         user->messagingWindow->show();
-        user->messagingWindow->gotMessage(s);
+        user->messagingWindow->gotMessage(message);
     }
 }
 

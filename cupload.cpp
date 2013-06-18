@@ -2,6 +2,7 @@
 #include <QAbstractSocket>
 #include <QIODevice>
 #include <QHostAddress>
+#include "TextHelper.h"
 
 CUpload::CUpload()
 {
@@ -127,7 +128,7 @@ void CUpload::startUploading() {
         socket.write((const char *)&revRef, 4);
         socket.write("\0\0\0\0\0\0\0\0", 8);
         socket.write("FILP\0\1\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\2INFO\0\0\0\0\0\0\0\0", 36);
-        quint16 nameSize = currentName.toLocal8Bit().length();
+        quint16 nameSize = TextHelper::EncodeText(currentName).size();
         quint32 infoForkSize = 72 + nameSize;
         quint32 revInfoForkSize = qToBigEndian(infoForkSize);
         socket.write((const char *)&revInfoForkSize, 4);
@@ -135,7 +136,7 @@ void CUpload::startUploading() {
         quint16 revNameSize = qToBigEndian(nameSize);
         socket.write((const char *)&revNameSize, 2);
         qDebug() << "Name size is " << nameSize;
-        socket.write(currentName.toLocal8Bit().data(), nameSize);
+        socket.write(TextHelper::EncodeText(currentName).data(), nameSize);
         socket.write("DATA\0\0\0\0\0\0\0\0", 12);
         quint32 revDataSize = qToBigEndian(dataSize);
         socket.write((const char *)&revDataSize, 4);

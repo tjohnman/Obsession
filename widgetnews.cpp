@@ -2,6 +2,7 @@
 #include "ui_widgetnews.h"
 #include "CTransaction.h"
 #include <QSettings>
+#include "TextHelper.h"
 
 WidgetNews::WidgetNews(ConnectionController * c, QWidget *parent) :
     QWidget(parent),
@@ -79,8 +80,8 @@ void WidgetNews::getNews() {
                 unsigned char len = level.length();
                 qDebug() << "Writing name length... " << (quint16) len;
                 memcpy(pathdata+offset+4, &len, 1);
-                qDebug() << level.toLocal8Bit().data();
-                memcpy(pathdata+offset+5, level.toLocal8Bit().data(), len);
+                qDebug() << TextHelper::EncodeText(level).data();
+                memcpy(pathdata+offset+5, TextHelper::EncodeText(level).data(), len);
                 offset += 3+len;
             }
 

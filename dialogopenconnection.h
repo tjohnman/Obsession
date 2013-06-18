@@ -33,6 +33,7 @@ public slots:
     void updateBookmarkList();
     void choseBookmark();
     void bookmarkCurrent();
+    void updateAutoConnectStatus();
 };
 
 #endif // DIALOGOPENCONNECTION_H

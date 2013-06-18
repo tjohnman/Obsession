@@ -22,6 +22,7 @@ DialogOpenConnection::DialogOpenConnection(QWidget *parent, ConnectionController
     connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(bookmarkCurrent()));
     connect(bookmarksDialog, SIGNAL(accepted()), this, SLOT(updateBookmarkList()));
     connect(bookmarksDialog, SIGNAL(rejected()), this, SLOT(updateBookmarkList()));
+    connect(ui->autoConnectCheckbox, SIGNAL(clicked()), this, SLOT(updateAutoConnectStatus()));
     updateBookmarkList();
 }
 
@@ -48,6 +49,7 @@ void DialogOpenConnection::changeEvent(QEvent *e)
 }
 
 void DialogOpenConnection::clear() {
+    ui->autoConnectCheckbox->setDisabled(true);
     ui->comboBox->setCurrentIndex(-1);
     ui->lineEdit->setText("");
     ui->lineEdit_2->setText("");
@@ -82,10 +84,36 @@ void DialogOpenConnection::choseBookmark() {
         bookmarksDialog->show();
         return;
     }
+    ui->autoConnectCheckbox->setDisabled(false);
     ui->lineEdit->setText(settings.value("bookmarkaddress"+QString::number(current)).toString());
     ui->lineEdit_2->setText(settings.value("bookmarklogin"+QString::number(current)).toString());
     ui->lineEdit_3->setText(settings.value("bookmarkpassword"+QString::number(current)).toString());
+
+    qint32 bookmarkCount = settings.value("bookmarkCount", 0).toInt();
+    qint32 autoBookmark = settings.value("autoBookmark", -1).toInt();
+    if(autoBookmark > 0 && autoBookmark < bookmarkCount && autoBookmark == current)
+    {
+        ui->autoConnectCheckbox->setChecked(true);
+    }
+    else
+    {
+        ui->autoConnectCheckbox->setChecked(false);
+    }
+
     setFocusOnLogin();
+}
+
+void DialogOpenConnection::updateAutoConnectStatus()
+{
+    QSettings settings("mir", "Contra");
+    if(ui->autoConnectCheckbox->isChecked())
+    {
+        settings.setValue("autoBookmark", ui->comboBox->currentIndex());
+    }
+    else
+    {
+        settings.setValue("autoBookmark", -1);
+    }
 }
 
 void DialogOpenConnection::updateBookmarkList() {
