@@ -72,6 +72,7 @@ MainWindow::MainWindow(QWidget *parent, bool checkForUpdates) :
     connect(connection, SIGNAL(gotChatMessage(QString)), this, SLOT(onGotChatMessage(QString)));
     connect(connection, SIGNAL(userListChanged()), this, SLOT(onUserListChanged()));
     connect(connection, SIGNAL(gotPM(QString, qint16)), this, SLOT(onGotPM(QString, qint16)));
+    connect(connection, SIGNAL(gotUserInfo(QString,QString,quint16)), this, SLOT(onOpenUserInfo(QString,QString,quint16)));
 
     connect(connection, SIGNAL(serverError(QString)), this, SLOT(onError(QString)));
     connect(connection, SIGNAL(socketError(QString)), this, SLOT(onError(QString)));
@@ -89,8 +90,9 @@ MainWindow::MainWindow(QWidget *parent, bool checkForUpdates) :
     connect(connection, SIGNAL(gotFile(quint32, quint32, quint32)), downloadManager, SLOT(addDownload(quint32, quint32, quint32)));
     connect(connection, SIGNAL(gotUpload(quint32)), uploadManager, SLOT(addUpload(quint32)));
 
-    connect(chatWidget, SIGNAL(messagingWindowSignal(quint32)), this, SLOT(onOpenMessagingWindow(quint32)));
-    connect(chatWidget, SIGNAL(userInfoSignal(quint32)), this, SLOT(onOpenUserInfo(quint32)));
+    connect(chatWidget, SIGNAL(messagingWindowSignal(quint16)), this, SLOT(onOpenMessagingWindow(quint16)));
+    connect(chatWidget, SIGNAL(userInfoSignal(quint16)), this, SLOT(requestUserInfo(quint16)));
+    connect(chatWidget, SIGNAL(kickUserSignal(quint16)), this, SLOT(kickUser(quint16)));
     connect(ui->tabWidget, SIGNAL(currentChanged(qint32)), this, SLOT(changedTab()));
 
     statusLabel = new QLabel(ui->statusBar);
@@ -254,6 +256,7 @@ void MainWindow::openIconViewer() {
 void MainWindow::onError(QString errorString) {
     DialogError * dialog = new DialogError(errorString);
     dialog->show();
+    connect(dialog, SIGNAL(finished(int)), dialog, SLOT(deleteLater()));
     setStatus(errorString);
 }
 
@@ -374,7 +377,7 @@ void MainWindow::onUserListChanged() {
             item->setBackground(QBrush(image));
             item->setSizeHint(QSize(232, image.size().height()));
         }
-        chatWidget->addUser(item);
+        chatWidget->addUser(item, users->at(i)->id);
     }
 }
 
@@ -432,14 +435,7 @@ void MainWindow::onGotPM(QString message, qint16 uid) {
     }
 }
 
-void MainWindow::onOpenMessagingWindow(quint32 order) {
-    std::vector<s_user *> * users = connection->getUserList();
-    quint16 uid = 0;
-    for(quint32 i=0; i<users->size(); i++) {
-        if(users->at(i)->orderInList == order) {
-            uid = users->at(i)->id;
-        }
-    }
+void MainWindow::onOpenMessagingWindow(quint16 uid) {
     if(uid == 0) {
         qDebug() << "Warning: User not found";
         return;
@@ -455,14 +451,19 @@ void MainWindow::onOpenMessagingWindow(quint32 order) {
     }
 }
 
-void MainWindow::onOpenUserInfo(quint32 order) {
-    std::vector<s_user *> * users = connection->getUserList();
-    quint16 uid = 0;
-    for(quint32 i=0; i<users->size(); i++) {
-        if(users->at(i)->orderInList == order) {
-            uid = users->at(i)->id;
-        }
-    }
+void MainWindow::kickUser(quint16 uid)
+{
+    CTransaction * transaction = connection->createTransaction(110);
+    transaction->addParameter(103, uid);
+    connection->sendTransaction(transaction);
+}
+
+void MainWindow::requestUserInfo(quint16 uid)
+{
+    connection->requestUserInfo(uid);
+}
+
+void MainWindow::onOpenUserInfo(QString username, QString info, quint16 uid) {
     if(uid == 0) {
         qDebug() << "Warning: User not found";
         return;
@@ -473,6 +474,7 @@ void MainWindow::onOpenUserInfo(quint32 order) {
         if(user->infoWindow == NULL) {
             user->infoWindow = new DialogUserInfo(uid, connection, this);
         }
+        user->infoWindow->gotUserInfo(username, info);
         user->infoWindow->show();
     }
 }

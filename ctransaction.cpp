@@ -105,6 +105,13 @@ void CTransaction::addData(char * data) {
             newParameter->length = 2;
             newParameter->shortValue = pshort;
             break;
+        case 105:
+            newParameter->type = TYPE_STRING;
+            newParameter->id = id;
+            newParameter->length = size;
+            newParameter->data = (char *) malloc(sizeof(char)*size);
+            memcpy(newParameter->data, data + 4 + offset, size);
+            break;
         case 107:
             memcpy(&pint, data + 4+ offset, 4);
             newParameter->type = TYPE_INT;

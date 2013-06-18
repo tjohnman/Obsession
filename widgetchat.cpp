@@ -14,8 +14,9 @@ WidgetChat::WidgetChat(QWidget *parent) :
     ui->lineEdit->altPressed = false;
 
     connect(ui->lineEdit, SIGNAL(returnPressed()), this, SLOT(slotSendChat()));
-    connect(ui->listWidget, SIGNAL(openMessagingWindow(uint)), this , SLOT(onOpenMessagingWindow(uint)));
-    connect(ui->listWidget, SIGNAL(openUserInfo(uint)), this, SLOT(onOpenUserInfo(uint)));
+    connect(ui->listWidget, SIGNAL(openMessagingWindow(quint16)), this , SLOT(onOpenMessagingWindow(quint16)));
+    connect(ui->listWidget, SIGNAL(requestUserInfo(quint16)), this, SLOT(requestUserInfo(quint16)));
+    connect(ui->listWidget, SIGNAL(kickUser(quint16)), this, SLOT(onKickUser(quint16)));
 }
 
 void WidgetChat::printChat(QString str) {
@@ -35,8 +36,8 @@ void WidgetChat::clearUserList() {
     ui->listWidget->clear();
 }
 
-void WidgetChat::addUser(QListWidgetItem * item) {
-    ui->listWidget->addItem(item);
+void WidgetChat::addUser(QListWidgetItem * item, quint16 id) {
+    ui->listWidget->addRow(item, id);
 }
 
 WidgetChat::~WidgetChat()
@@ -83,10 +84,14 @@ void WidgetChat::slotSendChat() {
     }
 }
 
-void WidgetChat::onOpenMessagingWindow(uint i) {
+void WidgetChat::onOpenMessagingWindow(quint16 i) {
     emit messagingWindowSignal(i);
 }
 
-void WidgetChat::onOpenUserInfo(uint i) {
+void WidgetChat::requestUserInfo(quint16 i) {
     emit userInfoSignal(i);
+}
+
+void WidgetChat::onKickUser(quint16 i) {
+    emit kickUserSignal(i);
 }

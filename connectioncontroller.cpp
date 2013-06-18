@@ -159,7 +159,16 @@ QString ConnectionController::serverAgreement() {
     return pServerAgreement;
 }
 
-void ConnectionController::sendPMToUser(qint32 uid, QString message, bool automatic) {
+void ConnectionController::requestUserInfo(quint16 id)
+{
+    qint32 task = pTaskIDCounter++;
+    m_UserInfoTaskMap[task] = id;
+    CTransaction * PMTransaction = new CTransaction(303, task);
+    PMTransaction->addParameter(103, id);
+    sendTransaction(PMTransaction, true);
+}
+
+void ConnectionController::sendPMToUser(quint16 uid, QString message, bool automatic) {
     CTransaction * PMTransaction = new CTransaction(108, pTaskIDCounter++);
     PMTransaction->addParameter(103, uid);
     if(automatic) {
@@ -357,7 +366,9 @@ void ConnectionController::onSocketData() {
         qDebug() << "Transaction error code: " << receivedTransaction->errorCode();
         parameterBuffer = receivedTransaction->getParameterById(100);
         if(parameterBuffer) {
-            qDebug() << "Server error: " << QString(parameterBuffer->data);
+            QString errStr = QString(parameterBuffer->data);
+            errStr.truncate(parameterBuffer->length);
+            qDebug() << "Server error: " << errStr;
             char * errorstring = (char *) malloc(sizeof(char)*parameterBuffer->length+1);
             memcpy(errorstring, parameterBuffer->data, parameterBuffer->length);
             errorstring[parameterBuffer->length] = '\0';
@@ -553,9 +564,33 @@ void ConnectionController::onSocketData() {
                         }
                     }
 
+                 break;
+                case 303:
+                {
+                    s_parameter * paramu = receivedTransaction->getParameterById(102);
+                    s_parameter * parami = receivedTransaction->getParameterById(101);
+                    emit gotUserInfo(TextHelper::DecodeText(paramu->data, paramu->length), TextHelper::DecodeText(parami->data, parami->length), m_UserInfoTaskMap[receivedTransaction->taskID()]);
+                }
+                break;
+                case 352:
+                {
+                    parameterBuffer = receivedTransaction->getParameterById(110);
+                    s_parameter * loginPar = receivedTransaction->getParameterById(105);
+                    if(parameterBuffer && loginPar)
+                    {
+                        QByteArray login(loginPar->data, loginPar->length);
+
+                        if(login == pLogin)
+                        {
+                            qDebug() << "Updated permissions";
+                            pPermissionBitmap = 0;
+                            memcpy((char*)&pPermissionBitmap, parameterBuffer->data, parameterBuffer->length);
+                        }
+                    }
+                }
                     break;
-                    case 370:
-                    case 371:
+                 case 370:
+                 case 371:
                     {
                         for(quint32 i=0; i<receivedTransaction->numberOfParameters(); i++) {
                             parameterBuffer = receivedTransaction->getParameter(i);
@@ -674,8 +709,8 @@ void ConnectionController::onSocketData() {
                             }
                         }
                     }
-                    break;
-                    case 400:
+                break;
+                case 400:
                     {
                         QString text, poster, timestamp;
                         char * t;

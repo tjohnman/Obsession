@@ -14,10 +14,14 @@ public:
     DialogUserInfo(qint16, ConnectionController *, QWidget *parent = 0);
     ~DialogUserInfo();
 
+public slots:
+    void gotUserInfo(QString text, QString username);
+
 protected:
     void changeEvent(QEvent *e);
 
 private:
+    ConnectionController * connection;
     Ui::DialogUserInfo *ui;
 };
 

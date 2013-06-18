@@ -24,7 +24,7 @@ public:
     void setChatFont(QFont);
     void setEncodingLabel(QString);
 
-    void addUser(QListWidgetItem *);
+    void addUser(QListWidgetItem *, quint16 id);
 
     QSound * chatSound;
 
@@ -32,12 +32,14 @@ public:
 
 public slots:
     void slotSendChat();
-    void onOpenMessagingWindow(uint);
-    void onOpenUserInfo(uint);
+    void onOpenMessagingWindow(quint16);
+    void requestUserInfo(quint16);
+    void onKickUser(quint16);
 
 signals:
-    void messagingWindowSignal(uint);
-    void userInfoSignal(uint);
+    void messagingWindowSignal(quint16);
+    void userInfoSignal(quint16);
+    void kickUserSignal(quint16);
 
 protected:
     void changeEvent(QEvent *e);

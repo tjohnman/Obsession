@@ -8,6 +8,7 @@
 #include <qtEndian>
 #include <QDate>
 #include <QTimer>
+#include <map>
 
 class ConnectionController : public QObject
 {
@@ -22,7 +23,8 @@ public:
     void sendTransaction(CTransaction *, bool expectReply = false);
     void sendChatText(QString);
     void sendEmote(QString);
-    void sendPMToUser(qint32, QString, bool automatic = false);
+    void sendPMToUser(quint16, QString, bool automatic = false);
+    void requestUserInfo(quint16 id);
 
     bool isConnected();
     void toggleAFK();
@@ -41,49 +43,14 @@ public:
 
     QTcpSocket pSocket;
 
-    bool pPermissionDeleteFile;
-    bool pPermissionUploadFile;
-    bool pPermissionDownloadFile;
-    bool pPermissionRenameFile;
-    bool pPermissionMoveFile;
-    bool pPermissionCreateFolder;
-    bool pPermissionDeleteFolder;
-    bool pPermissionRenameFolder;
-    bool pPermissionMoveFolder;
-    bool pPermissionReadChat;
-    bool pPermissionSendChat;
-    bool pPermissionOpenChat;
-    bool pPermissionCloseChat;
-    bool pPermissionShowInList;
-    bool pPermissionCreateUser;
-    bool pPermissionDeleteUser;
-    bool pPermissionOpenUser;
-    bool pPermissionModifyUser;
-    bool pPermissionChangeOwnPassword;
-    bool pPermissionSendPrivateMessage;
-    bool pPermissionNewsReadArticle;
-    bool pPermissionNewsPostArticle;
-    bool pPermissionDisconnectUser;
-    bool pPermissionCannotBeDisconnected;
-    bool pPermissionGetClientInfo;
-    bool pPermissionUploadAnywhere;
-    bool pPermissionAnyName;
-    bool pPermissionNoAgreement;
-    bool pPermissionSetFileComment;
-    bool pPermissionViewDropBoxes;
-    bool pPermissionMakeAlias;
-    bool pPermissionBroadcast;
-    bool pPermissionNewsDeleteArticle;
-    bool pPermissionNewsCreateCategory;
-    bool pPermissionNewsDeleteCategory;
-    bool pPermissionNewsCreateFolder;
-    bool pPermissionNewsDeleteFolder;
+    qint64 pPermissionBitmap;
+
+    QByteArray pLogin;
 
 private:
     std::vector<CTransaction *> pPendingTransactions;
     std::vector<s_user *> pUsers;
 
-    QByteArray pLogin;
     QByteArray pPassword;
     quint16 pIconID;
     QString pNickname;
@@ -101,6 +68,8 @@ private:
     void sendUserInfo();
 
     CTransaction * receivedTransaction;
+
+    std::map<qint32,quint16> m_UserInfoTaskMap;
 
     //void sendCETIdentification(s_user *);
 
@@ -126,6 +95,7 @@ signals:
     void gotNewsCategory(unsigned char, QString);
     void gotNewsItem(QString, quint32 id, quint32 pid);
     void gotNewsArticleText(QString, QString, QString);
+    void gotUserInfo(QString username, QString info, quint16);
     void gotUpload(quint32);
     void receivedFileDeleteResponse(qint32 code);
 };

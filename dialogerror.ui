@@ -29,7 +29,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>Attention</string>
+   <string>Server message</string>
   </property>
   <property name="modal">
    <bool>true</bool>

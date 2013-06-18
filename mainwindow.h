@@ -49,8 +49,9 @@ public slots:
     void onGotServerName();
     void onGotChatMessage(QString message);
     void onGotPM(QString message, qint16 uid);
-    void onOpenMessagingWindow(quint32);
-    void onOpenUserInfo(quint32);
+    void onOpenMessagingWindow(quint16);
+    void onOpenUserInfo(QString username, QString info, quint16);
+    void kickUser(quint16);
     void onUserListChanged();
     void openPreferencesDialog();
     void showServerAgreement();
@@ -77,6 +78,7 @@ public slots:
     void onConnected();
     void onVersionReady();
     void openBookmarksDialog();
+    void requestUserInfo(quint16 id);
 
 protected:
     void changeEvent(QEvent *e);
