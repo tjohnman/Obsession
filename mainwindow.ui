@@ -91,6 +91,11 @@
     <addaction name="actionThreaded_News"/>
     <addaction name="separator"/>
     <addaction name="actionDownloads"/>
+    <addaction name="separator"/>
+    <addaction name="actionBroadcast"/>
+    <addaction name="separator"/>
+    <addaction name="actionView_account"/>
+    <addaction name="actionNew_account"/>
    </widget>
    <addaction name="menuConnection"/>
    <addaction name="menuServer"/>
@@ -252,6 +257,26 @@
   <action name="actionBookmarks">
    <property name="text">
     <string>Bookmarks...</string>
+   </property>
+  </action>
+  <action name="actionChange_own_password">
+   <property name="text">
+    <string>Change own password...</string>
+   </property>
+  </action>
+  <action name="actionView_account">
+   <property name="text">
+    <string>View account...</string>
+   </property>
+  </action>
+  <action name="actionNew_account">
+   <property name="text">
+    <string>New account...</string>
+   </property>
+  </action>
+  <action name="actionBroadcast">
+   <property name="text">
+    <string>Broadcast..</string>
    </property>
   </action>
  </widget>

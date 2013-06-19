@@ -25,6 +25,8 @@ public:
     void sendEmote(QString);
     void sendPMToUser(quint16, QString, bool automatic = false);
     void requestUserInfo(quint16 id);
+    void requestAccount(QString login);
+    void broadcast(QString text);
 
     bool isConnected();
     void toggleAFK();
@@ -43,7 +45,7 @@ public:
 
     QTcpSocket pSocket;
 
-    qint64 pPermissionBitmap;
+    quint64 pPermissionBitmap;
 
     QByteArray pLogin;
 
@@ -98,6 +100,7 @@ signals:
     void gotUserInfo(QString username, QString info, quint16);
     void gotUpload(quint32);
     void receivedFileDeleteResponse(qint32 code);
+    void gotPermissions(QString login, QString password, quint64 permissions);
 };
 
 #endif // CONNECTIONCONTROLLER_H

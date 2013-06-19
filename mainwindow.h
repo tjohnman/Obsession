@@ -79,6 +79,10 @@ public slots:
     void onVersionReady();
     void openBookmarksDialog();
     void requestUserInfo(quint16 id);
+    void openRequestPermissions();
+    void gotPermissions(QString login, QString password, quint64 perms);
+    void onClickCreateAccount();
+    void onClickBroadcast();
 
 protected:
     void changeEvent(QEvent *e);

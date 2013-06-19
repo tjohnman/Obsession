@@ -8,6 +8,10 @@
 #include "version.h"
 #include <QDesktopServices>
 #include <QMessageBox>
+#include "dialogprivileges.h"
+#include "dialogrequestaccount.h"
+#include "dialogcreateaccount.h"
+#include "dialogbroadcast.h"
 
 MainWindow::MainWindow(QWidget *parent, bool checkForUpdates) :
     QMainWindow(parent),
@@ -66,6 +70,9 @@ MainWindow::MainWindow(QWidget *parent, bool checkForUpdates) :
     connect(ui->actionDownloads, SIGNAL(triggered()), this, SLOT(openDownloads()));
     connect(ui->actionThreaded_News, SIGNAL(triggered()), this, SLOT(openThreadedNews()));
     connect(ui->actionBookmarks, SIGNAL(triggered()), this, SLOT(openBookmarksDialog()));
+    connect(ui->actionView_account, SIGNAL(triggered()), this, SLOT(openRequestPermissions()));
+    connect(ui->actionNew_account, SIGNAL(triggered()), this, SLOT(onClickCreateAccount()));
+    connect(ui->actionBroadcast, SIGNAL(triggered()), this, SLOT(onClickBroadcast()));
     //connect(ui->actionDebug_console, SIGNAL(triggered()), this, SLOT(openConsole()));
 
     connect(connection, SIGNAL(gotServerName()), this, SLOT(onGotServerName()));
@@ -73,6 +80,7 @@ MainWindow::MainWindow(QWidget *parent, bool checkForUpdates) :
     connect(connection, SIGNAL(userListChanged()), this, SLOT(onUserListChanged()));
     connect(connection, SIGNAL(gotPM(QString, qint16)), this, SLOT(onGotPM(QString, qint16)));
     connect(connection, SIGNAL(gotUserInfo(QString,QString,quint16)), this, SLOT(onOpenUserInfo(QString,QString,quint16)));
+    connect(connection, SIGNAL(gotPermissions(QString, QString, quint64)), this, SLOT(gotPermissions(QString, QString, quint64)));
 
     connect(connection, SIGNAL(serverError(QString)), this, SLOT(onError(QString)));
     connect(connection, SIGNAL(socketError(QString)), this, SLOT(onError(QString)));
@@ -148,8 +156,6 @@ void MainWindow::setStatus(QString s) {
 void MainWindow::log(QString t) {
     debugConsole->addText(t+"\n");
 }
-
-// SLOTS
 
 void MainWindow::onConnected() {
     setStatus("Connected");
@@ -341,6 +347,35 @@ void MainWindow::onGotChatMessage(QString message) {
     if(ui->tabWidget->currentWidget() != chatWidget) {
         ui->tabWidget->setTabText(0, "*Public Chat*");
     }
+}
+
+void MainWindow::openRequestPermissions()
+{
+    DialogRequestAccount * dialog = new DialogRequestAccount(connection, this);
+    dialog->show();
+    connect(dialog, SIGNAL(finished(int)), dialog, SLOT(deleteLater()));
+}
+
+void MainWindow::onClickBroadcast()
+{
+    DialogBroadcast * dialog = new DialogBroadcast(connection, this);
+    dialog->show();
+    connect(dialog, SIGNAL(finished(int)), dialog, SLOT(deleteLater()));
+}
+
+void MainWindow::gotPermissions(QString login, QString password, quint64 perms)
+{
+    DialogPrivileges * dialog = new DialogPrivileges(connection, login, password, perms, this);
+    dialog->readPrivileges();
+    dialog->show();
+    connect(dialog, SIGNAL(finished(int)), dialog, SLOT(deleteLater()));
+}
+
+void MainWindow::onClickCreateAccount()
+{
+    DialogCreateAccount * dialog = new DialogCreateAccount(connection, this);
+    dialog->show();
+    connect(dialog, SIGNAL(finished(int)), dialog, SLOT(deleteLater()));
 }
 
 void MainWindow::onUserListChanged() {

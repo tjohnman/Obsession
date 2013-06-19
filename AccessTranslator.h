@@ -8,45 +8,46 @@
 class AccessTranslator
 {
 public:
-    enum
+    enum : quint64
     {
-        DELETE_FILE = Q_UINT64_C(1),
-        UPLOAD_FILE = Q_UINT64_C(2),
-        DOWNLOAD_FILE = Q_UINT64_C(4),
-        RENAME_FILE = Q_UINT64_C(8),
-        MOVE_FILE = Q_UINT64_C(16),
-        CREATE_FOLDER = Q_UINT64_C(32),
-        DELETE_FOLDER = Q_UINT64_C(64),
-        RENAME_FOLDER = Q_UINT64_C(128),
-        MOVE_FOLDER = Q_UINT64_C(256),
-        READ_CHAT = Q_UINT64_C(512),
-        SEND_CHAT = Q_UINT64_C(1024),
-        OPEN_CHAT = Q_UINT64_C(2048),
-        CLOSE_CHAT = Q_UINT64_C(4096),
-        SHOW_IN_LIST = Q_UINT64_C(8192),
-        CREATE_USER = Q_UINT64_C(16384),
-        DELETE_USER = Q_UINT64_C(32768),
-        OPEN_USER = Q_UINT64_C(65536),
-        MODIFY_USER = Q_UINT64_C(131072),
-        CHANGE_OWN_PASSWORD = Q_UINT64_C(262144),
-        SEND_PRIV_MESSAGE = Q_UINT64_C(524288),
-        READ_NEWS = Q_UINT64_C(1048576),
-        POST_NEWS = Q_UINT64_C(2097152),
-        DISCONNECT_USER = Q_UINT64_C(4194304),
-        CANNOT_BE_DISCONNECTED = Q_UINT64_C(8388608),
-        GET_CLIENT_INFO = Q_UINT64_C(16777216),
-        UPLOAD_ANYWHERE = Q_UINT64_C(33554432),
-        ANY_NAME = Q_UINT64_C(67108864),
-        NO_AGREEMENT = Q_UINT64_C(134217728),
-        SET_FILE_COMMENT = Q_UINT64_C(268435456),
-        SET_FOLDER_COMMENT = Q_UINT64_C(536870912),
-        VIEW_DROPBOXES = Q_UINT64_C(1073741824),
-        MAKE_ALIAS = Q_UINT64_C(2147483648),
-        BROADCAST = Q_UINT64_C(4294967296),
-        CREATE_NEWS_CATEGORY = Q_UINT64_C(8589934592),
-        DELETE_NEWS_CATEGORY = Q_UINT64_C(17179869184),
-        CREATE_FOLDER_NEWS = Q_UINT64_C(34359738368),
-        DELETE_FOLDER_NEWS = Q_UINT64_C(68719476736)
+        DELETE_FILE = (1),
+        UPLOAD_FILE = (2),
+        DOWNLOAD_FILE = (4),
+        RENAME_FILE = (8),
+        MOVE_FILE = (16),
+        CREATE_FOLDER = (32),
+        DELETE_FOLDER = (64),
+        RENAME_FOLDER = (128),
+        MOVE_FOLDER = (256),
+        READ_CHAT = (512),
+        SEND_CHAT = (1024),
+        OPEN_CHAT = (2048),
+        CLOSE_CHAT = (4096),
+        SHOW_IN_LIST = (8192),
+        CREATE_USER = (16384),
+        DELETE_USER = (32768),
+        OPEN_USER = (65536),
+        MODIFY_USER = (131072),
+        CHANGE_OWN_PASSWORD = (262144),
+        SEND_PRIV_MESSAGE = (524288),
+        READ_NEWS = (1048576),
+        POST_NEWS = (2097152),
+        DISCONNECT_USER = (4194304),
+        CANNOT_BE_DISCONNECTED = (8388608),
+        GET_CLIENT_INFO = (16777216),
+        UPLOAD_ANYWHERE = (33554432),
+        ANY_NAME = (67108864),
+        NO_AGREEMENT = (134217728),
+        SET_FILE_COMMENT = (268435456),
+        SET_FOLDER_COMMENT = (536870912),
+        VIEW_DROPBOXES = (1073741824),
+        MAKE_ALIAS = (2147483648),
+        BROADCAST = (4294967296),
+        DELETE_NEWS_ARTICLE = (8589934592),
+        CREATE_NEWS_CATEGORY = (17179869184),
+        DELETE_NEWS_CATEGORY = (34359738368),
+        CREATE_FOLDER_NEWS = (68719476736),
+        DELETE_FOLDER_NEWS = (137438953472)
     };
 
     static bool HavePrivileges(ConnectionController * connection, quint64 mask)
@@ -57,6 +58,21 @@ public:
             return false;
         }
         return mask & connection->pPermissionBitmap;
+    }
+
+    static bool HavePrivileges(quint64 bitmap, quint64 mask)
+    {
+        return mask & bitmap;
+    }
+
+    static void AddPrivilege(quint64 &bitmap, quint64 mask)
+    {
+        bitmap |= mask;
+    }
+
+    static void RemovePrivilege(quint64 &bitmap, quint64 mask)
+    {
+        bitmap ^= mask;
     }
 };
 

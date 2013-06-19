@@ -73,6 +73,22 @@ qint32 ConnectionController::connectToServer(QString address, QString login, QSt
     return 0;
 }
 
+void ConnectionController::broadcast(QString text)
+{
+    CTransaction * trans = createTransaction(355);
+    QByteArray arr = TextHelper::EncodeText(text);
+    trans->addParameter(101, arr.size(), arr.data());
+    sendTransaction(trans);
+}
+
+void ConnectionController::requestAccount(QString login)
+{
+    QByteArray loginArr = TextHelper::EncodeText(login);
+    CTransaction * t = createTransaction(352);
+    t->addParameter(105, loginArr.size(), loginArr.data());
+    sendTransaction(t, true);
+}
+
 void ConnectionController::sendTransaction(CTransaction * t, bool expectReply) {
     if(isConnected()) {
         qint64 written = pSocket.write(t->bytes(), t->length());
@@ -578,14 +594,19 @@ void ConnectionController::onSocketData() {
                     s_parameter * loginPar = receivedTransaction->getParameterById(105);
                     if(parameterBuffer && loginPar)
                     {
-                        QByteArray login(loginPar->data, loginPar->length);
-
-                        if(login == pLogin)
+                        for(int i=0; i<loginPar->length; ++i)
                         {
-                            qDebug() << "Updated permissions";
-                            pPermissionBitmap = 0;
-                            memcpy((char*)&pPermissionBitmap, parameterBuffer->data, parameterBuffer->length);
+                            loginPar->data[i] = 255 - loginPar->data[i];
                         }
+                        QString login = TextHelper::DecodeText(loginPar->data, loginPar->length);
+
+                        quint64 permissions = 0;
+                        memcpy((char*)&permissions, parameterBuffer->data, parameterBuffer->length);
+                        qDebug() << permissions;
+
+                        s_parameter * passPar = receivedTransaction->getParameterById(106);
+                        QString password = TextHelper::DecodeText(passPar->data, passPar->length);
+                        emit gotPermissions(login, password, permissions);
                     }
                 }
                     break;

@@ -106,6 +106,7 @@ void CTransaction::addData(char * data) {
             newParameter->shortValue = pshort;
             break;
         case 105:
+        case 106:
             newParameter->type = TYPE_STRING;
             newParameter->id = id;
             newParameter->length = size;

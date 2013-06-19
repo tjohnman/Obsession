@@ -30,8 +30,8 @@ void DialogUserInfo::changeEvent(QEvent *e)
 
 void DialogUserInfo::gotUserInfo(QString username, QString text)
 {
+    text.replace("\r", "\n");
     text.replace("\n", "<br>");
-    text.replace("\r", "");
     ui->label->setText(QString("Username: <b>%1</b>").arg(username));
     ui->textBrowser->setHtml(text);
 }

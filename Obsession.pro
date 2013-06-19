@@ -35,7 +35,11 @@ SOURCES += main.cpp \
     widgetconsole.cpp \
     dialoguserinfo.cpp \
     threadiconloader.cpp \
-    threaduploader.cpp
+    threaduploader.cpp \
+    dialogprivileges.cpp \
+    dialogrequestaccount.cpp \
+    dialogcreateaccount.cpp \
+    dialogbroadcast.cpp
 HEADERS += mainwindow.h \
     ctransaction.h \
     defines.h \
@@ -69,7 +73,11 @@ HEADERS += mainwindow.h \
     version.h \
     threaduploader.h \
     TextHelper.h \
-    AccessTranslator.h
+    AccessTranslator.h \
+    dialogprivileges.h \
+    dialogrequestaccount.h \
+    dialogcreateaccount.h \
+    dialogbroadcast.h
 FORMS += mainwindow.ui \
     dialogopenconnection.ui \
     dialogpreferences.ui \
@@ -89,5 +97,9 @@ FORMS += mainwindow.ui \
     widgetdownloaditem.ui \
     dialoguploadsqueue.ui \
     widgetconsole.ui \
-    dialoguserinfo.ui
+    dialoguserinfo.ui \
+    dialogprivileges.ui \
+    dialogrequestaccount.ui \
+    dialogcreateaccount.ui \
+    dialogbroadcast.ui
 RESOURCES += resources.qrc
