@@ -18,6 +18,16 @@ public:
         return codec->toUnicode(str, length);
     }
 
+    static QString DecodeText(char * str, int length, QString encoding)
+    {
+        QTextCodec * codec = QTextCodec::codecForName(encoding.toUtf8());
+        if(!codec)
+        {
+            codec = QTextCodec::codecForName(QString::fromUtf8("macintosh").toUtf8());
+        }
+        return codec->toUnicode(str, length);
+    }
+
     static QByteArray EncodeText(QString str)
     {
         QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("contra"));
