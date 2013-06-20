@@ -7,6 +7,7 @@
 #include <QFile>
 #include <QDragEnterEvent>
 #include <QDropEvent>
+#include <map>
 
 namespace Ui {
     class DialogFileBrowser;
@@ -37,6 +38,7 @@ private:
     QString path;
     QString getExtension(QString name);
     QFile uploadedFile;
+    std::map<QString, QString> _m_RawNames;
 
 private slots:
     void onGotFileList(std::vector<s_hotlineFile *>);

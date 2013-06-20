@@ -80,6 +80,7 @@ void DialogFileBrowser::load() {
     if(!path.endsWith("/")) {
         path.append("/");
     }
+    ui->labelPath->setText(path);
     CTransaction * fileListTransaction = connection->createTransaction(200);
     qDebug() << "Path is " << path.length() << " characters (" << path << ")";
     if(path.length() > 1) {
@@ -90,7 +91,7 @@ void DialogFileBrowser::load() {
         quint16 pathlen = 2 + directorylevels * 3;
         for(qint32 i=0; i<levels.count(); i++) {
             QString level = levels.at(i);
-            pathlen += level.length();
+            pathlen += TextHelper::EncodeText(_m_RawNames[level]).length();
         }
 
         char * pathdata = (char *) malloc(sizeof(char)*pathlen);
@@ -104,11 +105,11 @@ void DialogFileBrowser::load() {
             qDebug() << "Writing zeros...";
             memset(pathdata+offset+2, 0, 2);
             QString level = levels.at(i);
-            unsigned char len = (unsigned char)TextHelper::EncodeText(level).size();
+            unsigned char len = (unsigned char)TextHelper::EncodeText(_m_RawNames[level]).length();
             qDebug() << "Writing name length... " << (quint16) len;
             memcpy(pathdata+offset+4, &len, 1);
-            qDebug() << TextHelper::EncodeText(level).data();
-            memcpy(pathdata+offset+5, TextHelper::EncodeText(level).data(), len);
+            qDebug() << TextHelper::EncodeText(_m_RawNames[level]);
+            memcpy(pathdata+offset+5, TextHelper::EncodeText(_m_RawNames[level]).data(), len);
             offset += 3+len;
         }
 
@@ -132,9 +133,14 @@ void DialogFileBrowser::onDoubleClick(QModelIndex model) {
 
 void DialogFileBrowser::onGotFileList(std::vector<s_hotlineFile *> list) {
     ui->treeWidget->clear();
+    _m_RawNames.clear();
+
     for(quint32 i=0; i<list.size(); i++) {
         QTreeWidgetItem * item = new QTreeWidgetItem();
-        QString _n = TextHelper::DecodeText(list[i]->name, list[i]->nameSize);
+        QString _n1 = TextHelper::DecodeText(list[i]->name, list[i]->nameSize);
+        QString _n2 = TextHelper::DecodeText(list[i]->name, list[i]->nameSize, "UTF-8");
+        QString _n = _n1.length() < _n2.length() ? _n1 : _n2;
+        _m_RawNames[_n] = _n1;
         item->setData(0, 0, _n);
         qint32 size = list[i]->size;
         if(!strncmp(list[i]->type, "fldr", 4)) {
