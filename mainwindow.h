@@ -80,7 +80,7 @@ public slots:
     void openBookmarksDialog();
     void requestUserInfo(quint16 id);
     void openRequestPermissions();
-    void gotPermissions(QString login, QString password, quint64 perms);
+    void gotPermissions(QString login, QString password, quint8, quint8, quint8, quint8, quint8, quint8, quint8, quint8);
     void onClickCreateAccount();
     void onClickBroadcast();
 

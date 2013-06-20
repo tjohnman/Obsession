@@ -100,7 +100,7 @@ signals:
     void gotUserInfo(QString username, QString info, quint16);
     void gotUpload(quint32);
     void receivedFileDeleteResponse(qint32 code);
-    void gotPermissions(QString login, QString password, quint64 permissions);
+    void gotPermissions(QString login, QString password, quint8 p1, quint8 p2, quint8 p3, quint8 p4, quint8, quint8, quint8, quint8);
 };
 
 #endif // CONNECTIONCONTROLLER_H

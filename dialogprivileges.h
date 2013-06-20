@@ -14,20 +14,19 @@ class DialogPrivileges : public QDialog
     Q_OBJECT
     
 public:
-    explicit DialogPrivileges(ConnectionController * c, QString user, QString password, quint64 privs, QWidget *parent = 0);
+    explicit DialogPrivileges(ConnectionController * c, QString user, QString password, quint8, quint8, quint8, quint8, quint8, quint8, quint8, quint8, QWidget *parent = 0);
     explicit DialogPrivileges(ConnectionController * c, QString user, QWidget *parent = 0);
     ~DialogPrivileges();
     void readPrivileges();
 
 
 signals:
-    void savedPrivileges(quint64 privs);
 
 private slots:
     void onAccepted();
 
 private:
-    quint64 pPrivileges;
+    quint8 pPrivileges1, pPrivileges2, pPrivileges3, pPrivileges4, pPrivileges5, pPrivileges6, pPrivileges7, pPrivileges8;
     Ui::DialogPrivileges *ui;
     ConnectionController * connection;
 };

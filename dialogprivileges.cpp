@@ -2,21 +2,29 @@
 #include "ui_dialogprivileges.h"
 
 #include "connectioncontroller.h"
-#include "AccessTranslator.h"
 #include "TextHelper.h"
 
-DialogPrivileges::DialogPrivileges(ConnectionController * c, QString user, QString password, quint64 privs, QWidget *parent) :
+DialogPrivileges::DialogPrivileges(ConnectionController * c, QString user, QString password,
+                                   quint8 p1, quint8 p2, quint8 p3, quint8 p4, quint8 p5, quint8 p6, quint8 p7, quint8 p8,
+                                   QWidget *parent) :
     QDialog(parent),
     ui(new Ui::DialogPrivileges)
 {
     ui->setupUi(this);
     connection = c;
-    pPrivileges = privs;
+    pPrivileges1 = p1;
+    pPrivileges2 = p2;
+    pPrivileges3 = p3;
+    pPrivileges4 = p4;
+    pPrivileges5 = p5;
+    pPrivileges6 = p6;
+    pPrivileges7 = p7;
+    pPrivileges8 = p8;
     ui->editLogin->setText(user);
     if(password.data()[0].toLatin1() == 0) password = "";
     ui->editPassword->setText(password);
 
-    qDebug() << "Permissions for " << user << " " << privs;
+    qDebug() << "Permissions for " << user;
     connect(this, SIGNAL(accepted()), this, SLOT(onAccepted()));
     connect(ui->buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
     connect(ui->buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
@@ -28,7 +36,14 @@ DialogPrivileges::DialogPrivileges(ConnectionController * c, QString user, QWidg
 {
     ui->setupUi(this);
     connection = c;
-    pPrivileges = 0;
+    pPrivileges1 = 0;
+    pPrivileges2 = 0;
+    pPrivileges3 = 0;
+    pPrivileges4 = 0;
+    pPrivileges5 = 0;
+    pPrivileges6 = 0;
+    pPrivileges7 = 0;
+    pPrivileges8 = 0;
     ui->editLogin->setText(user);
 
 
@@ -44,87 +59,87 @@ DialogPrivileges::~DialogPrivileges()
 
 void DialogPrivileges::readPrivileges()
 {
-    if(AccessTranslator::HavePrivileges(pPrivileges, AccessTranslator::DELETE_FILE)) ui->checkDeleteFile->setChecked(true);
-    if(AccessTranslator::HavePrivileges(pPrivileges, AccessTranslator::UPLOAD_FILE)) ui->checkUploadFile->setChecked(true);
-    if(AccessTranslator::HavePrivileges(pPrivileges, AccessTranslator::DOWNLOAD_FILE)) ui->checkDownloadFile->setChecked(true);
-    if(AccessTranslator::HavePrivileges(pPrivileges, AccessTranslator::RENAME_FILE)) ui->checkRenameFile->setChecked(true);
-    if(AccessTranslator::HavePrivileges(pPrivileges, AccessTranslator::MOVE_FILE)) ui->checkMoveFile->setChecked(true);
-    if(AccessTranslator::HavePrivileges(pPrivileges, AccessTranslator::CREATE_FOLDER)) ui->checkCreateFolders->setChecked(true);
-    if(AccessTranslator::HavePrivileges(pPrivileges, AccessTranslator::DELETE_FOLDER)) ui->checkDeleteFolders->setChecked(true);
-    if(AccessTranslator::HavePrivileges(pPrivileges, AccessTranslator::RENAME_FOLDER)) ui->checkRenameFolders->setChecked(true);
-    if(AccessTranslator::HavePrivileges(pPrivileges, AccessTranslator::MOVE_FOLDER)) ui->checkMoveFolder->setChecked(true);
-    if(AccessTranslator::HavePrivileges(pPrivileges, AccessTranslator::READ_CHAT)) ui->checkReadChat->setChecked(true);
-    if(AccessTranslator::HavePrivileges(pPrivileges, AccessTranslator::SEND_CHAT)) ui->checkSendChat->setChecked(true);
-    if(AccessTranslator::HavePrivileges(pPrivileges, AccessTranslator::OPEN_CHAT)) ui->checkOpenChat->setChecked(true);
-    if(AccessTranslator::HavePrivileges(pPrivileges, AccessTranslator::CLOSE_CHAT)) ui->checkCloseChat->setChecked(true);
-    if(AccessTranslator::HavePrivileges(pPrivileges, AccessTranslator::SHOW_IN_LIST)) ui->checkShowInList->setChecked(true);
-    if(AccessTranslator::HavePrivileges(pPrivileges, AccessTranslator::CREATE_USER)) ui->checkCreateUsers->setChecked(true);
-    if(AccessTranslator::HavePrivileges(pPrivileges, AccessTranslator::DELETE_USER)) ui->checkDeleteUsers->setChecked(true);
-    if(AccessTranslator::HavePrivileges(pPrivileges, AccessTranslator::OPEN_USER)) ui->checkOpenUsers->setChecked(true);
-    if(AccessTranslator::HavePrivileges(pPrivileges, AccessTranslator::MODIFY_USER)) ui->checkModifyUsers->setChecked(true);
-    if(AccessTranslator::HavePrivileges(pPrivileges, AccessTranslator::CHANGE_OWN_PASSWORD)) ui->checkChangeOwnPassword->setChecked(true);
-    if(AccessTranslator::HavePrivileges(pPrivileges, AccessTranslator::SEND_PRIV_MESSAGE)) ui->checkSendPM->setChecked(true);
-    if(AccessTranslator::HavePrivileges(pPrivileges, AccessTranslator::READ_NEWS)) ui->checkReadNews->setChecked(true);
-    if(AccessTranslator::HavePrivileges(pPrivileges, AccessTranslator::POST_NEWS)) ui->checkPostNews->setChecked(true);
-    if(AccessTranslator::HavePrivileges(pPrivileges, AccessTranslator::DISCONNECT_USER)) ui->checkKickUsers->setChecked(true);
-    if(AccessTranslator::HavePrivileges(pPrivileges, AccessTranslator::CANNOT_BE_DISCONNECTED)) ui->checkCannotBeDisconnected->setChecked(true);
-    if(AccessTranslator::HavePrivileges(pPrivileges, AccessTranslator::GET_CLIENT_INFO)) ui->checkGetUsersInfo->setChecked(true);
-    if(AccessTranslator::HavePrivileges(pPrivileges, AccessTranslator::UPLOAD_ANYWHERE)) ui->checkUploadAnywhere->setChecked(true);
-    if(AccessTranslator::HavePrivileges(pPrivileges, AccessTranslator::ANY_NAME)) ui->checkAnyName->setChecked(true);
-    if(AccessTranslator::HavePrivileges(pPrivileges, AccessTranslator::NO_AGREEMENT)) ui->checkNoAgreement->setChecked(true);
-    if(AccessTranslator::HavePrivileges(pPrivileges, AccessTranslator::SET_FILE_COMMENT)) ui->checkSetFileComments->setChecked(true);
-    if(AccessTranslator::HavePrivileges(pPrivileges, AccessTranslator::SET_FOLDER_COMMENT)) ui->checkSetFolderComments->setChecked(true);
-    if(AccessTranslator::HavePrivileges(pPrivileges, AccessTranslator::VIEW_DROPBOXES)) ui->checkViewDropboxes->setChecked(true);
-    if(AccessTranslator::HavePrivileges(pPrivileges, AccessTranslator::MAKE_ALIAS)) ui->checkMakeAlias->setChecked(true);
-    if(AccessTranslator::HavePrivileges(pPrivileges, AccessTranslator::BROADCAST)) ui->checkBroadcast->setChecked(true);
-    if(AccessTranslator::HavePrivileges(pPrivileges, AccessTranslator::DELETE_NEWS_ARTICLE)) ui->checkDeleteNewsArticle->setChecked(true);
-    if(AccessTranslator::HavePrivileges(pPrivileges, AccessTranslator::CREATE_NEWS_CATEGORY)) ui->checkCreateNewsCategory->setChecked(true);
-    if(AccessTranslator::HavePrivileges(pPrivileges, AccessTranslator::DELETE_NEWS_CATEGORY)) ui->checkDeleteNewsCategory->setChecked(true);
-    if(AccessTranslator::HavePrivileges(pPrivileges, AccessTranslator::CREATE_FOLDER_NEWS)) ui->checkCreateNewsFolder->setChecked(true);
-    if(AccessTranslator::HavePrivileges(pPrivileges, AccessTranslator::DELETE_FOLDER_NEWS)) ui->checkDeleteNewsFolder->setChecked(true);
+    if(pPrivileges1 & 128) ui->checkDeleteFile->setChecked(true);
+    if(pPrivileges1 & 64) ui->checkUploadFile->setChecked(true);
+    if(pPrivileges1 & 32) ui->checkDownloadFile->setChecked(true);
+    if(pPrivileges1 & 16) ui->checkRenameFile->setChecked(true);
+    if(pPrivileges1 & 8) ui->checkMoveFile->setChecked(true);
+    if(pPrivileges1 & 4) ui->checkCreateFolders->setChecked(true);
+    if(pPrivileges1 & 2) ui->checkDeleteFolders->setChecked(true);
+    if(pPrivileges1 & 1) ui->checkRenameFolders->setChecked(true);
+    if(pPrivileges2 & 128) ui->checkMoveFolder->setChecked(true);
+    if(pPrivileges2 & 64) ui->checkReadChat->setChecked(true);
+    if(pPrivileges2 & 32) ui->checkSendChat->setChecked(true);
+    if(pPrivileges2 & 16) ui->checkOpenChat->setChecked(true);
+    if(pPrivileges2 & 8) ui->checkCloseChat->setChecked(true);
+    if(pPrivileges2 & 4) ui->checkShowInList->setChecked(true);
+    if(pPrivileges2 & 2) ui->checkCreateUsers->setChecked(true);
+    if(pPrivileges2 & 1) ui->checkDeleteUsers->setChecked(true);
+    if(pPrivileges3 & 128) ui->checkOpenUsers->setChecked(true);
+    if(pPrivileges3 & 64) ui->checkModifyUsers->setChecked(true);
+    if(pPrivileges3 & 32) ui->checkChangeOwnPassword->setChecked(true);
+    if(pPrivileges3 & 16) ui->checkSendPM->setChecked(true);
+    if(pPrivileges3 & 8) ui->checkReadNews->setChecked(true);
+    if(pPrivileges3 & 4) ui->checkPostNews->setChecked(true);
+    if(pPrivileges3 & 2) ui->checkKickUsers->setChecked(true);
+    if(pPrivileges3 & 1) ui->checkCannotBeDisconnected->setChecked(true);
+    if(pPrivileges4 & 128) ui->checkGetUsersInfo->setChecked(true);
+    if(pPrivileges4 & 64) ui->checkUploadAnywhere->setChecked(true);
+    if(pPrivileges4 & 32) ui->checkAnyName->setChecked(true);
+    if(pPrivileges4 & 16) ui->checkNoAgreement->setChecked(true);
+    if(pPrivileges4 & 8) ui->checkSetFileComments->setChecked(true);
+    if(pPrivileges4 & 4) ui->checkSetFolderComments->setChecked(true);
+    if(pPrivileges4 & 2) ui->checkViewDropboxes->setChecked(true);
+    if(pPrivileges4 & 1) ui->checkMakeAlias->setChecked(true);
+    if(pPrivileges5 & 128) ui->checkBroadcast->setChecked(true);
+    if(pPrivileges5 & 64) ui->checkDeleteNewsArticle->setChecked(true);
+    if(pPrivileges5 & 32) ui->checkCreateNewsCategory->setChecked(true);
+    if(pPrivileges5 & 16) ui->checkDeleteNewsCategory->setChecked(true);
+    if(pPrivileges5 & 8) ui->checkCreateNewsFolder->setChecked(true);
+    if(pPrivileges5 & 4) ui->checkDeleteNewsFolder->setChecked(true);
 }
 
 void DialogPrivileges::onAccepted()
 {
-    quint64 privs = 0;
-    if(ui->checkDeleteFile->isChecked()) privs |= AccessTranslator::DELETE_FILE;
-    if(ui->checkUploadFile->isChecked()) privs |= AccessTranslator::UPLOAD_FILE;
-    if(ui->checkDownloadFile->isChecked()) privs |= AccessTranslator::DOWNLOAD_FILE;
-    if(ui->checkRenameFile->isChecked()) privs |= AccessTranslator::RENAME_FILE;
-    if(ui->checkMoveFile->isChecked()) privs |= AccessTranslator::MOVE_FILE;
-    if(ui->checkCreateFolders->isChecked()) privs |= AccessTranslator::CREATE_FOLDER;
-    if(ui->checkDeleteFolders->isChecked()) privs |= AccessTranslator::DELETE_FOLDER;
-    if(ui->checkRenameFolders->isChecked()) privs |= AccessTranslator::RENAME_FOLDER;
-    if(ui->checkMoveFolder->isChecked()) privs |= AccessTranslator::MOVE_FOLDER;
-    if(ui->checkReadChat->isChecked()) privs |= AccessTranslator::READ_CHAT;
-    if(ui->checkSendChat->isChecked()) privs |= AccessTranslator::SEND_CHAT;
-    if(ui->checkOpenChat->isChecked()) privs |= AccessTranslator::OPEN_CHAT;
-    if(ui->checkCloseChat->isChecked()) privs |= AccessTranslator::CLOSE_CHAT;
-    if(ui->checkShowInList->isChecked()) privs |= AccessTranslator::SHOW_IN_LIST;
-    if(ui->checkCreateUsers->isChecked()) privs |= AccessTranslator::CREATE_USER;
-    if(ui->checkDeleteUsers->isChecked()) privs |= AccessTranslator::DELETE_USER;
-    if(ui->checkOpenUsers->isChecked()) privs |= AccessTranslator::OPEN_USER;
-    if(ui->checkModifyUsers->isChecked()) privs |= AccessTranslator::MODIFY_USER;
-    if(ui->checkChangeOwnPassword->isChecked()) privs |= AccessTranslator::CHANGE_OWN_PASSWORD;
-    if(ui->checkSendPM->isChecked()) privs |= AccessTranslator::SEND_PRIV_MESSAGE;
-    if(ui->checkReadNews->isChecked()) privs |= AccessTranslator::READ_NEWS;
-    if(ui->checkPostNews->isChecked()) privs |= AccessTranslator::POST_NEWS;
-    if(ui->checkKickUsers->isChecked()) privs |= AccessTranslator::DISCONNECT_USER;
-    if(ui->checkCannotBeDisconnected->isChecked()) privs |= AccessTranslator::CANNOT_BE_DISCONNECTED;
-    if(ui->checkGetUsersInfo->isChecked()) privs |= AccessTranslator::GET_CLIENT_INFO;
-    if(ui->checkUploadAnywhere->isChecked()) privs |= AccessTranslator::UPLOAD_ANYWHERE;
-    if(ui->checkAnyName->isChecked()) privs |= AccessTranslator::ANY_NAME;
-    if(ui->checkNoAgreement->isChecked()) privs |= AccessTranslator::NO_AGREEMENT;
-    if(ui->checkSetFileComments->isChecked()) privs |= AccessTranslator::SET_FILE_COMMENT;
-    if(ui->checkSetFolderComments->isChecked()) privs |= AccessTranslator::SET_FOLDER_COMMENT;
-    if(ui->checkViewDropboxes->isChecked()) privs |= AccessTranslator::VIEW_DROPBOXES;
-    if(ui->checkMakeAlias->isChecked()) privs |= AccessTranslator::MAKE_ALIAS;
-    if(ui->checkBroadcast->isChecked()) privs |= AccessTranslator::BROADCAST;
-    if(ui->checkDeleteNewsArticle->isChecked()) privs |= AccessTranslator::DELETE_NEWS_ARTICLE;
-    if(ui->checkCreateNewsCategory->isChecked()) privs |= AccessTranslator::CREATE_NEWS_CATEGORY;
-    if(ui->checkDeleteNewsCategory->isChecked()) privs |= AccessTranslator::DELETE_NEWS_CATEGORY;
-    if(ui->checkCreateNewsFolder->isChecked()) privs |= AccessTranslator::CREATE_FOLDER_NEWS;
-    if(ui->checkDeleteNewsFolder->isChecked()) privs |= AccessTranslator::DELETE_FOLDER_NEWS;
+    quint8 p1=0, p2=0, p3=0, p4=0, p5=0, p6=0, p7=0, p8=0;
+    if(ui->checkDeleteFile->isChecked())            p1 |= 128;
+    if(ui->checkUploadFile->isChecked())            p1 |= 64;
+    if(ui->checkDownloadFile->isChecked())          p1 |= 32;
+    if(ui->checkRenameFile->isChecked())            p1 |= 16;
+    if(ui->checkMoveFile->isChecked())              p1 |= 8;
+    if(ui->checkCreateFolders->isChecked())         p1 |= 4;
+    if(ui->checkDeleteFolders->isChecked())         p1 |= 2;
+    if(ui->checkRenameFolders->isChecked())         p1 |= 1;
+    if(ui->checkMoveFolder->isChecked())            p2 |= 128;
+    if(ui->checkReadChat->isChecked())              p2 |= 64;
+    if(ui->checkSendChat->isChecked())              p2 |= 32;
+    if(ui->checkOpenChat->isChecked())              p2 |= 16;
+    if(ui->checkCloseChat->isChecked())             p2 |= 8;
+    if(ui->checkShowInList->isChecked())            p2 |= 4;
+    if(ui->checkCreateUsers->isChecked())           p2 |= 2;
+    if(ui->checkDeleteUsers->isChecked())           p2 |= 1;
+    if(ui->checkOpenUsers->isChecked())             p3 |= 128;
+    if(ui->checkModifyUsers->isChecked())           p3 |= 64;
+    if(ui->checkChangeOwnPassword->isChecked())     p3 |= 32;
+    if(ui->checkSendPM->isChecked())                p3 |= 16;
+    if(ui->checkReadNews->isChecked())              p3 |= 8;
+    if(ui->checkPostNews->isChecked())              p3 |= 4;
+    if(ui->checkKickUsers->isChecked())             p3 |= 2;
+    if(ui->checkCannotBeDisconnected->isChecked())  p3 |= 1;
+    if(ui->checkGetUsersInfo->isChecked())          p4 |= 128;
+    if(ui->checkUploadAnywhere->isChecked())        p4 |= 64;
+    if(ui->checkAnyName->isChecked())               p4 |= 32;
+    if(ui->checkNoAgreement->isChecked())           p4 |= 16;
+    if(ui->checkSetFileComments->isChecked())       p4 |= 8;
+    if(ui->checkSetFolderComments->isChecked())     p4 |= 4;
+    if(ui->checkViewDropboxes->isChecked())         p4 |= 2;
+    if(ui->checkMakeAlias->isChecked())             p4 |= 1;
+    if(ui->checkBroadcast->isChecked())             p5 |= 128;
+    if(ui->checkDeleteNewsArticle->isChecked())     p5 |= 64;
+    if(ui->checkCreateNewsCategory->isChecked())    p5 |= 32;
+    if(ui->checkDeleteNewsCategory->isChecked())    p5 |= 16;
+    if(ui->checkCreateNewsFolder->isChecked())      p5 |= 8;
+    if(ui->checkDeleteNewsFolder->isChecked())      p5 |= 4;
 
     CTransaction * trans = connection->createTransaction(353);
 
@@ -147,11 +162,19 @@ void DialogPrivileges::onAccepted()
         }
     }
 
+    quint8 privs[8];
+    memset(privs, 0, 8);
+    memcpy(&privs[0], (char*)&p1, 1);
+    memcpy(&privs[1], (char*)&p2, 1);
+    memcpy(&privs[2], (char*)&p3, 1);
+    memcpy(&privs[3], (char*)&p4, 1);
+    memcpy(&privs[4], (char*)&p5, 1);
+    memcpy(&privs[5], (char*)&p6, 1);
+    memcpy(&privs[6], (char*)&p7, 1);
+    memcpy(&privs[7], (char*)&p8, 1);
     trans->addParameter(105, login.size(), login.data());
     trans->addParameter(106, pass.size(), pass.data());
     trans->addParameter(102, login.size(), login.data());
     trans->addParameter(110, 8, (char*)&privs);
     connection->sendTransaction(trans);
-
-    emit savedPrivileges(privs);
 }

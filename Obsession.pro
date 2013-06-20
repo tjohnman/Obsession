@@ -73,7 +73,6 @@ HEADERS += mainwindow.h \
     version.h \
     threaduploader.h \
     TextHelper.h \
-    AccessTranslator.h \
     dialogprivileges.h \
     dialogrequestaccount.h \
     dialogcreateaccount.h \

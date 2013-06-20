@@ -600,13 +600,29 @@ void ConnectionController::onSocketData() {
                         }
                         QString login = TextHelper::DecodeText(loginPar->data, loginPar->length);
 
-                        quint64 permissions = 0;
-                        memcpy((char*)&permissions, parameterBuffer->data, parameterBuffer->length);
-                        qDebug() << permissions;
+                        quint8 permissions[8];
+                        memset(permissions, 0, 8);
+                        memcpy(&permissions[0], parameterBuffer->data, 1);
+                        memcpy(&permissions[1], parameterBuffer->data+1, 1);
+                        memcpy(&permissions[2], parameterBuffer->data+2, 1);
+                        memcpy(&permissions[3], parameterBuffer->data+3, 1);
+                        memcpy(&permissions[4], parameterBuffer->data+4, 1);
+                        memcpy(&permissions[5], parameterBuffer->data+5, 1);
+                        memcpy(&permissions[6], parameterBuffer->data+6, 1);
+                        memcpy(&permissions[7], parameterBuffer->data+7, 1);
+
+                        qDebug() << permissions[0];
+                        qDebug() << permissions[1];
+                        qDebug() << permissions[2];
+                        qDebug() << permissions[3];
+                        qDebug() << permissions[4];
+                        qDebug() << permissions[5];
+                        qDebug() << permissions[6];
+                        qDebug() << permissions[7];
 
                         s_parameter * passPar = receivedTransaction->getParameterById(106);
                         QString password = TextHelper::DecodeText(passPar->data, passPar->length);
-                        emit gotPermissions(login, password, permissions);
+                        emit gotPermissions(login, password, permissions[0], permissions[1], permissions[2], permissions[3], permissions[4], permissions[5], permissions[6], permissions[7]);
                     }
                 }
                     break;

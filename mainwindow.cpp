@@ -80,7 +80,7 @@ MainWindow::MainWindow(QWidget *parent, bool checkForUpdates) :
     connect(connection, SIGNAL(userListChanged()), this, SLOT(onUserListChanged()));
     connect(connection, SIGNAL(gotPM(QString, qint16)), this, SLOT(onGotPM(QString, qint16)));
     connect(connection, SIGNAL(gotUserInfo(QString,QString,quint16)), this, SLOT(onOpenUserInfo(QString,QString,quint16)));
-    connect(connection, SIGNAL(gotPermissions(QString, QString, quint64)), this, SLOT(gotPermissions(QString, QString, quint64)));
+    connect(connection, SIGNAL(gotPermissions(QString, QString, quint8, quint8, quint8, quint8, quint8, quint8, quint8, quint8)), this, SLOT(gotPermissions(QString, QString, quint8, quint8, quint8, quint8, quint8, quint8, quint8, quint8)));
 
     connect(connection, SIGNAL(serverError(QString)), this, SLOT(onError(QString)));
     connect(connection, SIGNAL(socketError(QString)), this, SLOT(onError(QString)));
@@ -363,9 +363,9 @@ void MainWindow::onClickBroadcast()
     connect(dialog, SIGNAL(finished(int)), dialog, SLOT(deleteLater()));
 }
 
-void MainWindow::gotPermissions(QString login, QString password, quint64 perms)
+void MainWindow::gotPermissions(QString login, QString password, quint8 p1, quint8 p2, quint8 p3, quint8 p4, quint8 p5, quint8 p6, quint8 p7, quint8 p8)
 {
-    DialogPrivileges * dialog = new DialogPrivileges(connection, login, password, perms, this);
+    DialogPrivileges * dialog = new DialogPrivileges(connection, login, password, p1, p2, p3, p4, p5, p6, p7, p8, this);
     dialog->readPrivileges();
     dialog->show();
     connect(dialog, SIGNAL(finished(int)), dialog, SLOT(deleteLater()));
