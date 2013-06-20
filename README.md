@@ -7,7 +7,7 @@ The Obsession Hotline client aims to be a modern alternative for Windows users. 
 
 Downloading and installing
 ----------
-First get the [directory structure](http://www.sumamimasen.com/obsession/ObsessionAlpha-a107.zip). This contains all the dll files needed. It's a big package, but you won't have to download it more than once.
+First get the [directory structure](http://www.sumamimasen.com/obsession/ObsessionAlpha.zip). This contains all the dll files needed. It's a big package, but you won't have to download it more than once.
 Make sure to also grab the [executable file](http://www.sumamimasen.com/obsession/Obsession.exe). Place this in the directory you downloaded above and you are good to go. Note that this may be not up to date with the latest code from the repo. I upload regular builds though.
 
 Getting updates
