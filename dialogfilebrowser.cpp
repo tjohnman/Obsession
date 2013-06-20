@@ -133,13 +133,11 @@ void DialogFileBrowser::onDoubleClick(QModelIndex model) {
 
 void DialogFileBrowser::onGotFileList(std::vector<s_hotlineFile *> list) {
     ui->treeWidget->clear();
-    _m_RawNames.clear();
 
     for(quint32 i=0; i<list.size(); i++) {
         QTreeWidgetItem * item = new QTreeWidgetItem();
         QString _n1 = TextHelper::DecodeText(list[i]->name, list[i]->nameSize);
-        QString _n2 = TextHelper::DecodeText(list[i]->name, list[i]->nameSize, "UTF-8");
-        QString _n = _n1.length() < _n2.length() ? _n1 : _n2;
+        QString _n = TextHelper::DecodeTextAutoUTF8(list[i]->name, list[i]->nameSize);
         _m_RawNames[_n] = _n1;
         item->setData(0, 0, _n);
         qint32 size = list[i]->size;

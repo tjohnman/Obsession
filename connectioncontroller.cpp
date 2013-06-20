@@ -935,10 +935,7 @@ void ConnectionController::onSocketData() {
 
                 qDebug() << "Emitting PM signal...";
 
-                QString decodedSelected = TextHelper::DecodeText(m, len);
-                QString decodedUtf8 = TextHelper::DecodeText(m, len, "UTF-8");
-
-                emit gotPM(decodedSelected.length() < decodedUtf8.length() ? decodedSelected : decodedUtf8, uid);
+                emit gotPM(TextHelper::DecodeTextAutoUTF8(m, len), uid);
             } else {
                 parameterBuffer = receivedTransaction->getParameterById(101);
                 if(parameterBuffer) {
@@ -952,16 +949,7 @@ void ConnectionController::onSocketData() {
         case 106:
             parameterBuffer = receivedTransaction->getParameterById(101);
             if(parameterBuffer) {
-                QString decodedSelected = TextHelper::DecodeText(parameterBuffer->data, parameterBuffer->length);
-                QString decodedUtf8 = TextHelper::DecodeText(parameterBuffer->data, parameterBuffer->length, "UTF-8");
-                if(decodedSelected.length() < decodedUtf8.length())
-                {
-                    emit gotChatMessage(decodedSelected);
-                }
-                else
-                {
-                    emit gotChatMessage(decodedUtf8);
-                }
+                emit gotChatMessage(TextHelper::DecodeTextAutoUTF8(parameterBuffer->data, parameterBuffer->length));
             }
             break;
 
