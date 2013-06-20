@@ -12,6 +12,7 @@
 #include "dialogrequestaccount.h"
 #include "dialogcreateaccount.h"
 #include "dialogbroadcast.h"
+#include "TextHelper.h"
 
 MainWindow::MainWindow(QWidget *parent, bool checkForUpdates) :
     QMainWindow(parent),
@@ -384,8 +385,7 @@ void MainWindow::onUserListChanged() {
     clearUserList();
     for(quint32 i=0; i<users->size(); i++) {
         users->at(i)->orderInList = i;
-        QString name = QString(users->at(i)->name);
-        QListWidgetItem * item = new QListWidgetItem("           "+name);
+        QListWidgetItem * item = new QListWidgetItem("           "+TextHelper::DecodeTextAutoUTF8(users->at(i)->name, users->at(i)->nameLength));
         QFont f = QFont();
         f.setBold(true);
         item->setFont(f);
@@ -406,7 +406,7 @@ void MainWindow::onUserListChanged() {
         }
 
         QString path = *(users->at(i)->iconPath);
-        qDebug() << path << " for " << name;
+        qDebug() << path << " for " << TextHelper::DecodeTextAutoUTF8(users->at(i)->name, users->at(i)->nameLength);
         QImage image = QImage(path);
         if(!image.isNull()) {
             item->setBackground(QBrush(image));

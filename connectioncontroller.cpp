@@ -1067,11 +1067,19 @@ void ConnectionController::onSocketData() {
                     }
 
                     parameterBuffer = receivedTransaction->getParameterById(102);
+
                     if(parameterBuffer) {
+                        QString oldName = TextHelper::DecodeTextAutoUTF8(user->name, user->nameLength);
+
                         qDebug() << "Updating user name";
-                        user->name = (char *) malloc(sizeof(char)*parameterBuffer->length+1);
+                        user->name = (char *) malloc(sizeof(char)*parameterBuffer->length);
                         memcpy(user->name, parameterBuffer->data, parameterBuffer->length);
-                        user->name[parameterBuffer->length] = '\0';
+                        user->nameLength = parameterBuffer->length;
+
+                        QString newName = TextHelper::DecodeTextAutoUTF8(user->name, parameterBuffer->length);
+                        QString message = QString("               <b>%1 is now known as %2</b>").arg(oldName, newName);
+
+                        emit gotChatMessage(message);
                     }
 
                 } else { // New user
@@ -1100,16 +1108,16 @@ void ConnectionController::onSocketData() {
                     qDebug() << "Setting name...";
                     parameterBuffer = receivedTransaction->getParameterById(102);
                     if(parameterBuffer) {
-                        newUser->name = (char *) malloc(sizeof(char*)*parameterBuffer->length+1);
+                        newUser->name = (char *) malloc(sizeof(char)*parameterBuffer->length);
                         memcpy(newUser->name, parameterBuffer->data, parameterBuffer->length);
-                        newUser->name[parameterBuffer->length] = '\0';
+                        newUser->nameLength = parameterBuffer->length;
                     }
 
                     newUser->messagingWindow = NULL;
 
                     pUsers.push_back(newUser);
 
-                    QString message = QString::fromUtf8("               -- ") + TextHelper::DecodeText(newUser->name, parameterBuffer->length) + QString::fromUtf8(" joined --");
+                    QString message = QString("               <b>%1 has joined</b>").arg(TextHelper::DecodeTextAutoUTF8(newUser->name, newUser->nameLength));
                     emit gotChatMessage(message);
                 }
                 emit userListChanged();
@@ -1127,7 +1135,7 @@ void ConnectionController::onSocketData() {
                     qDebug() << "But that user doesn't exist... ignoring";
                     break;
                 }
-                QString message = QString::fromUtf8("               -- ") + TextHelper::DecodeText(user->name, parameterBuffer->length) + QString::fromUtf8(" left --");
+                QString message = QString("               <b>%1 has left</b>").arg(TextHelper::DecodeTextAutoUTF8(user->name, user->nameLength));
                 emit gotChatMessage(message);
                 for(quint32 i=0; i<pUsers.size(); i++) {
                     if(pUsers[i]->id == uid) {
