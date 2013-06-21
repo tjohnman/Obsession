@@ -22,7 +22,7 @@ WidgetChat::WidgetChat(QWidget *parent) :
 void WidgetChat::printChat(QString str) {
     ui->textEdit->moveCursor(QTextCursor::End);
     QString formatted = TextHelper::FormatMessageToHTML(str);
-    ui->textEdit->insertHtml(formatted+"<br />");
+    ui->textEdit->insertHtml(formatted+"<br>");
     ui->textEdit->moveCursor(QTextCursor::End);
     ui->textEdit->ensureCursorVisible();
     ui->lineEdit->setFocus();
