@@ -1067,7 +1067,10 @@ void ConnectionController::onSocketData() {
                         QString newName = TextHelper::DecodeTextAutoUTF8(user->name, parameterBuffer->length);
                         QString message = QString("               <b>%1 is now known as %2</b>").arg(oldName, newName);
 
-                        emit gotChatMessage(message);
+                        if(oldName != newName)
+                        {
+                            emit gotChatMessage(message);
+                        }
                     }
 
                 } else { // New user
