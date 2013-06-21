@@ -39,7 +39,8 @@ SOURCES += main.cpp \
     dialogprivileges.cpp \
     dialogrequestaccount.cpp \
     dialogcreateaccount.cpp \
-    dialogbroadcast.cpp
+    dialogbroadcast.cpp \
+    dialogpostlinearnews.cpp
 HEADERS += mainwindow.h \
     ctransaction.h \
     defines.h \
@@ -76,7 +77,8 @@ HEADERS += mainwindow.h \
     dialogprivileges.h \
     dialogrequestaccount.h \
     dialogcreateaccount.h \
-    dialogbroadcast.h
+    dialogbroadcast.h \
+    dialogpostlinearnews.h
 FORMS += mainwindow.ui \
     dialogopenconnection.ui \
     dialogpreferences.ui \
@@ -100,5 +102,6 @@ FORMS += mainwindow.ui \
     dialogprivileges.ui \
     dialogrequestaccount.ui \
     dialogcreateaccount.ui \
-    dialogbroadcast.ui
+    dialogbroadcast.ui \
+    dialogpostlinearnews.ui
 RESOURCES += resources.qrc

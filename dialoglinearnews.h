@@ -22,8 +22,13 @@ private:
     Ui::DialogLinearNews *ui;
     ConnectionController * connection;
 
+private slots:
+    void onPostButton();
+    void onRefreshButton();
+
 public slots:
     void updateNews(QString);
+    void onPostNews(QString);
 };
 
 #endif // DIALOGLINEARNEWS_H

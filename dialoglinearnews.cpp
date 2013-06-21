@@ -1,6 +1,8 @@
 #include "dialoglinearnews.h"
 #include "ui_dialoglinearnews.h"
 #include "CTransaction.h"
+#include "dialogpostlinearnews.h"
+#include "TextHelper.h"
 
 DialogLinearNews::DialogLinearNews(ConnectionController * c, QWidget *parent) :
     QDialog(parent),
@@ -8,6 +10,9 @@ DialogLinearNews::DialogLinearNews(ConnectionController * c, QWidget *parent) :
 {
     ui->setupUi(this);
     connection = c;
+
+    connect(ui->buttonPost, SIGNAL(clicked()), this, SLOT(onPostButton()));
+    connect(ui->buttonRefresh, SIGNAL(clicked()), this, SLOT(onRefreshButton()));
 }
 
 void DialogLinearNews::requestNews() {
@@ -36,4 +41,26 @@ void DialogLinearNews::changeEvent(QEvent *e)
     default:
         break;
     }
+}
+
+void DialogLinearNews::onPostButton()
+{
+    DialogPostLinearNews * dialog = new DialogPostLinearNews(this);
+    connect(dialog, SIGNAL(postedText(QString)), this, SLOT(onPostNews(QString)));
+    connect(dialog, SIGNAL(finished(int)), dialog, SLOT(deleteLater()));
+    dialog->show();
+}
+
+void DialogLinearNews::onRefreshButton()
+{
+    requestNews();
+}
+
+void DialogLinearNews::onPostNews(QString str)
+{
+    CTransaction * t = connection->createTransaction(103);
+    QByteArray postData = TextHelper::EncodeText(str);
+    t->addParameter(101, postData.length(), postData.data());
+    connection->sendTransaction(t);
+    requestNews();
 }
