@@ -23,8 +23,9 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
-#include "dialogbookmarks.h"
+#include <QTimer>
 
+#include "dialogbookmarks.h"
 #include "WidgetChat.h"
 #include "WidgetNews.h"
 #include "WidgetConsole.h"
@@ -112,6 +113,8 @@ private:
     DialogUploadsQueue * uploadsDialog;
     DialogAbout * aboutDialog;
     DialogBookmarks * bookmarksDialog;
+
+    QTimer keepAliveTimer;
 
     WidgetChat * chatWidget;
     WidgetNews * threadedNewsWidget;

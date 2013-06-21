@@ -13,7 +13,7 @@ DialogFileBrowser::DialogFileBrowser(ConnectionController * c, QWidget *parent) 
 {
     ui->setupUi(this);
     connection = c;
-    path = "/";
+    path = _m_RawPath = "/";
     connect(connection, SIGNAL(gotFileList(std::vector<s_hotlineFile *>)), this, SLOT(onGotFileList(std::vector<s_hotlineFile *>)));
     connect(ui->treeWidget, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(onDoubleClick(QModelIndex)));
     connect(ui->treeWidget, SIGNAL(clicked(QModelIndex)), this, SLOT(selectionChange()));
@@ -80,6 +80,10 @@ void DialogFileBrowser::load() {
     if(!path.endsWith("/")) {
         path.append("/");
     }
+    if(!_m_RawPath.endsWith("/"))
+    {
+        _m_RawPath.append("/");
+    }
     ui->labelPath->setText(path);
     CTransaction * fileListTransaction = connection->createTransaction(200);
     qDebug() << "Path is " << path.length() << " characters (" << path << ")";
@@ -125,6 +129,8 @@ void DialogFileBrowser::onDoubleClick(QModelIndex model) {
     QTreeWidgetItem * item = ui->treeWidget->currentItem();
     if(item->data(2, 0).toString() == "fldr") {
         path = QString(path + item->data(0, 0).toString() + "/");
+        _m_RawPath = QString(_m_RawPath + _m_RawNames[item->data(0,0).toString()] + "/");
+        qDebug() << _m_RawPath;
         load();
     } else {
         requestFile();
@@ -364,7 +370,7 @@ void DialogFileBrowser::requestFileDelete()
 {
     CTransaction * transaction = connection->createTransaction(204);
     transaction->addParameter(201, TextHelper::EncodeText(ui->treeWidget->currentItem()->data(0, 0).toString()).size(), TextHelper::EncodeText(ui->treeWidget->currentItem()->data(0, 0).toString()).data());
-    QByteArray pathData = TextHelper::EncodeText(path);
+    QByteArray pathData = TextHelper::EncodeText(_m_RawPath);
     transaction->addParameter(202, pathData.size(), pathData.data());
 
     connect(connection, SIGNAL(receivedFileDeleteResponse(qint32)), this, SLOT(gotFileDeleteResponse(qint32)));
@@ -400,14 +406,13 @@ void DialogFileBrowser::requestUpload() {
     }
 
     qDebug() << "Path is " << path.length() << " characters (" << path << ")";
-
     qDebug() << "Calculating size for path data...";
     QStringList levels = path.split("/", QString::SkipEmptyParts);
     quint16 directorylevels = levels.count();
     quint16 pathlen = 2 + directorylevels * 3;
     for(qint32 i=0; i<levels.count(); i++) {
         QString level = levels.at(i);
-        pathlen += level.length();
+        pathlen += TextHelper::EncodeText(_m_RawNames[level]).length();
     }
 
     char * pathdata = (char *) malloc(sizeof(char)*pathlen);
@@ -421,11 +426,11 @@ void DialogFileBrowser::requestUpload() {
         qDebug() << "Writing zeros...";
         memset(pathdata+offset+2, 0, 2);
         QString level = levels.at(i);
-        unsigned char len = TextHelper::EncodeText(level).size();
+        unsigned char len = (unsigned char)TextHelper::EncodeText(_m_RawNames[level]).length();
         qDebug() << "Writing name length... " << (quint16) len;
         memcpy(pathdata+offset+4, &len, 1);
-        qDebug() << TextHelper::EncodeText(level).data();
-        memcpy(pathdata+offset+5, TextHelper::EncodeText(level), len);
+        qDebug() << TextHelper::EncodeText(_m_RawNames[level]);
+        memcpy(pathdata+offset+5, TextHelper::EncodeText(_m_RawNames[level]).data(), len);
         offset += 3+len;
     }
     uploadRequest->addParameter(202, pathlen, pathdata);

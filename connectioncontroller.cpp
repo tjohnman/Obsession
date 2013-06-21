@@ -42,6 +42,8 @@ bool ConnectionController::isConnected() {
 qint32 ConnectionController::connectToServer(QString address, QString login, QString password) {
     emit connecting();
     pServerAddress = address;
+    pPlainLogin = login;
+    pPlainPassword = password;
     qint32 semicolonIndex = address.lastIndexOf(":");
     QString addr;
     quint16 port;
@@ -196,7 +198,11 @@ void ConnectionController::sendPMToUser(quint16 uid, QString message, bool autom
     sendTransaction(PMTransaction);
 }
 
-void ConnectionController::closeConnection() {
+void ConnectionController::closeConnection(bool silent) {
+    if(!silent)
+    {
+        emit gotChatMessage(QString("                <b>Disconnected from %1</b>").arg(pServerAddress));
+    }
     pSocket.close();
     if(pSocket.state() != QAbstractSocket::UnconnectedState) {
         pSocket.waitForDisconnected(3000);
@@ -216,6 +222,12 @@ CTransaction * ConnectionController::createTransaction(qint16 id) {
 /************
     SLOTS
 *************/
+
+void ConnectionController::requestUserList()
+{
+    CTransaction * requestUserListTransaction = new CTransaction(300, pTaskIDCounter++);
+    sendTransaction(requestUserListTransaction, true);
+}
 
 void ConnectionController::onSocketConnected() {
     pSocket.setSocketOption(QAbstractSocket::KeepAliveOption, 1);
@@ -330,8 +342,29 @@ void ConnectionController::onSocketError(QAbstractSocket::SocketError e) {
         string = "Unknown socket error.";
     }
 
-    emit socketError(string);
-    closeConnection();
+
+    QSettings settings("mir", "Contra");
+    if(e == 1 && settings.value("autoReconnect", false).toBool())
+    {
+        emit socketError(string+"<br>Reconnecting...");
+        qDebug() << "Reconnecting...";
+        closeConnection();
+        QTimer * reconnectTimer = new QTimer();
+        reconnectTimer->setSingleShot(true);
+        reconnectTimer->setInterval(2000);
+        connect(reconnectTimer, SIGNAL(timeout()), this, SLOT(reconnect()));
+        connect(reconnectTimer, SIGNAL(timeout()), reconnectTimer, SLOT(deleteLater()));
+        reconnectTimer->start();
+    } else
+    {
+        emit socketError(string);
+        closeConnection();
+    }
+}
+
+void ConnectionController::reconnect()
+{
+    connectToServer(pServerAddress,pPlainLogin,pPlainPassword);
 }
 
 void ConnectionController::onNameChanged() {
@@ -416,22 +449,29 @@ void ConnectionController::onSocketData() {
                     sendUserInfo();
 
                     if(receivedTransaction->errorCode() == 0) {
-                        //parameterBuffer = receivedTransaction->getParameterById(160);
-                        //parameterBuffer = receivedTransaction->getParameterById(161);
                         parameterBuffer = receivedTransaction->getParameterById(162);
                         if(parameterBuffer) {
                             if(parameterBuffer->type == TYPE_STRING) {
-                                char * n = (char *) malloc(parameterBuffer->length+1);
-                                memcpy(n, parameterBuffer->data, parameterBuffer->length);
-                                n[parameterBuffer->length] = '\0';
-                                pServerName = QByteArray(n);
-                                free(n);
-                                emit gotServerName();
+                                pServerName = TextHelper::DecodeTextAutoUTF8(parameterBuffer->data, parameterBuffer->length);
+                                if(!pServerName.isEmpty() && pServerName != " ")
+                                {
+                                    emit gotServerName();
+                                    emit gotChatMessage(QString("                <b>Connected to %1</b>").arg(pServerName));
+                                }
+                                else
+                                {
+                                    pServerName = "";
+                                    emit gotChatMessage(QString("                <b>Connected to %1</b>").arg(pServerAddress));
+                                }
                             }
                         }
+                        else
+                        {
+                            pServerName = "";
+                            emit gotChatMessage("                <b>Connection established</b>");
+                        }
 
-                        CTransaction * requestUserListTransaction = new CTransaction(300, pTaskIDCounter++);
-                        sendTransaction(requestUserListTransaction, true);
+                        requestUserList();
                     }
                     break;
                     }
@@ -1065,7 +1105,7 @@ void ConnectionController::onSocketData() {
                         user->nameLength = parameterBuffer->length;
 
                         QString newName = TextHelper::DecodeTextAutoUTF8(user->name, parameterBuffer->length);
-                        QString message = QString("               <b>%1 is now known as %2</b>").arg(oldName, newName);
+                        QString message = QString("                <b>%1 is now known as %2</b>").arg(oldName, newName);
 
                         if(oldName != newName)
                         {
@@ -1107,8 +1147,7 @@ void ConnectionController::onSocketData() {
                     newUser->messagingWindow = NULL;
 
                     pUsers.push_back(newUser);
-
-                    QString message = QString("               <b>%1 has joined</b>").arg(TextHelper::DecodeTextAutoUTF8(newUser->name, newUser->nameLength));
+                    QString message = QString("                <b>%1 has joined</b>").arg(TextHelper::DecodeTextAutoUTF8(newUser->name, newUser->nameLength));
                     emit gotChatMessage(message);
                 }
                 emit userListChanged();
@@ -1126,7 +1165,7 @@ void ConnectionController::onSocketData() {
                     qDebug() << "But that user doesn't exist... ignoring";
                     break;
                 }
-                QString message = QString("               <b>%1 has left</b>").arg(TextHelper::DecodeTextAutoUTF8(user->name, user->nameLength));
+                QString message = QString("                <b>%1 has left</b>").arg(TextHelper::DecodeTextAutoUTF8(user->name, user->nameLength));
                 emit gotChatMessage(message);
                 for(quint32 i=0; i<pUsers.size(); i++) {
                     if(pUsers[i]->id == uid) {

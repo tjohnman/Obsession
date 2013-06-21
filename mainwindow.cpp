@@ -91,7 +91,6 @@ MainWindow::MainWindow(QWidget *parent, bool checkForUpdates) :
 
     connect(ui->actionIcons, SIGNAL(triggered()), this, SLOT(openIconViewer()));
 
-    connect(connection, SIGNAL(connecting()), this, SLOT(clearChat()));
     connect(connection, SIGNAL(connecting()), this, SLOT(clearUserList()));
     connect(connection, SIGNAL(connecting()), this, SLOT(onConnecting()));
     connect(connection, SIGNAL(connected()), this, SLOT(onConnected()));
@@ -127,6 +126,8 @@ MainWindow::MainWindow(QWidget *parent, bool checkForUpdates) :
         pUpdateCheckReply = pNetworkAccessManager->get(*pUpdateCheckRequest);
         connect(pUpdateCheckReply, SIGNAL(finished()), this, SLOT(onVersionReady()));
     }
+
+    keepAliveTimer.setInterval(60000);
 }
 
 MainWindow::~MainWindow()
@@ -160,6 +161,13 @@ void MainWindow::log(QString t) {
 
 void MainWindow::onConnected() {
     setStatus("Connected");
+
+    QSettings settings("mir", "Contra");
+    if(settings.value("connectionKeepAlive", true).toBool())
+    {
+        connect(&keepAliveTimer, SIGNAL(timeout()), connection, SLOT(requestUserList()));
+        keepAliveTimer.start();
+    }
 }
 
 void MainWindow::playChatSound() {
@@ -230,7 +238,7 @@ void MainWindow::openUploads() {
 }
 
 void MainWindow::onConnecting() {
-    connection->closeConnection();
+    connection->closeConnection(true);
     setStatus("Connecting...");
     ui->tabWidget->clear();
     threadedNewsWidget->clear();
@@ -327,7 +335,6 @@ void MainWindow::slotCloseWindow() {
 
 void MainWindow::disconnect() {
     connection->closeConnection();
-    clearChat();
     clearUserList();
     setStatus("Disconnected");
 }
@@ -443,6 +450,17 @@ void MainWindow::onPreferencesSaved() {
     font.setBold(settings.value("fontBold", false).toBool());
     chatWidget->setChatFont(font);
     chatWidget->setEncodingLabel(settings.value("EncodingName", "Mac OS Roman").toString());
+
+    if(settings.value("connectionKeepAlive", true).toBool())
+    {
+        connect(&keepAliveTimer, SIGNAL(timeout()), connection, SLOT(requestUserList()));
+        keepAliveTimer.start();
+    }
+    else
+    {
+        keepAliveTimer.disconnect(&keepAliveTimer, SIGNAL(timeout()), connection, SLOT(requestUserList()));
+        keepAliveTimer.stop();
+    }
 }
 
 void MainWindow::openPreferencesDialog() {

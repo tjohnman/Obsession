@@ -33,7 +33,7 @@ public:
     bool isAFK();
     QString serverAgreement();
 
-    void closeConnection();
+    void closeConnection(bool silent = false);
 
     s_user * getUserByUid(qint16 uid);
     s_user * getUserByName(QString name);
@@ -57,13 +57,14 @@ private:
     quint16 pIconID;
     QString pNickname;
     qint16 pClientVersion;
-    quint16 ownUserID;
 
     QString pServerAddress;
     quint16 pServerPort;
-    QByteArray pServerName;
+    QString pServerName;
     qint16 pServerVersion;
     QString pServerAgreement;
+
+    QString pPlainLogin, pPlainPassword;
 
     qint32 pTaskIDCounter;
 
@@ -76,10 +77,12 @@ private:
     //void sendCETIdentification(s_user *);
 
 public slots:
+    void reconnect();
     void onSocketConnected();
     void onSocketError(QAbstractSocket::SocketError);
     void onSocketData();
     void onNameChanged();
+    void requestUserList();
 
 signals:
     void gotServerName();

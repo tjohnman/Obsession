@@ -37,9 +37,11 @@ DialogPreferences::DialogPreferences(QWidget *parent) :
     font.setBold(settings.value("fontBold", false).toBool());
     ui->sampleEdit->setFont(font);
 
-    ui->dlQueueEdit->setText(QString::number(settings.value("dlqueue", 0).toInt()));
+    ui->dlQueueEdit->setText(QString::number(settings.value("dlqueue", 1).toInt()));
     ui->soundCheckBox->setChecked(settings.value("soundsEnabled", true).toBool());
     ui->debugCheckBox->setChecked(settings.value("debugging", false).toBool());
+    ui->checkKeepAlive->setChecked(settings.value("connectionKeepAlive", true).toBool());
+    ui->checkReconnect->setChecked(settings.value("autoReconnect", false).toBool());
 
     bookmarksDialog = new DialogBookmarks(this);
 
@@ -116,6 +118,9 @@ void DialogPreferences::acceptSettings() {
     settings.setValue("dlqueue", ui->dlQueueEdit->text().toInt());
     settings.setValue("soundsEnabled", ui->soundCheckBox->isChecked());
     settings.setValue("debugging", ui->debugCheckBox->isChecked());
+    settings.setValue("connectionKeepAlive", ui->checkKeepAlive->isChecked());
+    settings.setValue("autoReconnect", ui->checkReconnect->isChecked());
+
     emit saved();
     ui->sampleEdit->setText("Sample text");
     close();

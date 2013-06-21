@@ -1,5 +1,9 @@
 #include "listwidgetusers.h"
 #include <QDebug>
+#include <QStyledItemDelegate>
+#include <QPainter>
+#include <QPen>
+#include <QFont>
 
 ListWidgetUsers::ListWidgetUsers(QWidget *parent) :
     QListWidget(parent)
@@ -16,7 +20,6 @@ ListWidgetUsers::ListWidgetUsers(QWidget *parent) :
     connect(infoAction, SIGNAL(triggered()), this, SLOT(sendInfoRequest()));
 
     connect(this, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(sendOpenRequest()));
-
 }
 
 void ListWidgetUsers::contextMenuEvent(QContextMenuEvent * event) {

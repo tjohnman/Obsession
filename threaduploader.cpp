@@ -33,10 +33,6 @@ void ThreadUploader::run()
         }
 
         bytesSent += sent;
-        if(bytesSent % 102400 == 0)
-        {
-            emit sentBytes(bytesSent);
-        }
     }
 
     socket->close();

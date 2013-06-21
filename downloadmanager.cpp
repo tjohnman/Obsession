@@ -54,7 +54,7 @@ void DownloadManager::onDownloadFinished() {
     }
 
     QSettings settings("mir", "Contra");
-    qint32 dlqueue = settings.value("dlqueue", 0).toInt();
+    qint32 dlqueue = settings.value("dlqueue", 1).toInt();
 
     qint32 free;
     if(dlqueue <= 0) {
