@@ -24,7 +24,6 @@ private:
     QTimer * timer;
 
 private slots:
-    void timerUpdate();
 
 protected:
     void run();

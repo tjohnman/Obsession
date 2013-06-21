@@ -11,9 +11,6 @@ void ThreadUploader::run()
     int packetSize = 1024;
     qint64 sent;
     QByteArray readData;
-    timer = new QTimer();
-    connect(timer, SIGNAL(timeout()), this, SLOT(timerUpdate()));
-    timer->start(1000);
 
     while(dataSize > bytesSent)
     {
@@ -33,14 +30,10 @@ void ThreadUploader::run()
         }
 
         bytesSent += sent;
+        if(bytesSent % 102400) emit sentBytes(bytesSent);
     }
 
     socket->close();
     emit complete(0);
     return;
-}
-
-void ThreadUploader::timerUpdate()
-{
-    emit sentBytes(bytesSent);
 }
