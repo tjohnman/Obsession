@@ -370,8 +370,36 @@ void DialogFileBrowser::requestFileDelete()
 {
     CTransaction * transaction = connection->createTransaction(204);
     transaction->addParameter(201, TextHelper::EncodeText(ui->treeWidget->currentItem()->data(0, 0).toString()).size(), TextHelper::EncodeText(ui->treeWidget->currentItem()->data(0, 0).toString()).data());
-    QByteArray pathData = TextHelper::EncodeText(_m_RawPath);
-    transaction->addParameter(202, pathData.size(), pathData.data());
+
+    qDebug() << "Calculating size for path data...";
+    QStringList levels = path.split("/", QString::SkipEmptyParts);
+    quint16 directorylevels = levels.count();
+    quint16 pathlen = 2 + directorylevels * 3;
+    for(qint32 i=0; i<levels.count(); i++) {
+        QString level = levels.at(i);
+        pathlen += TextHelper::EncodeText(_m_RawNames[level]).length();
+    }
+
+    char * pathdata = (char *) malloc(sizeof(char)*pathlen);
+
+    qDebug() << "Writing number of levels (" << directorylevels << ")...";
+    directorylevels = qToBigEndian(directorylevels);
+    memcpy(pathdata, &directorylevels, 2);
+
+    qint32 offset = 0;
+    for(qint32 i=0; i<levels.count(); i++) {
+        qDebug() << "Writing zeros...";
+        memset(pathdata+offset+2, 0, 2);
+        QString level = levels.at(i);
+        unsigned char len = (unsigned char)TextHelper::EncodeText(_m_RawNames[level]).length();
+        qDebug() << "Writing name length... " << (quint16) len;
+        memcpy(pathdata+offset+4, &len, 1);
+        qDebug() << TextHelper::EncodeText(_m_RawNames[level]);
+        memcpy(pathdata+offset+5, TextHelper::EncodeText(_m_RawNames[level]).data(), len);
+        offset += 3+len;
+    }
+
+    transaction->addParameter(202, pathlen, pathdata);
 
     connect(connection, SIGNAL(receivedFileDeleteResponse(qint32)), this, SLOT(gotFileDeleteResponse(qint32)));
 
