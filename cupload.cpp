@@ -50,7 +50,6 @@ void CUpload::updateSpeed() {
     QString speedString;
     float speed;
     speed = bytesSent - lastSent;
-    if(speed == 0) return;
     lastSent = bytesSent;
     float size = dataSize, read = bytesSent;
     QString sizeString, readString;

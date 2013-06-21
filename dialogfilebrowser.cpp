@@ -362,6 +362,7 @@ void DialogFileBrowser::changeEvent(QEvent *e)
 }
 
 void DialogFileBrowser::requestFile() {
+    if(ui->treeWidget->currentItem() == NULL) return;
     qDebug() << "Emitting name signal for manager";
     emit requestedFile(ui->treeWidget->currentItem()->data(0, 0).toString(), ui->treeWidget->currentItem()->data(3, 0).toInt(), path);
 }
