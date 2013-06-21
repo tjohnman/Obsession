@@ -22,6 +22,11 @@
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0">
     <widget class="QPlainTextEdit" name="plainTextEdit">
+     <property name="font">
+      <font>
+       <family>Courier</family>
+      </font>
+     </property>
      <property name="readOnly">
       <bool>true</bool>
      </property>
