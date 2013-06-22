@@ -112,11 +112,13 @@ void CUpload::startUploading() {
         socket.waitForConnected();
         if(socket.state() != QAbstractSocket::ConnectedState) {
             qDebug() << "Upload connection timed out";
+            threadFinished(4);
             return;
         }
 
         if(!file->open(QIODevice::ReadOnly)) {
             qDebug() << "Could not open file for reading";
+            threadFinished(3);
             return;
         }
 
@@ -146,6 +148,7 @@ void CUpload::startUploading() {
 
         if(socket.state() != QAbstractSocket::ConnectedState) {
             qDebug() << "Server closed the connection after receiving header";
+            threadFinished(2);
             return;
         }
 
@@ -190,9 +193,28 @@ void CUpload::threadFinished(int code)
         finished = true;
         emit uploadFinished();
         break;
+    default:
     case 1:
         qDebug() << "Data sending failed. Bailing out.";
-        widget->infoLabel()->setText("Error: transfer failed.");
+        widget->infoLabel()->setText("Upload interrupted.");
+        uploadTimer->stop();
+        finished = true;
+        uploadInProgress = false;
+        break;
+    case 2:
+        widget->infoLabel()->setText("Server rejected the operation. Check encoding settings.");
+        uploadTimer->stop();
+        finished = true;
+        uploadInProgress = false;
+        break;
+    case 3:
+        widget->infoLabel()->setText("Error reading file.");
+        uploadTimer->stop();
+        finished = true;
+        uploadInProgress = false;
+        break;
+    case 4:
+        widget->infoLabel()->setText("Could not connect for transfer. Check encoding settings.");
         uploadTimer->stop();
         finished = true;
         uploadInProgress = false;
