@@ -199,7 +199,7 @@ void ConnectionController::sendPMToUser(quint16 uid, QString message, bool autom
 }
 
 void ConnectionController::closeConnection(bool silent) {
-    if(!silent)
+    if(!silent && pServerAddress != "" && !pServerAddress.isEmpty())
     {
         emit gotChatMessage(QString("                <b>Disconnected from %1</b>").arg(pServerAddress));
     }
