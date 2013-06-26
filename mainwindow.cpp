@@ -26,13 +26,6 @@ MainWindow::MainWindow(QWidget *parent, bool checkForUpdates) :
 
     aboutDialog = new DialogAbout(this);
 
-    QSettings settings("mir", "Contra");
-    if(settings.value("JapaneseMode", false).toBool()) {
-        //QTextCodec::setCodecForCStrings(QTextCodec::codecForName("Shift-JIS"));
-    } else {
-        //QTextCodec::setCodecForCStrings(QTextCodec::codecForName("Apple Roman"));
-    }
-
     connection = new ConnectionController();
 
     chatWidget = new WidgetChat(this);
@@ -74,7 +67,6 @@ MainWindow::MainWindow(QWidget *parent, bool checkForUpdates) :
     connect(ui->actionView_account, SIGNAL(triggered()), this, SLOT(openRequestPermissions()));
     connect(ui->actionNew_account, SIGNAL(triggered()), this, SLOT(onClickCreateAccount()));
     connect(ui->actionBroadcast, SIGNAL(triggered()), this, SLOT(onClickBroadcast()));
-    //connect(ui->actionDebug_console, SIGNAL(triggered()), this, SLOT(openConsole()));
 
     connect(connection, SIGNAL(gotServerName()), this, SLOT(onGotServerName()));
     connect(connection, SIGNAL(gotChatMessage(QString)), this, SLOT(onGotChatMessage(QString)));
