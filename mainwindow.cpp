@@ -119,7 +119,7 @@ MainWindow::MainWindow(QWidget *parent, bool checkForUpdates) :
         connect(pUpdateCheckReply, SIGNAL(finished()), this, SLOT(onVersionReady()));
     }
 
-    keepAliveTimer.setInterval(60000);
+    keepAliveTimer.setInterval(120000);
 }
 
 MainWindow::~MainWindow()
