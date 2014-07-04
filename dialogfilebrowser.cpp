@@ -24,6 +24,8 @@ DialogFileBrowser::DialogFileBrowser(ConnectionController * c, QWidget *parent) 
     connect(ui->buttonDelete, SIGNAL(clicked()), this, SLOT(requestFileDelete()));
     connect(ui->buttonRefresh, SIGNAL(clicked()), this, SLOT(load()));
 
+    ui->treeWidget->sortByColumn(0, Qt::AscendingOrder);
+
 
     ui->buttonDownload->setEnabled(false);
     ui->buttonDelete->setEnabled(false);
