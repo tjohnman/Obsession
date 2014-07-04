@@ -29,6 +29,7 @@ ConnectionController::ConnectionController()
 
     pTaskIDCounter = 0;
 
+    pReconnectionAttempts = 0;
     receivedTransaction = NULL;
 }
 
@@ -39,7 +40,17 @@ bool ConnectionController::isConnected() {
     return false;
 }
 
-qint32 ConnectionController::connectToServer(QString address, QString login, QString password) {
+qint32 ConnectionController::connectToServer(QString address, QString login, QString password, bool resetAutoReconnect) {
+
+    if(resetAutoReconnect)
+    {
+        pReconnectionAttempts = 0;
+    }
+    else
+    {
+        ++pReconnectionAttempts;
+    }
+
     emit connecting();
     pServerAddress = address;
     pPlainLogin = login;
@@ -344,7 +355,7 @@ void ConnectionController::onSocketError(QAbstractSocket::SocketError e) {
 
 
     QSettings settings("mir", "Contra");
-    if(e == 1 && settings.value("autoReconnect", false).toBool())
+    if(e == 1 && settings.value("autoReconnect", false).toBool() && pReconnectionAttempts < 3)
     {
         emit socketError(string+"<br>Reconnecting...");
         qDebug() << "Reconnecting...";
@@ -364,7 +375,7 @@ void ConnectionController::onSocketError(QAbstractSocket::SocketError e) {
 
 void ConnectionController::reconnect()
 {
-    connectToServer(pServerAddress,pPlainLogin,pPlainPassword);
+    connectToServer(pServerAddress,pPlainLogin,pPlainPassword, false);
 }
 
 void ConnectionController::onNameChanged() {

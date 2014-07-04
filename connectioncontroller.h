@@ -19,7 +19,7 @@ public:
     bool pAFK;
     QString serverName();
 
-    qint32 connectToServer(QString address, QString login, QString password);
+    qint32 connectToServer(QString address, QString login, QString password, bool resetAutoReconnect = true);
     void sendTransaction(CTransaction *, bool expectReply = false);
     void sendChatText(QString);
     void sendEmote(QString);
@@ -67,6 +67,8 @@ private:
     QString pPlainLogin, pPlainPassword;
 
     qint32 pTaskIDCounter;
+
+    quint8 pReconnectionAttempts;
 
     void sendUserInfo();
 
