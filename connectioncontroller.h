@@ -89,6 +89,7 @@ public slots:
 signals:
     void gotServerName();
     void gotChatMessage(QString str);
+    void gotBroadcast(QString str);
     void userListChanged();
     void gotPM(QString, qint16);
     void gotFileList(std::vector<s_hotlineFile *>);

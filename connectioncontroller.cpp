@@ -677,6 +677,14 @@ void ConnectionController::onSocketData() {
                     }
                 }
                     break;
+                 case 355:
+                    {
+                        parameterBuffer = receivedTransaction->getParameterById(101);
+                        if(parameterBuffer) {
+                            emit gotBroadcast(TextHelper::DecodeTextAutoUTF8(parameterBuffer->data, parameterBuffer->length));
+                        }
+                    }
+                    break;
                  case 370:
                  case 371:
                     {

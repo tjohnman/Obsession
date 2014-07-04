@@ -70,6 +70,7 @@ MainWindow::MainWindow(QWidget *parent, bool checkForUpdates) :
 
     connect(connection, SIGNAL(gotServerName()), this, SLOT(onGotServerName()));
     connect(connection, SIGNAL(gotChatMessage(QString)), this, SLOT(onGotChatMessage(QString)));
+    connect(connection, SIGNAL(gotBroadcast(QString)), this, SLOT(onGotBroadcast(QString)));
     connect(connection, SIGNAL(userListChanged()), this, SLOT(onUserListChanged()));
     connect(connection, SIGNAL(gotPM(QString, qint16)), this, SLOT(onGotPM(QString, qint16)));
     connect(connection, SIGNAL(gotUserInfo(QString,QString,quint16)), this, SLOT(onOpenUserInfo(QString,QString,quint16)));
@@ -339,6 +340,11 @@ void MainWindow::showServerAgreement() {
 
 void MainWindow::onGotServerName() {
     setStatus(QString("Connected to ") + connection->serverName());
+}
+
+void MainWindow::onGotBroadcast(QString message)
+{
+    onError("Server-wide broadcast: "+message);
 }
 
 void MainWindow::onGotChatMessage(QString message) {

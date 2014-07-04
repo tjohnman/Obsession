@@ -20,7 +20,7 @@ DialogPreferences::DialogPreferences(QWidget *parent) :
 
     QFont font;
     font.setFamily(settings.value("fontFamily", "Consolas").toString());
-    qint32 style = settings.value("fontStyle", 10).toInt();
+    qint32 style = settings.value("fontStyle", 9).toInt();
     switch(style) {
     case 0:
         font.setStyle(QFont::StyleNormal);
