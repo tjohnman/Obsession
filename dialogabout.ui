@@ -216,7 +216,7 @@
       </font>
      </property>
      <property name="text">
-      <string>Special thanks to Cap n' Hack, Epo, tre. and all the people</string>
+      <string>Special thanks all the people at Digital Obsession</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
@@ -234,7 +234,7 @@
       </font>
      </property>
      <property name="text">
-      <string>at Digital Obsession for their help and support.</string>
+      <string> for their help and support.</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
