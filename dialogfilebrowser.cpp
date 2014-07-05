@@ -333,6 +333,8 @@ void DialogFileBrowser::onGotFileList(std::vector<s_hotlineFile *> list) {
     {
         ui->treeWidget->resizeColumnToContents(i);
     }
+
+    selectionChange();
 }
 
 void DialogFileBrowser::goDirectoryUp() {
