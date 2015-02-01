@@ -1,6 +1,6 @@
 #include "dialoglinearnews.h"
 #include "ui_dialoglinearnews.h"
-#include "CTransaction.h"
+#include "ctransaction.h"
 #include "dialogpostlinearnews.h"
 #include "TextHelper.h"
 

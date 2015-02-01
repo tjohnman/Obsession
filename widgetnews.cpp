@@ -1,6 +1,6 @@
 #include "widgetnews.h"
 #include "ui_widgetnews.h"
-#include "CTransaction.h"
+#include "ctransaction.h"
 #include <QSettings>
 #include "TextHelper.h"
 

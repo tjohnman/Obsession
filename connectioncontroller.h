@@ -1,11 +1,11 @@
 #ifndef CONNECTIONCONTROLLER_H
 #define CONNECTIONCONTROLLER_H
 
-#include <qTcpSocket>
+#include <QTcpSocket>
 #include <QByteArray>
 #include <vector>
-#include "CTransaction.h"
-#include <qtEndian>
+#include "ctransaction.h"
+#include <QtEndian>
 #include <QDate>
 #include <QTimer>
 #include <map>

@@ -1,6 +1,6 @@
 #include "dialogopenconnection.h"
 #include "ui_dialogopenconnection.h"
-#include "MainWindow.h"
+#include "mainwindow.h"
 #include <QSettings>
 
 DialogOpenConnection::DialogOpenConnection(QWidget *parent, ConnectionController * c) :

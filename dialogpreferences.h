@@ -2,7 +2,7 @@
 #define DIALOGPREFERENCES_H
 
 #include <QDialog>
-#include "DialogBookmarks.h"
+#include "dialogbookmarks.h"
 #include <QFontDialog>
 
 namespace Ui {

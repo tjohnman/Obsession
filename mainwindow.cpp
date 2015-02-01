@@ -1,10 +1,10 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QTextCodec>
-#include "DialogPreferences.h"
-#include "DialogPrivateMessaging.h"
-#include "DialogUserInfo.h"
-#include "DialogTrackers.h"
+#include "dialogpreferences.h"
+#include "dialogprivatemessaging.h"
+#include "dialoguserinfo.h"
+#include "dialogtrackers.h"
 #include "version.h"
 #include <QDesktopServices>
 #include <QMessageBox>

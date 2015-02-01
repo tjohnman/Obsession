@@ -2,12 +2,12 @@
 #define DIALOGTRACKERS_H
 
 #include <QDialog>
-#include "ConnectionController.h"
+#include "connectioncontroller.h"
 #include <QTcpSocket>
 #include <vector>
 #include "dialogaddtracker.h"
 #include <QModelIndex>
-#include "DialogOpenConnection.h"
+#include "dialogopenconnection.h"
 
 namespace Ui {
     class DialogTrackers;

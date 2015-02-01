@@ -2,7 +2,7 @@
 #define DIALOGPRIVATEMESSAGING_H
 
 #include <QDialog>
-#include "ConnectionController.h"
+#include "connectioncontroller.h"
 #include "defines.h"
 
 namespace Ui {

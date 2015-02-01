@@ -2,7 +2,7 @@
 #define DIALOGLINEARNEWS_H
 
 #include <QDialog>
-#include "ConnectionController.h"
+#include "connectioncontroller.h"
 
 namespace Ui {
     class DialogLinearNews;

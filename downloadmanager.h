@@ -12,9 +12,9 @@
 #include <QListWidgetItem>
 #include <QListWidget>
 
-#include "CDownload.h"
+#include "cdownload.h"
 #include "widgetdownloaditem.h"
-#include "ConnectionController.h"
+#include "connectioncontroller.h"
 #include "defines.h"
 
 class DownloadManager : public QObject

@@ -1,5 +1,5 @@
 #include "ctransaction.h"
-#include <qtEndian>
+#include <QtEndian>
 #include <string.h>
 
 CTransaction::CTransaction(char * headerData) {

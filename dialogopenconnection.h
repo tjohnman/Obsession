@@ -3,7 +3,7 @@
 
 #include <QDialog>
 #include "connectioncontroller.h"
-#include "DialogBookmarks.h"
+#include "dialogbookmarks.h"
 
 namespace Ui {
     class DialogOpenConnection;

@@ -2,7 +2,7 @@
 #define DIALOGFILEBROWSER_H
 
 #include <QDialog>
-#include "ConnectionController.h"
+#include "connectioncontroller.h"
 #include <QModelIndex>
 #include <QFile>
 #include <QDragEnterEvent>

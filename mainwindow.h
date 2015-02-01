@@ -2,18 +2,18 @@
 #define MAINWINDOW_H
 
 #include <QtWidgets/QMainWindow>
-#include "ConnectionController.h"
+#include "connectioncontroller.h"
 #include "dialogopenconnection.h"
 #include <QtWidgets/QLabel>
 #include <QTextCursor>
 #include "dialogagreement.h"
-#include "DialogFileBrowser.h"
-#include "DialogError.h"
+#include "dialogfilebrowser.h"
+#include "dialogerror.h"
 #include <QSound>
-#include "DialogIconViewer.h"
-#include "DialogLinearNews.h"
+#include "dialogiconviewer.h"
+#include "dialoglinearnews.h"
 #include <QFocusEvent>
-#include "DownloadManager.h"
+#include "downloadmanager.h"
 #include "uploadmanager.h"
 #include "dialogdownloadqueue.h"
 #include "dialoguploadsqueue.h"
@@ -26,9 +26,9 @@
 #include <QTimer>
 
 #include "dialogbookmarks.h"
-#include "WidgetChat.h"
-#include "WidgetNews.h"
-#include "WidgetConsole.h"
+#include "widgetchat.h"
+#include "widgetnews.h"
+#include "widgetconsole.h"
 
 namespace Ui {
     class MainWindow;

@@ -2,7 +2,7 @@
 #define DIALOGUSERINFO_H
 
 #include <QDialog>
-#include "ConnectionController.h"
+#include "connectioncontroller.h"
 
 namespace Ui {
     class DialogUserInfo;

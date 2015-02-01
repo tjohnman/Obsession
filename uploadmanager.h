@@ -12,9 +12,9 @@
 #include <QListWidgetItem>
 #include <QListWidget>
 
-#include "CUpload.h"
+#include "cupload.h"
 #include "widgetdownloaditem.h"
-#include "ConnectionController.h"
+#include "connectioncontroller.h"
 #include "defines.h"
 
 class UploadManager : public QObject

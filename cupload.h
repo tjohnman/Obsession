@@ -6,7 +6,7 @@
 #include <QFile>
 #include <QString>
 #include <QTimer>
-#include "ConnectionController.h"
+#include "connectioncontroller.h"
 #include "widgetdownloaditem.h"
 #include <QListWidgetItem>
 #include "threaduploader.h"

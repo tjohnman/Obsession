@@ -2,7 +2,7 @@
 #define WIDGETNEWS_H
 
 #include <QWidget>
-#include "ConnectionController.h"
+#include "connectioncontroller.h"
 
 class QTreeWidgetItem;
 

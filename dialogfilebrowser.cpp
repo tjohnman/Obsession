@@ -1,6 +1,6 @@
 #include "dialogfilebrowser.h"
 #include "ui_dialogfilebrowser.h"
-#include "CTransaction.h"
+#include "ctransaction.h"
 #include <QTextStream>
 #include <QMimeData>
 #include <QFileDialog>
