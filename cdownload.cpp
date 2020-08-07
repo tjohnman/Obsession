@@ -2,6 +2,8 @@
 #include <QAbstractSocket>
 #include <QIODevice>
 #include <QHostAddress>
+#include <QStandardPaths>
+
 #include "TextHelper.h"
 
 CDownload::CDownload()
@@ -320,7 +322,8 @@ void CDownload::serverReady() {
     widget->progressBar()->setValue(bytesRead);
 
     qDebug() << "Opening file for writing...";
-    file->setFileName("Downloads/"+currentName);
+    const QString downloadsFolder = QStandardPaths::writableLocation(QStandardPaths::DownloadLocation);
+    file->setFileName(downloadsFolder + "/" + currentName);
     if(file->exists()) {
         qDebug() << "Wil append to file";
         if(!file->open(QIODevice::Append)) {

@@ -48,11 +48,6 @@
    </item>
    <item row="1" column="0" colspan="7">
     <widget class="QTreeWidget" name="treeWidget">
-     <property name="font">
-      <font>
-       <pointsize>8</pointsize>
-      </font>
-     </property>
      <property name="indentation">
       <number>2</number>
      </property>
@@ -81,7 +76,7 @@
        <string>Users</string>
       </property>
       <property name="textAlignment">
-       <set>AlignHCenter|AlignVCenter|AlignCenter</set>
+       <set>AlignCenter</set>
       </property>
      </column>
      <column>

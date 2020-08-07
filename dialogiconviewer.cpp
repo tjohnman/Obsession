@@ -19,7 +19,7 @@ DialogIconViewer::DialogIconViewer(QWidget *parent) :
 }
 
 void DialogIconViewer::onClicked(QModelIndex model) {
-    QSettings settings("mir", "contra");
+    QSettings settings("mir", "Contra");
     QString name = model.data(0).toString();
     if(name.endsWith(".png")) {
         name = name.left(name.length()-4);

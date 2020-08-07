@@ -76,6 +76,15 @@ private:
 
     std::map<qint32,quint16> m_UserInfoTaskMap;
 
+    typedef struct {
+        bool pitbull = false;
+        bool encryption = false;
+    } t_protocolExtensions;
+
+    t_protocolExtensions pServerProtocolExtensions;
+
+    t_protocolExtensions checkForProtocolExtensions();
+
     //void sendCETIdentification(s_user *);
 
 public slots:

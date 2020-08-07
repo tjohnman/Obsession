@@ -121,7 +121,9 @@ void DialogPreferences::acceptSettings() {
     settings.setValue("connectionKeepAlive", ui->checkKeepAlive->isChecked());
     settings.setValue("autoReconnect", ui->checkReconnect->isChecked());
 
+    settings.sync();
     emit saved();
+
     ui->sampleEdit->setText("Sample text");
     close();
 }

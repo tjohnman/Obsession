@@ -9,7 +9,7 @@ class TextHelper
 public:
     static QString DecodeText(char * str, int length)
     {
-        QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("contra"));
+        QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
         QTextCodec * codec = QTextCodec::codecForName(settings.value(QString::fromUtf8("Encoding"), "macintosh").toString().toUtf8());
         if(!codec)
         {
@@ -20,7 +20,7 @@ public:
 
     static QString DecodeTextAutoUTF8(char * str, int length)
     {
-        QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("contra"));
+        QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
         QTextCodec * codec = QTextCodec::codecForName(settings.value(QString::fromUtf8("Encoding"), "macintosh").toString().toUtf8());
         if(!codec)
         {
@@ -43,7 +43,7 @@ public:
 
     static QByteArray EncodeText(QString str)
     {
-        QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("contra"));
+        QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
         QTextCodec * codec = QTextCodec::codecForName(settings.value(QString::fromUtf8("Encoding"), "macintosh").toString().toUtf8());
         if(!codec)
         {

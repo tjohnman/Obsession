@@ -126,13 +126,13 @@ QString WidgetNews::getItemPath(QTreeWidgetItem * item) {
 }
 
 void WidgetNews::setRead(QTreeWidgetItem * item, bool set) {
-    QSettings settings("mir", "contra");
+    QSettings settings("mir", "Contra");
     QString key = item->data(0, 0).toString()+item->data(1, 0).toString()+item->data(2, 0).toString()+item->data(3, 0).toString();
     settings.setValue(key, set);
 }
 
 bool WidgetNews::checkIfRead(QTreeWidgetItem * item) {
-    QSettings settings("mir", "contra");
+    QSettings settings("mir", "Contra");
     QString key = item->data(0, 0).toString()+item->data(1, 0).toString()+item->data(2, 0).toString()+item->data(3, 0).toString();
     return settings.value(key, false).toBool();
 }

@@ -6,6 +6,8 @@
 #include <QHostAddress>
 #include <QNetworkAccessManager>
 #include <QTextCodec>
+
+#include "version.h"
 #include "TextHelper.h"
 
 ConnectionController::ConnectionController()
@@ -17,7 +19,7 @@ ConnectionController::ConnectionController()
     pServerAgreement = QString();
 
     // TODO: Preferences
-    QSettings settings("mir", "contra");
+    QSettings settings("mir", "Contra");
     pNickname = settings.value("nick", "unnamed").toString();
     pIconID = (quint16) settings.value("icon", 25096).toString().toShort();
     qDebug() << "Loaded icon ID: " << pIconID;
@@ -134,14 +136,14 @@ void ConnectionController::sendEmote(QString text) {
 
 void ConnectionController::toggleAFK() {
     if(pAFK) {
-        QSettings settings("mir", "contra");
+        QSettings settings("mir", "Contra");
         pNickname = settings.value(QString("nick"), "unnamed").toString();
         sendUserInfo();
         sendEmote(QString("is back"));
         pAFK = false;
     } else {
         sendEmote(QString("is AFK"));
-        QSettings settings("mir", "contra");
+        QSettings settings("mir", "Contra");
         pNickname = settings.value(QString("nick"), "unnamed").toString() + QString(" (AFK)");
         pAFK = true;
         sendUserInfo();
@@ -153,7 +155,7 @@ bool ConnectionController::isAFK() {
 }
 
 void ConnectionController::sendUserInfo() {
-    QSettings settings("mir", "contra");
+    QSettings settings("mir", "Contra");
     pNickname = settings.value(QString("nick"), "unnamed").toString();
     pIconID = settings.value("icon", 25096).toString().toShort();
     CTransaction * uinfoTransaction = new CTransaction(304, pTaskIDCounter++);
@@ -246,6 +248,8 @@ void ConnectionController::onSocketConnected() {
 
     emit connected();
 
+    t_protocolExtensions protocol_extensions = this->checkForProtocolExtensions();
+
     char clientMagicBytes[12] = {0x54, 0x52, 0x54, 0x50, 0x48, 0x4f, 0x54, 0x4c, 0x00, 0x01, 0x00, 0x02};
     char serverMagicBytes[8] = {0x54, 0x52, 0x54, 0x50, 0x00, 0x00, 0x00, 0x00};
 
@@ -284,7 +288,39 @@ void ConnectionController::onSocketConnected() {
     loginTransaction->addParameter(104, iconID);
     loginTransaction->addParameter(160, ver);
 
+    if(protocol_extensions.pitbull) {
+        qDebug() << "Pitbull server detected.";
+        loginTransaction->addParameter(163, 4, (char *)"OBSE");
+        loginTransaction->addParameter(164, VERSION_MAJOR*10 + VERSION_MINOR);
+    }
+
     sendTransaction(loginTransaction, true);
+}
+
+ConnectionController::t_protocolExtensions ConnectionController::checkForProtocolExtensions() {
+    qDebug() << "Checking for protocol extensions…";
+
+    QTcpSocket * sock = new QTcpSocket();
+    connect(sock, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(onSocketError(QAbstractSocket::SocketError)));
+
+    qDebug() << pSocket.peerAddress() << ":" << pSocket.peerPort() + 1;
+    // Check for Pitbull
+    sock->connectToHost(pSocket.peerAddress(), pSocket.peerPort() + 1);
+    sock->waitForConnected();
+
+    sock->write("VERS\0\0\0\0\0\0\0\0\0\0\0\0", 16);
+    sock->waitForBytesWritten();
+
+    sock->waitForReadyRead();
+    QByteArray response = sock->readAll().left(4);
+
+    pServerProtocolExtensions.pitbull = response.compare("YES.") == 0;
+
+    sock->disconnect();
+    delete sock;
+    // -- check for Pitbull
+
+    return pServerProtocolExtensions;
 }
 
 
@@ -454,7 +490,7 @@ void ConnectionController::onSocketData() {
                     break;
                 case 107:
                     {
-                    QSettings settings("mir", "contra");
+                    QSettings settings("mir", "Contra");
                     pNickname = settings.value(QString("nick"), "unnamed").toString();
 
                     sendUserInfo();
@@ -486,6 +522,43 @@ void ConnectionController::onSocketData() {
                     }
                     break;
                     }
+                case 126:
+                    if(pServerProtocolExtensions.pitbull) {
+                    /*
+                    125 is sending an image
+                    126 is recieving one
+                    ￼
+                    // Set Parameters
+                    Parameters.AddString(HFieldType.FileName, fileName);
+                    Parameters.AddBinary(HFieldType.Data, HUtils.ImageToByteArray(image, image.RawFormat));
+                    if (chatId != 0)
+                    Parameters.AddUInt32(HFieldType.ChatId, chatId);
+                    if (opts != 0)
+                    Parameters.AddUInt32(HFieldType.Options, opts);
+                    ￼
+                    fields for sending
+                    ￼
+                    p.AddBinary(HFieldType.UserStamp, client.ToUserStamp().ToBinary());
+                    p.AddString(HFieldType.FileName, fileName);
+                    p.AddBinary(HFieldType.Data, data);
+                    if (opts != 0)
+                    p.AddUInt32(HFieldType.Options, opts);
+                    ￼
+                    fields for recieving
+                    ￼
+                    UserStamp is a special type pitbull uses
+                    ￼
+                    it bascialy contains a username, id, info etc etc
+                    */
+
+                    /*
+                    theres a seperate transaction to send an image to private chat
+                    ￼
+                    SendImg = 123, // Client [Pitbull]
+                    ServerImg = 124, // Server [Pitbull]
+                    */
+                    }
+                    break;
                 case 200:
                     {
                     std::vector<s_hotlineFile *> fileList;
@@ -606,7 +679,7 @@ void ConnectionController::onSocketData() {
 
                                 newUser->doesCET = false;
 
-                                newUser->iconPath = new QString(QString("icons/") + QString::number(newUser->icon) + QString(".png"));
+                                newUser->iconPath = new QString(QString(":/icons/") + QString::number(newUser->icon) + QString(".png"));
                                 qDebug() << newUser->iconPath;
 
                                 memcpy(&newUser->flags, parameterBuffer->data + 4, 2);
@@ -636,7 +709,9 @@ void ConnectionController::onSocketData() {
                 {
                     s_parameter * paramu = receivedTransaction->getParameterById(102);
                     s_parameter * parami = receivedTransaction->getParameterById(101);
-                    emit gotUserInfo(TextHelper::DecodeText(paramu->data, paramu->length), TextHelper::DecodeText(parami->data, parami->length), m_UserInfoTaskMap[receivedTransaction->taskID()]);
+                    if(paramu && parami) {
+                        emit gotUserInfo(TextHelper::DecodeText(paramu->data, paramu->length), TextHelper::DecodeText(parami->data, parami->length), m_UserInfoTaskMap[receivedTransaction->taskID()]);
+                    }
                 }
                 break;
                 case 352:

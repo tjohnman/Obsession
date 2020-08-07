@@ -101,8 +101,8 @@ MainWindow::MainWindow(QWidget *parent, bool checkForUpdates) :
 
     setStatus(QString("Not connected"));
 
-    chatSound = new QSound("sounds/chat.wav");
-    pmSound = new QSound("sounds/pm.wav");
+    chatSound = new QSound(":/sounds/chat.wav");
+    pmSound = new QSound(":/sounds/pm.wav");
 
     chatWidget->chatSound = chatSound;
     chatWidget->connection = connection;

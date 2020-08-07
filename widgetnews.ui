@@ -25,9 +25,6 @@
      <attribute name="headerVisible">
       <bool>false</bool>
      </attribute>
-     <attribute name="headerVisible">
-      <bool>false</bool>
-     </attribute>
      <column>
       <property name="text">
        <string notr="true">1</string>
@@ -85,8 +82,8 @@
     <widget class="QPlainTextEdit" name="plainTextEdit">
      <property name="font">
       <font>
-       <family>Courier</family>
-       <pointsize>9</pointsize>
+       <family>Andale Mono</family>
+       <pointsize>14</pointsize>
       </font>
      </property>
      <property name="readOnly">

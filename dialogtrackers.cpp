@@ -82,7 +82,7 @@ void DialogTrackers::deleteTracker() {
 }
 
 void DialogTrackers::saveTrackerList() {
-    QSettings settings("mir", "contra");
+    QSettings settings("mir", "Contra");
     settings.setValue("numtrackers", (qint32)pTrackerAddresses.size());
     qint32 numTrackers = settings.value("numtrackers").toInt();
     qDebug() << "Saving " << numTrackers << " trackers...";
@@ -93,7 +93,7 @@ void DialogTrackers::saveTrackerList() {
 }
 
 void DialogTrackers::updateTrackerList() {
-    QSettings settings("mir", "contra");
+    QSettings settings("mir", "Contra");
     qint32 numTrackers = settings.value("numtrackers").toInt();
     qDebug() << "Loading " << numTrackers << " trackers...";
     pTrackerNames.clear();

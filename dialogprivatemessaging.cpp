@@ -41,7 +41,7 @@ void DialogPrivateMessaging::changeEvent(QEvent *e)
 
 void DialogPrivateMessaging::sendMessage() {
     if(!ui->lineEdit->text().isEmpty()) {
-        QSettings settings("mir", "contra");
+        QSettings settings("mir", "Contra");
         connection->sendPMToUser(uid, ui->lineEdit->text());
         ui->textEdit->moveCursor(QTextCursor::End);
         QString formatted = TextHelper::FormatMessageToHTML(ui->lineEdit->text());

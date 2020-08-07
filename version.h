@@ -1,2 +1,2 @@
-#define VERSION_MAJOR 108
-#define VERSION_MINOR 4
+#define VERSION_MAJOR 109 // 3 digits
+#define VERSION_MINOR 0 // 2 digits

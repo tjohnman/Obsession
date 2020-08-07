@@ -5,7 +5,7 @@
 #include <QDebug>
 
 void ThreadIconLoader::run() {
-    QDir iconsFolder = QDir("icons");
+    QDir iconsFolder = QDir(":/icons");
     qDebug() << QDir::currentPath();
     qDebug() << "Loading" << iconsFolder.count() << "icons...";
     QFileInfoList fileList = iconsFolder.entryInfoList();
