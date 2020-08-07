@@ -6,6 +6,7 @@
 #include <QHostAddress>
 #include <QNetworkAccessManager>
 #include <QTextCodec>
+#include <dialogprivatemessaging.h>
 
 #include "version.h"
 #include "TextHelper.h"
@@ -22,8 +23,6 @@ ConnectionController::ConnectionController()
     QSettings settings("mir", "Contra");
     pNickname = settings.value("nick", "unnamed").toString();
     pIconID = (quint16) settings.value("icon", 25096).toString().toShort();
-    qDebug() << "Loaded icon ID: " << pIconID;
-    qDebug() << "Icon is :" << pIconID;
 
     pAFK = false;
 
@@ -107,13 +106,11 @@ void ConnectionController::requestAccount(QString login)
 void ConnectionController::sendTransaction(CTransaction * t, bool expectReply) {
     if(isConnected()) {
         qint64 written = pSocket.write(t->bytes(), t->length());
-        qDebug() << "Wrote " << written << " bytes.";
         if(expectReply) {
             pPendingTransactions.push_back(t);
         } else {
             delete t;
         }
-        qDebug() << "Sent transaction.";
     }
 }
 
@@ -224,13 +221,8 @@ void ConnectionController::closeConnection(bool silent) {
 }
 
 CTransaction * ConnectionController::createTransaction(qint16 id) {
-    qDebug() << "Connection controller: Creating new CTransaction (" << id << ")";
     return new CTransaction(id, pTaskIDCounter++);
 }
-
-/*void ConnectionController::sendCETIdentification(s_user * user) {
-    // need to get IP
-}*/
 
 /************
     SLOTS
@@ -254,10 +246,8 @@ void ConnectionController::onSocketConnected() {
     char serverMagicBytes[8] = {0x54, 0x52, 0x54, 0x50, 0x00, 0x00, 0x00, 0x00};
 
     qint32 bytes = pSocket.write(clientMagicBytes, 12);
-    qDebug() << "Sent magic (" << bytes << " bytes)";
     pSocket.waitForReadyRead(30000);
     QByteArray response = pSocket.readAll();
-    qDebug() << "Got magic: " << response.size() << " bytes";
 
     for(quint32 i=0; i<8; i++) {
         if(response.data()[i] != serverMagicBytes[i]) {
@@ -265,8 +255,6 @@ void ConnectionController::onSocketConnected() {
             return;
         }
     }
-
-    qDebug() << "Handshake ok";
 
     if(pSocket.bytesAvailable()) {
         pSocket.readAll();
@@ -289,7 +277,6 @@ void ConnectionController::onSocketConnected() {
     loginTransaction->addParameter(160, ver);
 
     if(protocol_extensions.pitbull) {
-        qDebug() << "Pitbull server detected.";
         loginTransaction->addParameter(163, 4, (char *)"OBSE");
         loginTransaction->addParameter(164, VERSION_MAJOR*10 + VERSION_MINOR);
     }
@@ -298,10 +285,7 @@ void ConnectionController::onSocketConnected() {
 }
 
 ConnectionController::t_protocolExtensions ConnectionController::checkForProtocolExtensions() {
-    qDebug() << "Checking for protocol extensions…";
-
     QTcpSocket * sock = new QTcpSocket();
-    connect(sock, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(onSocketError(QAbstractSocket::SocketError)));
 
     qDebug() << pSocket.peerAddress() << ":" << pSocket.peerPort() + 1;
     // Check for Pitbull
@@ -394,7 +378,6 @@ void ConnectionController::onSocketError(QAbstractSocket::SocketError e) {
     if(e == 1 && settings.value("autoReconnect", false).toBool() && pReconnectionAttempts < 3)
     {
         emit socketError(string+"<br>Reconnecting...");
-        qDebug() << "Reconnecting...";
         closeConnection();
         QTimer * reconnectTimer = new QTimer();
         reconnectTimer->setSingleShot(true);
@@ -424,21 +407,10 @@ void ConnectionController::onSocketData() {
     if(receivedTransaction == NULL) {
         qDebug() << "--------------------------------------";
         qint32 available = pSocket.bytesAvailable();
-        qDebug() << "Got " << available << " bytes";
-
-        qDebug() << "Getting data from socket...";
         QByteArray dataArray = pSocket.read(22);
-        qDebug() << "Got " << dataArray.size() << " bytes";
         dataBuffer = dataArray.data();
 
         receivedTransaction = new CTransaction(dataBuffer);
-
-        qDebug() << "isReply is: " << receivedTransaction->isReply();
-        qDebug() << "transactionID is: " << receivedTransaction->transactionID();
-        qDebug() << "taskID is: " << receivedTransaction->taskID();
-        qDebug() << "errorCode is: " << receivedTransaction->errorCode();
-        qDebug() << "dataLength is: " << receivedTransaction->dataLength();
-        qDebug() << "number of parameters: " << receivedTransaction->numberOfParameters();
 
         if(receivedTransaction->errorCode() == -1) {
             qDebug() << "Bailing out...";
@@ -447,28 +419,21 @@ void ConnectionController::onSocketData() {
     }
 
     if(pSocket.bytesAvailable() < receivedTransaction->dataLength()-2 && receivedTransaction->dataLength() > 0) {
-        qDebug() << "Have " << pSocket.bytesAvailable() << ", need " << receivedTransaction->dataLength()-2;
-        qDebug() << "Not enough data, will wait...";
         return;
     }
-
-    qDebug() << "Will now read data";
 
     receivedTransaction->addData(pSocket.read(receivedTransaction->dataLength()-2).data());
 
     s_parameter * parameterBuffer;
 
     if(receivedTransaction->errorCode() != 0) {
-        qDebug() << "Transaction error code: " << receivedTransaction->errorCode();
         parameterBuffer = receivedTransaction->getParameterById(100);
         if(parameterBuffer) {
             QString errStr = QString(parameterBuffer->data);
             errStr.truncate(parameterBuffer->length);
-            qDebug() << "Server error: " << errStr;
             char * errorstring = (char *) malloc(sizeof(char)*parameterBuffer->length+1);
             memcpy(errorstring, parameterBuffer->data, parameterBuffer->length);
             errorstring[parameterBuffer->length] = '\0';
-            qDebug() << "Emitting server error signal...";
             emit serverError(QString(errorstring));
         }
     }
@@ -476,7 +441,6 @@ void ConnectionController::onSocketData() {
     if(receivedTransaction->isReply()) {
         for(quint32 i=0; i<pPendingTransactions.size(); i++) {
             if(receivedTransaction->taskID() == pPendingTransactions[i]->taskID()) {
-                qDebug() << "Got response for " << pPendingTransactions[i]->transactionID();
                 switch(pPendingTransactions[i]->transactionID()) {
                 case 101:
                     parameterBuffer = receivedTransaction->getParameterById(101);
@@ -484,7 +448,6 @@ void ConnectionController::onSocketData() {
                         char * msg = (char *) malloc(parameterBuffer->length);
                         memcpy(msg, parameterBuffer->data, parameterBuffer->length);
                         msg[parameterBuffer->length] = '\0';
-                        qDebug() << "Got linear news, emitting signal...";
                         emit gotLinearNews(QString(msg));
                     }
                     break;
@@ -658,6 +621,7 @@ void ConnectionController::onSocketData() {
                     }
                     break;
                 case 300:
+                    qDebug() << "Userlist updated.";
 
                     while(pUsers.size() > 0) {
                         s_user * u = pUsers.back();
@@ -680,7 +644,6 @@ void ConnectionController::onSocketData() {
                                 newUser->doesCET = false;
 
                                 newUser->iconPath = new QString(QString(":/icons/") + QString::number(newUser->icon) + QString(".png"));
-                                qDebug() << newUser->iconPath;
 
                                 memcpy(&newUser->flags, parameterBuffer->data + 4, 2);
                                 newUser->flags = qFromBigEndian(newUser->flags);
@@ -692,10 +655,7 @@ void ConnectionController::onSocketData() {
                                 memcpy(newUser->name, parameterBuffer->data + 8, newUser->nameLength);
                                 newUser->name[newUser->nameLength] = '\0';
 
-                                newUser->messagingWindow = NULL;
                                 newUser->infoWindow = NULL;
-
-                                qDebug() << "Got user " << QString(newUser->name) << " with uid: " << newUser->id;
 
                                 pUsers.push_back(newUser);
 
@@ -1060,14 +1020,10 @@ void ConnectionController::onSocketData() {
                 memcpy(&uid, &parameterBuffer->shortValue, parameterBuffer->length);
                 uid = qFromBigEndian(uid);
 
-                qDebug() << "Retreiving message...";
                 quint16 len = receivedTransaction->getParameterById(101)->length;
-                qDebug() << "Length: " << len;
                 char * m = (char *) malloc(sizeof(char)*len+1);
                 memcpy(m, receivedTransaction->getParameterById(101)->data, receivedTransaction->getParameterById(101)->length);
                 m[len] = '\0';
-
-                qDebug() << "Emitting PM signal...";
 
                 emit gotPM(TextHelper::DecodeTextAutoUTF8(m, len), uid);
             } else {
@@ -1203,6 +1159,7 @@ void ConnectionController::onSocketData() {
 
                         if(oldName != newName)
                         {
+                            emit userChangedName(oldName, newName);
                             emit gotChatMessage(message);
                         }
                     }
@@ -1238,8 +1195,6 @@ void ConnectionController::onSocketData() {
                         newUser->nameLength = parameterBuffer->length;
                     }
 
-                    newUser->messagingWindow = NULL;
-
                     pUsers.push_back(newUser);
                     QString message = QString("                <b>%1 has joined</b>").arg(TextHelper::DecodeTextAutoUTF8(newUser->name, newUser->nameLength));
                     emit gotChatMessage(message);
@@ -1255,10 +1210,14 @@ void ConnectionController::onSocketData() {
                 uid = qFromBigEndian(uid);
                 qDebug() << "User " << uid << " left";
                 s_user * user = getUserByUid(uid);
-                if(getUserByUid(uid) == NULL) {
+
+                if(!user) {
                     qDebug() << "But that user doesn't exist... ignoring";
                     break;
                 }
+
+                emit userLeft(user);
+
                 QString message = QString("                <b>%1 has left</b>").arg(TextHelper::DecodeTextAutoUTF8(user->name, user->nameLength));
                 emit gotChatMessage(message);
                 for(quint32 i=0; i<pUsers.size(); i++) {
@@ -1268,9 +1227,9 @@ void ConnectionController::onSocketData() {
                         break;
                     }
                 }
-                if(user) {
-                    delete user;
-                }
+
+                delete user;
+
                 emit userListChanged();
             }
             break;
@@ -1285,4 +1244,10 @@ void ConnectionController::onSocketData() {
     if(pSocket.bytesAvailable()) {
         onSocketData();
     }
+}
+
+std::string ConnectionController::getUserHash(s_user * user) {
+    QString string;
+    string.append(user->name);
+    return string.toStdString();
 }

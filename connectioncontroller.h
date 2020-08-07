@@ -41,6 +41,8 @@ public:
 
     CTransaction * createTransaction(qint16 id);
 
+    std::string getUserHash(s_user *);
+
     QString serverIdent;
 
     QTcpSocket pSocket;
@@ -116,6 +118,8 @@ signals:
     void gotUpload(quint32);
     void receivedFileDeleteResponse(qint32 code);
     void gotPermissions(QString login, QString password, quint8 p1, quint8 p2, quint8 p3, quint8 p4, quint8, quint8, quint8, quint8);
+    void userChangedName(QString old_name, QString new_name);
+    void userLeft(s_user * user);
 };
 
 #endif // CONNECTIONCONTROLLER_H

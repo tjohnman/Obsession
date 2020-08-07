@@ -29,6 +29,7 @@
 #include "widgetchat.h"
 #include "widgetnews.h"
 #include "widgetconsole.h"
+#include "dialogprivatemessaging.h"
 
 namespace Ui {
     class MainWindow;
@@ -85,6 +86,8 @@ public slots:
     void gotPermissions(QString login, QString password, quint8, quint8, quint8, quint8, quint8, quint8, quint8, quint8);
     void onClickCreateAccount();
     void onClickBroadcast();
+    void onUserChangedName(QString old_name, QString new_name);
+    void onUserLeft(s_user * user);
 
 protected:
     void changeEvent(QEvent *e);
@@ -94,6 +97,7 @@ private:
     bool altPressed;
 
     void setStatus(QString s);
+    DialogPrivateMessaging * getUserPrivateChat(s_user * user);
 
     QNetworkReply * pUpdateCheckReply;
     QNetworkAccessManager * pNetworkAccessManager;
@@ -120,6 +124,8 @@ private:
     WidgetChat * chatWidget;
     WidgetNews * threadedNewsWidget;
     WidgetConsole * debugConsole;
+
+    std::map<std::string, DialogPrivateMessaging *> pPrivateChats;
 };
 
 #endif // MAINWINDOW_H

@@ -32,7 +32,6 @@ CDownload::CDownload()
 void CDownload::stopDownload() {
     if(inited) {
         if(!finished && connection->isConnected()) {
-            qDebug() << "Download stopped";
             socket.close();
             socket.disconnect(this, SLOT(gotData()));
             downloadInProgress = false;
@@ -48,7 +47,6 @@ void CDownload::stopDownload() {
             emit downloadFinished();
         }
     } else {
-        qDebug() << "Queued download cancelled";
         widget->infoLabel()->setText("Cancelled");
         finished = true;
     }
@@ -181,7 +179,6 @@ qint32 CDownload::init() {
     forced = false;
 
     if(queuePosition > 0) {
-        qDebug() << "File is at queue ("<<queuePosition<<")";
         widget->infoLabel()->setText("Queued by server at position "+QString::number(queuePosition));
         return 0;
     }
@@ -215,7 +212,6 @@ void CDownload::startDownloading() {
         socket.connectToHost(connection->pSocket.peerAddress(), connection->pSocket.peerPort()+1, QIODevice::ReadWrite);
         socket.waitForConnected();
         if(socket.state() == !QAbstractSocket::ConnectedState) {
-            qDebug() << "DownloaderThread connection timed out";
             return;
         }
 
@@ -232,28 +228,23 @@ void CDownload::startDownloading() {
         magic[16] = '\0';
         socket.write(magic, 16);
         socket.waitForBytesWritten();
-        qDebug() << "Sent magic ("<<magic<<")";
     } else {
-        qDebug() << "Warning: Must connect to download files";
         return;
     }
 }
 
 void CDownload::serverReady() {
     if(!gotForkSize) {
-        qDebug() << "Got response from server";
         if(socket.bytesAvailable() < 40) {
             qDebug() << "Still need more bytes for header, waiting...";
             return;
         }
-        qDebug() << "Got " << socket.bytesAvailable() << " bytes waiting.";
         downloadInProgress = true;
         disconnect(&socket, SIGNAL(readyRead()), this, SLOT(serverReady()));
 
         char * flatHeader = socket.read(24).data();
 
         if(strncmp(flatHeader, "FILP", 4)) {
-            qDebug() << "Incorrect magic! Aborting.";
             socket.close();
             downloadInProgress = false;
             emit gotError();
@@ -263,7 +254,6 @@ void CDownload::serverReady() {
         char * forkHeader = socket.read(16).data();
 
         if(strncmp(forkHeader, "INFO", 4)) {
-            qDebug() << "INFO header was expected, but got something else.";
             socket.close();
             downloadInProgress = false;
             emit gotError();
@@ -275,20 +265,16 @@ void CDownload::serverReady() {
         memcpy(&forkSize, forkHeader+12, 4);
         forkSize = qFromBigEndian(forkSize);
 
-        qDebug() << "Fork size is " << forkSize << " bytes.";
-
         gotForkSize = true;
     }
 
     if(socket.bytesAvailable() < forkSize) {
-        qDebug() << "Information fork has yet to arrive, waiting for more bytes...";
         return;
     }
 
     char * forkInfo = socket.read(forkSize).data();
 
     qint32 nameSize = forkSize - 72;
-    qDebug() << "Name size will be " << nameSize;
 
     bool hxd = false;
 
@@ -360,7 +346,6 @@ void CDownload::gotData() {
     bytesRead += read;
     bytesReadThisSession += read;
     widget->progressBar()->setValue(bytesRead);
-    //qDebug() << bytesRead << "/" << dataSize;
 
     if(bytesWritten >= fileSize) {
         qDebug() << "Download complete";

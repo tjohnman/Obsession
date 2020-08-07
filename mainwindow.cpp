@@ -76,6 +76,9 @@ MainWindow::MainWindow(QWidget *parent, bool checkForUpdates) :
     connect(connection, SIGNAL(gotUserInfo(QString,QString,quint16)), this, SLOT(onOpenUserInfo(QString,QString,quint16)));
     connect(connection, SIGNAL(gotPermissions(QString, QString, quint8, quint8, quint8, quint8, quint8, quint8, quint8, quint8)), this, SLOT(gotPermissions(QString, QString, quint8, quint8, quint8, quint8, quint8, quint8, quint8, quint8)));
 
+    connect(connection, SIGNAL(userLeft(s_user *)), this, SLOT(onUserLeft(s_user *)));
+    connect(connection, SIGNAL(userChangedName(QString, QString)), this, SLOT(onUserChangedName(QString, QString)));
+
     connect(connection, SIGNAL(serverError(QString)), this, SLOT(onError(QString)));
     connect(connection, SIGNAL(socketError(QString)), this, SLOT(onError(QString)));
 
@@ -389,12 +392,18 @@ void MainWindow::onUserListChanged() {
     std::vector<s_user*> * users = connection->getUserList();
     clearUserList();
     for(quint32 i=0; i<users->size(); i++) {
-        users->at(i)->orderInList = i;
-        QListWidgetItem * item = new QListWidgetItem("           "+TextHelper::DecodeTextAutoUTF8(users->at(i)->name, users->at(i)->nameLength));
+        s_user * user = users->at(i);
+        user->orderInList = i;
+
+        DialogPrivateMessaging * private_messages = this->getUserPrivateChat(user);
+        private_messages->user = user;
+
+        QListWidgetItem * item = new QListWidgetItem("           "+TextHelper::DecodeTextAutoUTF8(user->name, user->nameLength));
         QFont f = QFont();
+
         f.setBold(true);
         item->setFont(f);
-        switch(users->at(i)->flags%4) {
+        switch(user->flags%4) {
         default:
         case 0:
             item->setTextColor(QColor(0, 0, 0));
@@ -411,13 +420,13 @@ void MainWindow::onUserListChanged() {
         }
 
         QString path = *(users->at(i)->iconPath);
-        qDebug() << path << " for " << TextHelper::DecodeTextAutoUTF8(users->at(i)->name, users->at(i)->nameLength);
+        qDebug() << path << " for " << TextHelper::DecodeTextAutoUTF8(user->name, user->nameLength);
         QImage image = QImage(path);
         if(!image.isNull()) {
             item->setBackground(QBrush(image));
             item->setSizeHint(QSize(232, image.size().height()));
         }
-        chatWidget->addUser(item, users->at(i)->id);
+        chatWidget->addUser(item, user->id);
     }
 }
 
@@ -461,6 +470,20 @@ void MainWindow::onPreferencesSaved() {
     }
 }
 
+void MainWindow::onUserChangedName(QString old_name, QString new_name) {
+    this->pPrivateChats[new_name.toStdString()] = this->pPrivateChats[old_name.toStdString()];
+    this->pPrivateChats.erase(old_name.toStdString());
+}
+
+void MainWindow::onUserLeft(s_user * user) {
+    std::string user_hash = connection->getUserHash(user);
+    std::map<std::string, DialogPrivateMessaging *>::iterator it = this->pPrivateChats.find(user_hash);
+    if(it != this->pPrivateChats.end()) {
+        delete this->pPrivateChats[user_hash];
+        this->pPrivateChats.erase(user_hash);
+    }
+}
+
 void MainWindow::openPreferencesDialog() {
     DialogPreferences * dialog = new DialogPreferences(this);
     connect(dialog, SIGNAL(saved()), connection, SLOT(onNameChanged()));
@@ -471,18 +494,18 @@ void MainWindow::openPreferencesDialog() {
 
 void MainWindow::onGotPM(QString message, qint16 uid) {
     s_user * user = connection->getUserByUid(uid);
+
     if(user) {
-        if(user->messagingWindow == NULL || !user->messagingWindow) {
-            user->messagingWindow = new DialogPrivateMessaging(uid, connection, this);
-            connect(user->messagingWindow, SIGNAL(sentPM()), this, SLOT(playChatSound()));
-        }
-        if(user->messagingWindow->isVisible()) {
+        DialogPrivateMessaging * private_chat = this->getUserPrivateChat(user);
+
+        if(private_chat->isVisible()) {
             playChatSound();
         } else {
             playPMSound();
+            private_chat->show();
         }
-        user->messagingWindow->show();
-        user->messagingWindow->gotMessage(message);
+
+        private_chat->gotMessage(message);
     }
 }
 
@@ -494,11 +517,7 @@ void MainWindow::onOpenMessagingWindow(quint16 uid) {
 
     s_user * user = connection->getUserByUid(uid);
     if(user) {
-        if(user->messagingWindow == NULL) {
-            user->messagingWindow = new DialogPrivateMessaging(uid, connection, this);
-            connect(user->messagingWindow, SIGNAL(sentPM()), this, SLOT(playChatSound()));
-        }
-        user->messagingWindow->show();
+        this->getUserPrivateChat(user)->show();
     }
 }
 
@@ -558,4 +577,24 @@ void MainWindow::onVersionReady()
     }
 
     pUpdateCheckReply->deleteLater();
+}
+
+
+DialogPrivateMessaging * MainWindow::getUserPrivateChat(s_user * user) {
+    std::string user_hash = connection->getUserHash(user);
+    std::map<std::string, DialogPrivateMessaging *>::iterator it = this->pPrivateChats.find(user_hash);
+
+    qDebug() << "Getting private chat for " << user_hash.c_str() << "...";
+
+    DialogPrivateMessaging * privateChat;
+
+    if(it != this->pPrivateChats.end() && it->second) {
+        qDebug() << "Found it.";
+        return it->second;
+    } else {
+        privateChat = new DialogPrivateMessaging(user->id, connection, this);
+        this->pPrivateChats[user_hash] = privateChat;
+        qDebug() << "Created it.";
+        return privateChat;
+    }
 }

@@ -4,6 +4,7 @@
 QT += core gui network
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets multimedia
 CONFIG -= exceptions rtti
+CONFIG += resources_big
 TARGET = Obsession
 TEMPLATE = app
 SOURCES += main.cpp \

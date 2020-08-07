@@ -21,6 +21,9 @@ public:
 
     void gotMessage(QString m);
 
+public slots:
+    void onPreferencesSaved();
+
 protected:
     void changeEvent(QEvent *e);
 

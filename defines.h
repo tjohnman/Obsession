@@ -41,7 +41,6 @@ typedef struct {
     quint16 nameLength;
     char * name;
     bool doesCET;
-    DialogPrivateMessaging * messagingWindow;
     DialogUserInfo * infoWindow;
     quint32 orderInList;
 } s_user;
