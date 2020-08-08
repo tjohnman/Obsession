@@ -404,6 +404,8 @@ void MainWindow::onClickCreateAccount()
 }
 
 void MainWindow::onUserListChanged() {
+    QSettings settings("mir", "Contra");
+
     std::vector<s_user*> * users = connection->getUserList();
     clearUserList();
     for(quint32 i=0; i<users->size(); i++) {
@@ -418,29 +420,51 @@ void MainWindow::onUserListChanged() {
 
         f.setBold(true);
         item->setFont(f);
-        switch(user->flags%4) {
-        default:
-        case 0:
-            item->setForeground(QColor(0, 0, 0));
-            break;
-        case 1:
-            item->setForeground(QColor(100, 100, 100));
-            break;
-        case 2:
-            item->setForeground(QColor(127, 0, 0));
-            break;
-        case 3:
-            item->setForeground(QColor(127, 0, 127));
-            break;
-        }
 
         QString path = *(users->at(i)->iconPath);
-
         QImage image = QImage(path);
+        bool use_light_color = false;
+
         if(!image.isNull()) {
             item->setBackground(QBrush(image));
             item->setSizeHint(QSize(232, image.size().height()));
+
+            if(settings.value("useLightColorNames", true).toBool()) {
+                qreal average = 0;
+                int height = image.height();
+                int width = image.width();
+                for(int y=0; y<height; y+=4) {
+                    QRgb * rgb = (QRgb *) image.scanLine(y);
+                    for(int x=0; x<width; x+=4) {
+                        average += 0.2126*qRed(rgb[x]) + 0.7152*qGreen(rgb[x]) + 0.0722*qBlue(rgb[x]);
+                    }
+                }
+                average /= (image.width()/4) * (image.height()/4);
+                use_light_color = average < 100;
+            }
         }
+
+        switch(user->flags%4) {
+        default:
+        case 0:
+            if(use_light_color) item->setForeground(QColor(255, 255, 255));
+            else item->setForeground(QColor(0, 0, 0));
+            break;
+        case 1:
+            if(use_light_color) item->setForeground(QColor(200, 200, 200));
+            else item->setForeground(QColor(100, 100, 100));
+            break;
+        case 2:
+            if(use_light_color) item->setForeground(QColor(255, 127, 127));
+            else item->setForeground(QColor(127, 0, 0));
+            break;
+        case 3:
+            if(use_light_color) item->setForeground(QColor(255, 127, 255));
+            else item->setForeground(QColor(127, 0, 127));
+            break;
+        }
+
+
         chatWidget->addUser(item, user->id);
     }
 }
@@ -483,6 +507,7 @@ void MainWindow::onPreferencesSaved() {
         keepAliveTimer.disconnect(&keepAliveTimer, SIGNAL(timeout()), connection, SLOT(requestUserList()));
         keepAliveTimer.stop();
     }
+    this->onUserListChanged();
 }
 
 void MainWindow::onUserChangedName(QString old_name, QString new_name) {

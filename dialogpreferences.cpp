@@ -42,6 +42,7 @@ DialogPreferences::DialogPreferences(QWidget *parent) :
     ui->debugCheckBox->setChecked(settings.value("debugging", false).toBool());
     ui->checkKeepAlive->setChecked(settings.value("connectionKeepAlive", true).toBool());
     ui->checkReconnect->setChecked(settings.value("autoReconnect", false).toBool());
+    ui->useLightColorsCheck->setChecked(settings.value("useLightColorNames", true).toBool());
 
     bookmarksDialog = new DialogBookmarks(this);
 
@@ -120,6 +121,7 @@ void DialogPreferences::acceptSettings() {
     settings.setValue("debugging", ui->debugCheckBox->isChecked());
     settings.setValue("connectionKeepAlive", ui->checkKeepAlive->isChecked());
     settings.setValue("autoReconnect", ui->checkReconnect->isChecked());
+    settings.setValue("useLightColorNames", ui->useLightColorsCheck->isChecked());
 
     settings.sync();
     emit saved();

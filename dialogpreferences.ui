@@ -9,19 +9,19 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>300</width>
+    <width>350</width>
     <height>422</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>300</width>
+    <width>350</width>
     <height>422</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>300</width>
+    <width>350</width>
     <height>654686</height>
    </size>
   </property>
@@ -112,6 +112,13 @@
     </layout>
    </item>
    <item>
+    <widget class="QCheckBox" name="checkReconnect">
+     <property name="text">
+      <string>Auto reconnect.</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QCheckBox" name="soundCheckBox">
      <property name="text">
       <string>Enable sounds.</string>
@@ -126,16 +133,16 @@
     </widget>
    </item>
    <item>
-    <widget class="QCheckBox" name="checkReconnect">
+    <widget class="QCheckBox" name="checkKeepAlive">
      <property name="text">
-      <string>Auto reconnect.</string>
+      <string>Keep connection alive.</string>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="QCheckBox" name="checkKeepAlive">
+    <widget class="QCheckBox" name="useLightColorsCheck">
      <property name="text">
-      <string>Keep connection alive.</string>
+      <string>Use lighter color nick for users with dark icons.</string>
      </property>
     </widget>
    </item>
