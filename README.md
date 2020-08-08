@@ -3,17 +3,12 @@ Obsession
 
 A Hotline client written in Qt featuring Shift-JIS support and other stuff.
 
-The Obsession Hotline client aims to be a modern alternative for Windows users. It supports Shift-JIS encoding for Japanese users or for browsing Japanese servers. It is written using Qt and although porting it to other operating systems should be trivial, right now it only works on Windows, as there are other much better alternatives for Mac OS X in development: http://hotline.wikia.com/wiki/Clients.
+The Obsession Hotline client aims to be a modern alternative for Windows and macOS users. It supports Shift-JIS encoding for Japanese users or for browsing Japanese servers. It is written using Qt and should compile and work out of the box on Windows, macOS and Linux. Check out other clients in the [Hotline Wiki](http://hotline.wikia.com/wiki/Clients).
 
 Downloading and installing
 ----------
-First get the [directory structure](http://www.sumamimasen.com/obsession/ObsessionAlpha.zip). This contains all the dll files needed. It's a big package, but you won't have to download it more than once.
-Make sure to also grab the [executable file](http://www.sumamimasen.com/obsession/Obsession.exe). Place this in the directory you downloaded above and you are good to go. Note that this may be not up to date with the latest code from the repo. I upload regular builds though.
 
-Getting updates
----------------
-The client will connect to the Internet and check for updates on launch. If there is a new update you will be prompted and sent here if desired. Normally you want to get the [executable file](http://www.sumamimasen.com/obsession/Obsession.exe) and copy it over the older version. Should a version require a redownload of the directory structure a special notice will be posted here.
-*Note* that you do need to get the file structure if you are updating from anything previous to 107.2. There have been some DLL changes.
+You can get release builds [here](https://github.com/tjohnman/Obsession/releases).
 
 What doesn't work
 -----------------
