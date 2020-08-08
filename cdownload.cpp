@@ -236,7 +236,6 @@ void CDownload::startDownloading() {
 void CDownload::serverReady() {
     if(!gotForkSize) {
         if(socket.bytesAvailable() < 40) {
-            qDebug() << "Still need more bytes for header, waiting...";
             return;
         }
         downloadInProgress = true;
@@ -282,10 +281,7 @@ void CDownload::serverReady() {
     memcpy(reportedName, forkInfo+72, nameSize);
 
     if(!strncmp(reportedName, "hxd", 3)) {
-        qDebug() << "Server is hxd.";
         hxd = true;
-    } else {
-        qDebug() << "Server reports name: " << reportedName;
     }
 
     char * dataHeader = socket.read(16).data();
@@ -301,17 +297,13 @@ void CDownload::serverReady() {
     memcpy(&fileSize, dataHeader+12, 4);
     fileSize = qFromBigEndian(fileSize);
 
-    qDebug() << "Reported file size is " << fileSize;
-
     bytesRead = 0;
     widget->progressBar()->setMaximum(fileSize);
     widget->progressBar()->setValue(bytesRead);
 
-    qDebug() << "Opening file for writing...";
     const QString downloadsFolder = QStandardPaths::writableLocation(QStandardPaths::DownloadLocation);
     file->setFileName(downloadsFolder + "/" + currentName);
     if(file->exists()) {
-        qDebug() << "Wil append to file";
         if(!file->open(QIODevice::Append)) {
             qDebug() << "Could not open file for writing!";
             return;
@@ -331,7 +323,6 @@ void CDownload::serverReady() {
 }
 
 void CDownload::gotData() {
-    //qDebug() << "Got data (" << socket.bytesAvailable() << ")";
     qint32 read = socket.bytesAvailable();
     if(read <= 0) {
         // Still nothing to read.
@@ -348,8 +339,6 @@ void CDownload::gotData() {
     widget->progressBar()->setValue(bytesRead);
 
     if(bytesWritten >= fileSize) {
-        qDebug() << "Download complete";
-        qDebug() << "Wrote " << bytesWritten << " bytes";
         socket.close();
         socket.disconnect(this, SLOT(gotData()));
         bytesRead = 0;

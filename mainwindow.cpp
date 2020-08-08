@@ -158,12 +158,11 @@ void MainWindow::log(QString t) {
 void MainWindow::autoConnect() {
     bool auto_connected = false;
     QSettings settings("mir", "Contra");
-    qDebug() << settings.fileName();
+
     QString auto_bookmark = settings.value("autoBookmark", "").toString();
     int bookmark_count = settings.value("bookmarkCount", 0).toInt();
-    qDebug() << "Auto: " << auto_bookmark;
+
     if(auto_bookmark != "") for(int i=0; i<bookmark_count; ++i) {
-        qDebug() << "Bookmark: " << settings.value("bookmarkaddress"+QString::number(i));
         if(settings.value("bookmarkaddress"+QString::number(i)) == auto_bookmark) {
             auto_connected = true;
             this->connection->connectToServer(settings.value("bookmarkaddress"+QString::number(i), "localhost").toString(),
@@ -209,9 +208,7 @@ void MainWindow::changedTab() {
 }
 
 void MainWindow::openThreadedNews() {
-    qDebug() << "Adding threaded news widget...";
     ui->tabWidget->addTab(threadedNewsWidget, "News");
-    qDebug() << "Setting focus...";
     ui->tabWidget->setCurrentIndex(ui->tabWidget->count()-1);
     threadedNewsWidget->getNews();
 }
@@ -223,7 +220,6 @@ void MainWindow::onDownloadQueueUpdated() {
 }
 
 void MainWindow::removeTab(qint32 i) {
-    qDebug() << "Clicked on tab close " << i;
     if(i != 0) {
         ui->tabWidget->removeTab(i);
     }
@@ -294,9 +290,7 @@ void MainWindow::onError(QString errorString) {
 }
 
 void MainWindow::openFileBrowser() {
-    qDebug() << "Opening file browser...";
     ui->tabWidget->addTab(fileBrowserDialog, "Files");
-    //fileBrowserDialog->show();
     fileBrowserDialog->load();
     ui->tabWidget->setCurrentIndex(ui->tabWidget->count()-1);
 }
@@ -410,7 +404,6 @@ void MainWindow::onClickCreateAccount()
 }
 
 void MainWindow::onUserListChanged() {
-    qDebug() << "Updating QListWidget...";
     std::vector<s_user*> * users = connection->getUserList();
     clearUserList();
     for(quint32 i=0; i<users->size(); i++) {
@@ -428,21 +421,21 @@ void MainWindow::onUserListChanged() {
         switch(user->flags%4) {
         default:
         case 0:
-            item->setTextColor(QColor(0, 0, 0));
+            item->setForeground(QColor(0, 0, 0));
             break;
         case 1:
-            item->setTextColor(QColor(100, 100, 100));
+            item->setForeground(QColor(100, 100, 100));
             break;
         case 2:
-            item->setTextColor(QColor(127, 0, 0));
+            item->setForeground(QColor(127, 0, 0));
             break;
         case 3:
-            item->setTextColor(QColor(127, 0, 127));
+            item->setForeground(QColor(127, 0, 127));
             break;
         }
 
         QString path = *(users->at(i)->iconPath);
-        qDebug() << path << " for " << TextHelper::DecodeTextAutoUTF8(user->name, user->nameLength);
+
         QImage image = QImage(path);
         if(!image.isNull()) {
             item->setBackground(QBrush(image));
@@ -593,7 +586,7 @@ void MainWindow::onVersionReady()
                                         " Do you want to launch your web browser to download it?", "Yes", "No"))
         {
             case 0:
-            QDesktopServices::openUrl(QUrl("https://github.com/tjohnman/Obsession/blob/master/README.md"));
+            QDesktopServices::openUrl(QUrl(""));
             break;
         }
     }
@@ -606,17 +599,13 @@ DialogPrivateMessaging * MainWindow::getUserPrivateChat(s_user * user) {
     std::string user_hash = connection->getUserHash(user);
     std::map<std::string, DialogPrivateMessaging *>::iterator it = this->pPrivateChats.find(user_hash);
 
-    qDebug() << "Getting private chat for " << user_hash.c_str() << "...";
-
     DialogPrivateMessaging * privateChat;
 
     if(it != this->pPrivateChats.end() && it->second) {
-        qDebug() << "Found it.";
         return it->second;
     } else {
         privateChat = new DialogPrivateMessaging(user->id, connection, this);
         this->pPrivateChats[user_hash] = privateChat;
-        qDebug() << "Created it.";
         return privateChat;
     }
 }

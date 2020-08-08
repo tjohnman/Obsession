@@ -24,7 +24,6 @@ DialogPrivileges::DialogPrivileges(ConnectionController * c, QString user, QStri
     if(password.data()[0].toLatin1() == 0) password = "";
     ui->editPassword->setText(password);
 
-    qDebug() << "Permissions for " << user;
     connect(this, SIGNAL(accepted()), this, SLOT(onAccepted()));
     connect(ui->buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
     connect(ui->buttonBox, SIGNAL(rejected()), this, SLOT(reject()));

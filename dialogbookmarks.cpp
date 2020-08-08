@@ -101,7 +101,7 @@ void DialogBookmarks::newBookmark() {
     settings.setValue("bookmarkpassword"+QString::number(bookmarkCount), ui->lineEdit_4->text());
     bookmarkCount++;
     settings.setValue("bookmarkCount", bookmarkCount);
-    qDebug() << bookmarkCount;
+
     ui->listWidget->setCurrentRow(ui->listWidget->count()-1);
     ui->lineEdit->setFocus();
 }
@@ -128,7 +128,6 @@ void DialogBookmarks::deleteBookmark() {
         bookmarkCount--;
         settings.setValue("bookmarkCount", bookmarkCount);
 
-        qDebug() << "Deleted item " << ui->listWidget->currentRow();
         loadBookmarks();
     }
 }

@@ -88,11 +88,9 @@ void DialogFileBrowser::load() {
     }
     ui->labelPath->setText(path);
     CTransaction * fileListTransaction = connection->createTransaction(200);
-    qDebug() << "Path is " << path.length() << " characters (" << path << ")";
-    if(path.length() > 1) {
 
-        qDebug() << "Calculating size for path data...";
-        QStringList levels = path.split("/", QString::SkipEmptyParts);
+    if(path.length() > 1) {
+        QStringList levels = path.split("/", Qt::SkipEmptyParts);
         quint16 directorylevels = levels.count();
         quint16 pathlen = 2 + directorylevels * 3;
         for(qint32 i=0; i<levels.count(); i++) {
@@ -102,26 +100,21 @@ void DialogFileBrowser::load() {
 
         char * pathdata = (char *) malloc(sizeof(char)*pathlen);
 
-        qDebug() << "Writing number of levels (" << directorylevels << ")...";
         directorylevels = qToBigEndian(directorylevels);
         memcpy(pathdata, &directorylevels, 2);
 
         qint32 offset = 0;
         for(qint32 i=0; i<levels.count(); i++) {
-            qDebug() << "Writing zeros...";
             memset(pathdata+offset+2, 0, 2);
             QString level = levels.at(i);
             unsigned char len = (unsigned char)TextHelper::EncodeText(_m_RawNames[level]).length();
-            qDebug() << "Writing name length... " << (quint16) len;
             memcpy(pathdata+offset+4, &len, 1);
-            qDebug() << TextHelper::EncodeText(_m_RawNames[level]);
             memcpy(pathdata+offset+5, TextHelper::EncodeText(_m_RawNames[level]).data(), len);
             offset += 3+len;
         }
 
         fileListTransaction->addParameter(202, pathlen, pathdata);
     }
-    qDebug() << "Sending file list request for path: " << path;
     connection->sendTransaction(fileListTransaction, true);
     ui->label->setText("loading...");
     ui->treeWidget->setEnabled(false);
@@ -132,7 +125,6 @@ void DialogFileBrowser::onDoubleClick(QModelIndex model) {
     if(item->data(2, 0).toString() == "fldr") {
         path = QString(path + item->data(0, 0).toString() + "/");
         _m_RawPath = QString(_m_RawPath + _m_RawNames[item->data(0,0).toString()] + "/");
-        qDebug() << _m_RawPath;
         load();
     } else {
         requestFile();
@@ -176,8 +168,6 @@ void DialogFileBrowser::onGotFileList(std::vector<s_hotlineFile *> list) {
         }
         item->setData(3, 0, size);
         item->setTextAlignment(1, Qt::AlignRight);
-
-        //qDebug() << "Type is " << list[i]->type << ", extension is: " << getExtension(_n);
 
         if(!strncmp(list[i]->type, "fldr", 4)) {
             item->setIcon(0, QIcon(":/files/interfaceIcons/filesFolder.png"));
@@ -367,7 +357,6 @@ void DialogFileBrowser::changeEvent(QEvent *e)
 
 void DialogFileBrowser::requestFile() {
     if(ui->treeWidget->currentItem() == NULL) return;
-    qDebug() << "Emitting name signal for manager";
     emit requestedFile(ui->treeWidget->currentItem()->data(0, 0).toString(), ui->treeWidget->currentItem()->data(3, 0).toInt(), path);
 }
 
@@ -376,8 +365,7 @@ void DialogFileBrowser::requestFileDelete()
     CTransaction * transaction = connection->createTransaction(204);
     transaction->addParameter(201, TextHelper::EncodeText(ui->treeWidget->currentItem()->data(0, 0).toString()).size(), TextHelper::EncodeText(ui->treeWidget->currentItem()->data(0, 0).toString()).data());
 
-    qDebug() << "Calculating size for path data...";
-    QStringList levels = path.split("/", QString::SkipEmptyParts);
+    QStringList levels = path.split("/", Qt::SkipEmptyParts);
     quint16 directorylevels = levels.count();
     quint16 pathlen = 2 + directorylevels * 3;
     for(qint32 i=0; i<levels.count(); i++) {
@@ -387,19 +375,16 @@ void DialogFileBrowser::requestFileDelete()
 
     char * pathdata = (char *) malloc(sizeof(char)*pathlen);
 
-    qDebug() << "Writing number of levels (" << directorylevels << ")...";
     directorylevels = qToBigEndian(directorylevels);
     memcpy(pathdata, &directorylevels, 2);
 
     qint32 offset = 0;
     for(qint32 i=0; i<levels.count(); i++) {
-        qDebug() << "Writing zeros...";
         memset(pathdata+offset+2, 0, 2);
         QString level = levels.at(i);
         unsigned char len = (unsigned char)TextHelper::EncodeText(_m_RawNames[level]).length();
-        qDebug() << "Writing name length... " << (quint16) len;
+
         memcpy(pathdata+offset+4, &len, 1);
-        qDebug() << TextHelper::EncodeText(_m_RawNames[level]);
         memcpy(pathdata+offset+5, TextHelper::EncodeText(_m_RawNames[level]).data(), len);
         offset += 3+len;
     }
@@ -438,9 +423,7 @@ void DialogFileBrowser::requestUpload() {
         path.append("/");
     }
 
-    qDebug() << "Path is " << path.length() << " characters (" << path << ")";
-    qDebug() << "Calculating size for path data...";
-    QStringList levels = path.split("/", QString::SkipEmptyParts);
+    QStringList levels = path.split("/", Qt::SkipEmptyParts);
     quint16 directorylevels = levels.count();
     quint16 pathlen = 2 + directorylevels * 3;
     for(qint32 i=0; i<levels.count(); i++) {
@@ -450,17 +433,15 @@ void DialogFileBrowser::requestUpload() {
 
     char * pathdata = (char *) malloc(sizeof(char)*pathlen);
 
-    qDebug() << "Writing number of levels (" << directorylevels << ")...";
     directorylevels = qToBigEndian(directorylevels);
     memcpy(pathdata, &directorylevels, 2);
 
     qint32 offset = 0;
     for(qint32 i=0; i<levels.count(); i++) {
-        qDebug() << "Writing zeros...";
         memset(pathdata+offset+2, 0, 2);
         QString level = levels.at(i);
         unsigned char len = (unsigned char)TextHelper::EncodeText(_m_RawNames[level]).length();
-        qDebug() << "Writing name length... " << (quint16) len;
+
         memcpy(pathdata+offset+4, &len, 1);
         qDebug() << TextHelper::EncodeText(_m_RawNames[level]);
         memcpy(pathdata+offset+5, TextHelper::EncodeText(_m_RawNames[level]).data(), len);

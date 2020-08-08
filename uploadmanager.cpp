@@ -40,11 +40,10 @@ uint UploadManager::cleanIdle() {
 void UploadManager::onRequestedFile(QString name, qint32 size) {
     CUpload * upload = new CUpload();
     upload->fileSize = size;
-    qDebug() << "Got new item. Will use size "<<size<<" for matching";
+
     upload->file->setFileName(name);
     upload->currentName = name.split("/").last();
 
-    qDebug() << "Creating item widget";
     QListWidgetItem * item = new QListWidgetItem();
     WidgetDownloadItem * customItem = new WidgetDownloadItem();
     item->setSizeHint(customItem->sizeHint());
@@ -55,14 +54,11 @@ void UploadManager::onRequestedFile(QString name, qint32 size) {
     connect(customItem->stopButton(), SIGNAL(clicked()), upload, SLOT(stopUpload()));
 
     upload->updateName();
-    qDebug() << "Saving item";
     uploads.push_back(upload);
 }
 
 void UploadManager::addUpload(quint32 ref) {
-    qDebug() << "Got signal from connection controller";
     CUpload * upload = NULL;
-    qDebug() << "Trying to find pending";
     for(quint32 i=0; i<uploads.size(); i++) {
         if(uploads[i]->pending) {
             upload = uploads[i];
@@ -71,11 +67,10 @@ void UploadManager::addUpload(quint32 ref) {
     }
 
     if(upload == NULL) {
-        qDebug() << "Error. Item was not in upload list";
+        qDebug() << "Error. Item was not in upload list.";
     }
 
     upload->referenceNumber = ref;
     upload->connection = connection;
-    qDebug() << "Initializing upload item...";
     upload->init();
 }

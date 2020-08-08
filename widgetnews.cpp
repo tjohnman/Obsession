@@ -21,16 +21,13 @@ void WidgetNews::clear() {
 }
 
 void WidgetNews::getNews() {
-    qDebug() << "Getting threaded news...";
     CTransaction * getTransaction = NULL;
 
     if(!ui->treeWidget->currentItem()) {
         ui->treeWidget->clear();
-        qDebug() << "Creating transaction...";
         getTransaction = connection->createTransaction(370);
     } else {
         if(ui->treeWidget->currentItem()->data(1, 0).toInt() == 0) {
-            qDebug() << "Opening news item...";
             setRead(ui->treeWidget->currentItem(), true);
             QFont font;
             font.setBold(false);
@@ -41,11 +38,9 @@ void WidgetNews::getNews() {
         }
         ui->treeWidget->currentItem()->takeChildren();
         if(ui->treeWidget->currentItem()->data(1, 0).toInt() == 2) {
-            qDebug() << "Creating transaction...";
             getTransaction = connection->createTransaction(370);
         }
         if(ui->treeWidget->currentItem()->data(1, 0).toInt() == 3) {
-            qDebug() << "Creating transaction...";
             getTransaction = connection->createTransaction(371);
         }
         QString path;
@@ -56,9 +51,7 @@ void WidgetNews::getNews() {
         }
 
         if(path.length() > 1) {
-
-            qDebug() << "Calculating size for path data...";
-            QStringList levels = path.split(":", QString::SkipEmptyParts);
+            QStringList levels = path.split(":", Qt::SkipEmptyParts);
             quint16 directorylevels = levels.count();
             quint16 pathlen = 2 + directorylevels * 3;
             for(qint32 i=0; i<levels.count(); i++) {
@@ -68,19 +61,15 @@ void WidgetNews::getNews() {
 
             char * pathdata = (char *) malloc(sizeof(char)*pathlen);
 
-            qDebug() << "Writing number of levels (" << directorylevels << ")...";
             directorylevels = qToBigEndian(directorylevels);
             memcpy(pathdata, &directorylevels, 2);
 
             qint32 offset = 0;
             for(qint32 i=0; i<levels.count(); i++) {
-                qDebug() << "Writing zeros...";
                 memset(pathdata+offset+2, 0, 2);
                 QString level = levels.at(i);
                 unsigned char len = level.length();
-                qDebug() << "Writing name length... " << (quint16) len;
                 memcpy(pathdata+offset+4, &len, 1);
-                qDebug() << TextHelper::EncodeText(level).data();
                 memcpy(pathdata+offset+5, TextHelper::EncodeText(level).data(), len);
                 offset += 3+len;
             }
@@ -91,7 +80,6 @@ void WidgetNews::getNews() {
 
     ui->treeWidget->setEnabled(false);
 
-    qDebug() << "Sending transaction...";
     connection->sendTransaction(getTransaction, true);
 }
 
@@ -121,7 +109,6 @@ QString WidgetNews::getItemPath(QTreeWidgetItem * item) {
         c = c->parent();
     }
 
-    qDebug() << "Item path is: " << _path;
     return _path;
 }
 
@@ -147,7 +134,6 @@ void WidgetNews::onNewsArticleText(QString t, QString poster, QString timestamp)
 }
 
 void WidgetNews::onNewsItems(QString _name, quint32 id, quint32 pid) {
-    qDebug() << "Inserting news item in list...";
     QTreeWidgetItem * currentItem = NULL;
     if(ui->treeWidget->currentItem()) {
         currentItem = ui->treeWidget->currentItem();
@@ -178,7 +164,6 @@ void WidgetNews::onNewsItems(QString _name, quint32 id, quint32 pid) {
 }
 
 void WidgetNews::onNewsCategory(unsigned char _type, QString _name) {
-    qDebug() << "Inserting new categories in list...";
     QTreeWidgetItem * currentItem = NULL;
     if(ui->treeWidget->currentItem()) {
         currentItem = ui->treeWidget->currentItem();

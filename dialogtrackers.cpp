@@ -35,7 +35,7 @@ DialogTrackers::DialogTrackers(ConnectionController * c, QWidget *parent) :
 void DialogTrackers::connectToServer(QModelIndex model) {
     QString address = ui->treeWidget->topLevelItem(model.row())->data(3, 0).toString();
     QString port = ui->treeWidget->topLevelItem(model.row())->data(4, 0).toString();
-    qDebug() << "Double clicked: " << address << ":" << port;
+
     connection->closeConnection();
 
     if(!connection->connectToServer(address+":"+port, "", "")) {
@@ -48,7 +48,6 @@ void DialogTrackers::socketError(QAbstractSocket::SocketError e) {
 }
 
 void DialogTrackers::addTracker() {
-    qDebug() << "Adding tracker";
     if(!addTrackerDialog->name().isEmpty() && !addTrackerDialog->address().isEmpty()) {
         pTrackerNames.push_back(addTrackerDialog->name());
         pTrackerAddresses.push_back(addTrackerDialog->address());
@@ -85,7 +84,7 @@ void DialogTrackers::saveTrackerList() {
     QSettings settings("mir", "Contra");
     settings.setValue("numtrackers", (qint32)pTrackerAddresses.size());
     qint32 numTrackers = settings.value("numtrackers").toInt();
-    qDebug() << "Saving " << numTrackers << " trackers...";
+
     for(qint32 i=0; i<numTrackers; i++) {
         settings.setValue(QString("tracker")+QString::number(i), pTrackerNames[i]);
         settings.setValue(QString("trackeradd")+QString::number(i), pTrackerAddresses[i]);
@@ -95,7 +94,7 @@ void DialogTrackers::saveTrackerList() {
 void DialogTrackers::updateTrackerList() {
     QSettings settings("mir", "Contra");
     qint32 numTrackers = settings.value("numtrackers").toInt();
-    qDebug() << "Loading " << numTrackers << " trackers...";
+
     pTrackerNames.clear();
     pTrackerAddresses.clear();
     ui->comboBox->clear();
@@ -112,7 +111,7 @@ void DialogTrackers::updateCurrentList() {
 
 void DialogTrackers::updateServerList(QString tracker) {
     ui->label->setText("loading...");
-    qDebug() << "Updating server list for tracker " << tracker;
+
     if(ui->comboBox->count() == 0) {
         return;
     }
@@ -121,9 +120,7 @@ void DialogTrackers::updateServerList(QString tracker) {
     ui->treeWidget->clear();
 
     for(quint32 i=0; i<pTrackerNames.size(); i++) {
-        qDebug() << "Searching...";
         if(pTrackerNames[i] == tracker) {
-            qDebug() << "Found address in list";
             address = pTrackerAddresses[i];
         }
     }
@@ -133,38 +130,32 @@ void DialogTrackers::updateServerList(QString tracker) {
     delete pSocket;
     pSocket = new QTcpSocket();
 
-    qDebug() << "Connecting...";
     connect(pSocket, SIGNAL(connected()), this, SLOT(sendRequest()));
     pSocket->connectToHost(address, 5498, QIODevice::ReadWrite);
 }
 
 void DialogTrackers::sendRequest() {
-    qDebug() << "Connected to " << pSocket->peerAddress() << " on port " << pSocket->peerPort();
-
     char magic[6] = {0x48, 0x54, 0x52, 0x4b, 0x00, 0x01};
     pSocket->write(magic, 6);
     pSocket->waitForBytesWritten();
-    qDebug() << "Sent magic";
+
     pSocket->waitForReadyRead(10000);
     char response[6];
     memset(response, 0, 6);
     qint64 readBytes = pSocket->read(response, 6);
-    qDebug() << "Read " << readBytes << " from tracker";
+
     if(readBytes != 6 || strncmp(magic, response, 6) != 0) {
-        qDebug() << "Connecting to tracker failed";
         qDebug() << (quint8) response[0] << " " << (quint8) response[1] << " " << (quint8) response[2] << " " << (quint8) response[3] << " " << (quint8) response[4] << " " << (quint8) response[5];
         ui->label->setText("Connecting to tracker failed.");
         return;
     }
-    qDebug() << "Handshake successful";
+
     gotHeader = false;
     connect(pSocket, SIGNAL(readyRead()), this, SLOT(onSocketData()));
     onSocketData();
 }
 
 void DialogTrackers::onSocketData() {
-    qDebug() << "Getting header...";
-
     quint16 confirm;
 
     if(!gotHeader) {
@@ -173,15 +164,13 @@ void DialogTrackers::onSocketData() {
 
         pSocket->read((char*)&confirm, 2);
         confirm = qFromBigEndian(confirm);
-        qDebug() << "Server confirms: " << confirm;
 
         pSocket->read((char*)&dataLength, 2);
         dataLength = qFromBigEndian(dataLength);
-        qDebug() << "Length of data: " << dataLength;
 
         pSocket->read((char*)&numberOfServers, 2);
         numberOfServers = qFromBigEndian(numberOfServers);
-        qDebug() << "Number of servers: " << numberOfServers;
+
         gotHeader = true;
         lastPassBytes = 0;
         totalBytes = 0;
@@ -192,15 +181,11 @@ void DialogTrackers::onSocketData() {
     lastPassBytes = pSocket->bytesAvailable();
 
     if(totalBytes < dataLength - 4) {
-        qDebug() << "Waiting for all data to come in...";
+        // Waiting for all data to come in.
         return;
     }
 
     while(pSocket->bytesAvailable()) {
-        qDebug() << "--------------------------";
-        qDebug() << pSocket->bytesAvailable() << " bytes available. Reading...";
-        qDebug() << "--------------------------";
-
         QString name;
         QString description;
         QString address;
@@ -220,37 +205,29 @@ void DialogTrackers::onSocketData() {
                   QString::number(c) + QString(".") +
                   QString::number(d);
 
-        qDebug() << "Address: " << address;
-
         pSocket->read((char*)&port, 2);
         port = qFromBigEndian(port);
-        qDebug() << "Port: " << port;
 
         pSocket->read((char*)&users, 2);
         users = qFromBigEndian(users);
-        qDebug() << "Users: " << users;
 
         pSocket->read(2);
 
         pSocket->read((char*)&len, 1);
-        qDebug() << "Name is " << len << " bytes long";
 
         char * nameBuffer = new char[len];
         memset(nameBuffer, 0, len);
         pSocket->read(nameBuffer, len);
         name = QString::fromLocal8Bit(nameBuffer, len);
         delete[] nameBuffer;
-        qDebug() << "Server name: " << name;
 
         pSocket->read((char*)&len, 1);
-        qDebug() << "Description is " << len << " bytes long";
 
         char * descBuffer = new char[len];
         memset(descBuffer, 0, len);
         pSocket->read(descBuffer, len);
         description = QString::fromLocal8Bit(descBuffer, len);
         delete[] descBuffer;
-        qDebug() << "Server description: " << description;
 
         QTreeWidgetItem * item = new QTreeWidgetItem(QStringList() << name << QString::number(users) << description << address << QString::number(port));
         item->setToolTip(0, name);

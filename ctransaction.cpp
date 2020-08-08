@@ -21,11 +21,8 @@ CTransaction::CTransaction(char * headerData) {
     dataLengthCheck = qFromBigEndian(dataLengthCheck);
     pNumberOfParameters = qFromBigEndian(pNumberOfParameters);
 
-    qDebug() << "Total size: " << pDataLength;
-    qDebug() << "Data size: " << dataLengthCheck;
-
     if(dataLengthCheck != pDataLength) {
-        qDebug() << "Data length inconsistency";
+        qDebug() << "Data length inconsistency.";
         pErrorCode = -1;
     }
     done = false;
@@ -60,8 +57,6 @@ void CTransaction::addData(char * data) {
 
         id = qFromBigEndian(id);
         size = qFromBigEndian(size);
-
-        qDebug() << "Parameter no." << i << " is id: " << id << " (" << size << " bytes)";
 
         quint16 pshort = 0;
         quint32 pint = 0;
@@ -271,8 +266,6 @@ void CTransaction::addData(char * data) {
 char * CTransaction::bytes() {
     char * b = (char *) malloc(sizeof(char) * length());
 
-    qDebug() << "Transaction is " << length() << " bytes";
-
     qint16 reply = qToBigEndian(pIsReply);
     memcpy(b, &reply, 2);
 
@@ -319,7 +312,7 @@ char * CTransaction::bytes() {
         }
         offset += 4 + pParameters[i]->length;
     }
-    qDebug() << "Built transaction bytes";
+
     return b;
 }
 
@@ -402,6 +395,6 @@ s_parameter * CTransaction::getParameter(quint32 i) {
     if(i < pParameters.size()) {
         return pParameters[i];
     }
-    qDebug() << "Requested inexistent parameter! (" << i << " of " << pParameters.size() << ")";
+    qDebug() << "Requested inexistent parameter (" << i << " of " << pParameters.size() << ").";
     return NULL;
 }

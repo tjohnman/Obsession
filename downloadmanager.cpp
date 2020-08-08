@@ -1,5 +1,6 @@
 #include "downloadmanager.h"
 #include <QSettings>
+#include <QStandardPaths>
 #include "dialogerror.h"
 #include "TextHelper.h"
 
@@ -43,7 +44,6 @@ uint DownloadManager::cleanIdle() {
 
 void DownloadManager::onDownloadFinished() {
     quint32 active = 0;
-    qDebug() << "Local queue updated";
 
     for(quint32 i=0; i<downloads.size(); i++) {
         CDownload * download;
@@ -62,7 +62,6 @@ void DownloadManager::onDownloadFinished() {
             CDownload * download;
             download = downloads[i];
             if(download->widget->infoLabel()->text() == "Queued") {
-                qDebug() << "Requesting last download...";
                 sendDownloadRequestToServer(download);
             }
         }
@@ -73,7 +72,6 @@ void DownloadManager::onDownloadFinished() {
                 CDownload * download;
                 download = downloads[i];
                 if(download->widget->infoLabel()->text() == "Queued") {
-                    qDebug() << "Requesting next download...";
                     sendDownloadRequestToServer(download);
                     break;
                 }
@@ -97,10 +95,7 @@ void DownloadManager::sendDownloadRequestToServer(CDownload * download) {
         path.append("/");
     }
 
-    qDebug() << "Path is " << path.length() << " characters (" << path << ")";
-
-    qDebug() << "Calculating size for path data...";
-    QStringList levels = path.split("/", QString::SkipEmptyParts);
+    QStringList levels = path.split("/", Qt::SkipEmptyParts);
     quint16 directorylevels = levels.count();
     quint16 pathlen = 2 + directorylevels * 3;
     for(qint32 i=0; i<levels.count(); i++) {
@@ -109,19 +104,16 @@ void DownloadManager::sendDownloadRequestToServer(CDownload * download) {
 
     char * pathdata = (char *) malloc(sizeof(char)*pathlen);
 
-    qDebug() << "Writing number of levels (" << directorylevels << ")...";
     directorylevels = qToBigEndian(directorylevels);
     memcpy(pathdata, &directorylevels, 2);
 
     qint32 offset = 0;
     for(qint32 i=0; i<levels.count(); i++) {
-        qDebug() << "Writing zeros...";
         memset(pathdata+offset+2, 0, 2);
         QString level = levels.at(i);
         unsigned char len = TextHelper::EncodeText(level).size();
-        qDebug() << "Writing name length... " << (quint16) len;
+
         memcpy(pathdata+offset+4, &len, 1);
-        qDebug() << TextHelper::EncodeText(level).data();
         memcpy(pathdata+offset+5, TextHelper::EncodeText(level).data(), len);
         offset += 3+len;
     }
@@ -130,10 +122,10 @@ void DownloadManager::sendDownloadRequestToServer(CDownload * download) {
     // Look for existing data
 
     QFile preFile;
-    preFile.setFileName("Downloads/"+QString(download->currentName));
+    preFile.setFileName(QStandardPaths::writableLocation(QStandardPaths::DownloadLocation)+"/"+QString(download->currentName));
     if(preFile.exists()) {
         quint32 preSize = preFile.size();
-        qDebug() << "Existing file size is " << preSize;
+
         preSize = qToBigEndian(preSize);
         char resumeData[74];
         memcpy(resumeData, "RFLT\0\1\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\2DATA", 46);
@@ -152,13 +144,12 @@ void DownloadManager::onQueueUpdate(quint32 ref, quint32 pos) {
     for(quint32 i=0; i<downloads.size(); i++) {
         if(downloads[i]->referenceNumber == ref) {
             download = downloads[i];
-            qDebug() << "Got item";
+
             download->queuePosition = pos;
             download->init();
             return;
         }
     }
-    qDebug() << "Got queue update but no download matches the reference number.";
 }
 
 void DownloadManager::onRequestedFile(QString name, qint32 size, QString path) {
@@ -168,23 +159,21 @@ void DownloadManager::onRequestedFile(QString name, qint32 size, QString path) {
         return;
     }
     CDownload * newDownload = new CDownload();
-    qDebug() << "Got new item. Will use size "<<size<<" for matching";
+
     newDownload->currentName = name;
     newDownload->pathOnServer = path;
     newDownload->fileSize = size;
 
     QFile preFile;
-    preFile.setFileName("Downloads/"+QString(newDownload->currentName));
+    preFile.setFileName(QStandardPaths::writableLocation(QStandardPaths::DownloadLocation)+"/"+QString(newDownload->currentName));
     if(preFile.exists()) {
         quint32 preSize = preFile.size();
-        qDebug() << "Existing file size is " << preSize;
         newDownload->bytesRead = preSize;
         newDownload->dataSize = size - preSize;
     } else {
         newDownload->dataSize = size;
     }
 
-    qDebug() << "Creating item widget";
     QListWidgetItem * item = new QListWidgetItem();
     WidgetDownloadItem * customItem = new WidgetDownloadItem();
     item->setSizeHint(customItem->sizeHint());
@@ -205,14 +194,13 @@ void DownloadManager::onRequestedFile(QString name, qint32 size, QString path) {
     newDownload->updateName();
     connect(newDownload, SIGNAL(downloadFinished()), this, SLOT(onDownloadFinished()));
     connect(newDownload, SIGNAL(forcedDownload(CDownload *)), this, SLOT(onForcedDownload(CDownload*)));
-    qDebug() << "Saving item";
+
     downloads.push_back(newDownload);
     onDownloadFinished();
 }
 
 void DownloadManager::addDownload(quint32 ref, quint32 size, quint32 queuepos) {
     CDownload * newDownload = NULL;
-    qDebug() << "Trying to match size: "<<size;
     for(quint32 i=0; i<downloads.size(); i++) {
         if(downloads[i]->fileSize == size) {
             newDownload = downloads[i];
@@ -220,7 +208,6 @@ void DownloadManager::addDownload(quint32 ref, quint32 size, quint32 queuepos) {
     }
 
     if(newDownload == NULL) {
-        qDebug() << "Server did not send size. Guessing...";
         for(quint32 i=0; i<downloads.size(); i++) {
             if(!downloads[i]->matched) {
                 newDownload = downloads[i];
@@ -228,7 +215,7 @@ void DownloadManager::addDownload(quint32 ref, quint32 size, quint32 queuepos) {
             }
         }
         if(newDownload == NULL) {
-            qDebug() << "Error. There are no unmatched items left.";
+            qDebug() << "Could not match download to file.";
             return;
         }
     }
@@ -236,6 +223,6 @@ void DownloadManager::addDownload(quint32 ref, quint32 size, quint32 queuepos) {
     newDownload->referenceNumber = ref;
     newDownload->queuePosition = queuepos;
     newDownload->connection = connection;
-    qDebug() << "Initializing download item...";
+
     newDownload->init();
 }

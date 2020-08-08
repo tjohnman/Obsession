@@ -25,7 +25,7 @@ void DialogIconViewer::onClicked(QModelIndex model) {
         name = name.left(name.length()-4);
     }
     settings.setValue("icon", name);
-    qDebug() << name.toShort();
+
     emit iconChanged();
 }
 

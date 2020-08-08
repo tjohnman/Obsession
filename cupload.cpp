@@ -31,7 +31,6 @@ void CUpload::updateByteCount(qint64 bytes)
 
 void CUpload::stopUpload() {
     if(!finished) {
-        qDebug() << "Upload stopped";
         socket.close();
         socket.disconnect(this, SLOT(sentData(qint64)));
         file->close();
@@ -107,23 +106,22 @@ qint32 CUpload::init() {
 
 void CUpload::startUploading() {
     if(connection->pSocket.isValid() && connection->pSocket.state() == QAbstractSocket::ConnectedState) {
-        qDebug() << "Connecting...";
+
         socket.connectToHost(connection->pSocket.peerAddress(), connection->pSocket.peerPort()+1, QIODevice::ReadWrite);
         socket.waitForConnected();
         if(socket.state() != QAbstractSocket::ConnectedState) {
-            qDebug() << "Upload connection timed out";
+            qDebug() << "Upload connection timed out.";
             threadFinished(4);
             return;
         }
 
         if(!file->open(QIODevice::ReadOnly)) {
-            qDebug() << "Could not open file for reading";
+            qDebug() << "Could not open file for reading.";
             threadFinished(3);
             return;
         }
 
         uploadInProgress = true;
-        qDebug() << "Sending magic...";
 
         socket.write("HTXF");
         quint32 revRef = qToBigEndian(referenceNumber);
@@ -137,22 +135,19 @@ void CUpload::startUploading() {
         socket.write("MWIN????????\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0", 70);
         quint16 revNameSize = qToBigEndian(nameSize);
         socket.write((const char *)&revNameSize, 2);
-        qDebug() << "Name size is " << nameSize;
+
         socket.write(TextHelper::EncodeText(currentName).data(), nameSize);
         socket.write("DATA\0\0\0\0\0\0\0\0", 12);
         quint32 revDataSize = qToBigEndian(dataSize);
         socket.write((const char *)&revDataSize, 4);
-        qDebug() << "Data size is " << dataSize;
 
         socket.waitForBytesWritten();
 
         if(socket.state() != QAbstractSocket::ConnectedState) {
-            qDebug() << "Server closed the connection after receiving header";
+            qDebug() << "Server closed the connection after receiving header.";
             threadFinished(2);
             return;
         }
-
-        qDebug() << "Starting actual upload";
 
         timeElapsed = 0;
         uploadTimer->start(1000);
@@ -166,11 +161,8 @@ void CUpload::startUploading() {
         thread.bytesSent = 0;
         thread.dataSize = dataSize;
         thread.start();
-
-        qDebug() << "Upload thread started.";
-
     } else {
-        qDebug() << "Warning: Must connect to upload files";
+        qDebug() << "Warning: Must connect to upload files.";
         return;
     }
 }
@@ -180,8 +172,6 @@ void CUpload::threadFinished(int code)
     switch(code)
     {
     case 0:
-        qDebug() << "Upload complete";
-        qDebug() << "Sent " << bytesSent << " bytes";
         bytesSent = 0;
         dataSize = 0;
         widget->progressBar()->setValue(10);
@@ -195,7 +185,7 @@ void CUpload::threadFinished(int code)
         break;
     default:
     case 1:
-        qDebug() << "Data sending failed. Bailing out.";
+        qDebug() << "Data sending failed.";
         widget->infoLabel()->setText("Upload interrupted.");
         uploadTimer->stop();
         finished = true;
