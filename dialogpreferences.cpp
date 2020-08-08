@@ -47,8 +47,8 @@ DialogPreferences::DialogPreferences(QWidget *parent) :
 
     connect(ui->buttonBox, SIGNAL(accepted()), this, SLOT(acceptSettings()));
     connect(ui->buttonBox, SIGNAL(rejected()), this, SLOT(close()));
-    connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(openBookmarks()));
-    connect(ui->fontButton, SIGNAL(clicked()), this, SLOT(changeFont()));
+    connect(ui->buttonBookmarks, SIGNAL(clicked()), this, SLOT(openBookmarks()));
+    connect(ui->butonChangeFont, SIGNAL(clicked()), this, SLOT(changeFont()));
 }
 
 DialogPreferences::~DialogPreferences()

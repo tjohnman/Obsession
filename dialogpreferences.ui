@@ -31,167 +31,188 @@
   <property name="modal">
    <bool>true</bool>
   </property>
-  <layout class="QGridLayout" name="gridLayout">
-   <item row="13" column="0" colspan="2">
-    <widget class="QLineEdit" name="maxDlEdit">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="inputMask">
-      <string>0000</string>
-     </property>
-     <property name="text">
-      <string>0</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="0">
-    <widget class="QLabel" name="label_7">
-     <property name="text">
-      <string>Encoding:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="0">
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
     <widget class="QLabel" name="label">
      <property name="text">
       <string>Nickname:</string>
      </property>
     </widget>
    </item>
-   <item row="8" column="0" colspan="2">
-    <widget class="QLabel" name="label_3">
+   <item>
+    <widget class="QLineEdit" name="lineEdit">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>20</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <property name="spacing">
+      <number>-1</number>
+     </property>
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <property name="bottomMargin">
+      <number>0</number>
+     </property>
+     <item>
+      <widget class="QLabel" name="label_7">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>75</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>Encoding:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="encodingCombo">
+       <item>
+        <property name="text">
+         <string>Mac OS Roman</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Shift-JIS</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>ISO-8859-1</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>UTF-8</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="soundCheckBox">
      <property name="text">
-      <string>Download queue:</string>
+      <string>Enable sounds.</string>
      </property>
     </widget>
    </item>
-   <item row="0" column="1" colspan="3">
-    <widget class="QLineEdit" name="lineEdit"/>
-   </item>
-   <item row="17" column="0" colspan="4">
-    <widget class="QDialogButtonBox" name="buttonBox">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
-     </property>
-    </widget>
-   </item>
-   <item row="15" column="0">
-    <widget class="QLineEdit" name="maxUlEdit">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="inputMask">
-      <string>0000</string>
-     </property>
+   <item>
+    <widget class="QCheckBox" name="debugCheckBox">
      <property name="text">
-      <string>0</string>
+      <string>Enable debug logging.</string>
      </property>
     </widget>
    </item>
-   <item row="11" column="0">
-    <widget class="QLineEdit" name="ulQueueEdit">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="inputMask">
-      <string>0000</string>
-     </property>
-     <property name="text">
-      <string>0</string>
-     </property>
-    </widget>
-   </item>
-   <item row="14" column="0">
-    <widget class="QLabel" name="label_6">
-     <property name="text">
-      <string>Max ul speed:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="3">
+   <item>
     <widget class="QCheckBox" name="checkReconnect">
      <property name="text">
-      <string>Auto reconnect</string>
+      <string>Auto reconnect.</string>
      </property>
     </widget>
    </item>
-   <item row="2" column="3">
-    <widget class="QPushButton" name="pushButton_2">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
+   <item>
+    <widget class="QCheckBox" name="checkKeepAlive">
      <property name="text">
-      <string>Edit...</string>
+      <string>Keep connection alive.</string>
      </property>
     </widget>
    </item>
-   <item row="6" column="0" colspan="3">
-    <widget class="QPushButton" name="pushButton">
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_4">
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <property name="bottomMargin">
+      <number>0</number>
+     </property>
+     <item>
+      <widget class="QPushButton" name="butonChangeFont">
+       <property name="text">
+        <string>Change chat font...</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="sampleEdit">
+       <property name="text">
+        <string>Sample text</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <property name="bottomMargin">
+      <number>0</number>
+     </property>
+     <item>
+      <widget class="QLabel" name="label_3">
+       <property name="text">
+        <string>Download queue:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="dlQueueEdit">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>20</height>
+        </size>
+       </property>
+       <property name="inputMask">
+        <string>0000</string>
+       </property>
+       <property name="text">
+        <string>1</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QPushButton" name="buttonBookmarks">
      <property name="text">
       <string>Edit bookmarks...</string>
      </property>
     </widget>
    </item>
-   <item row="1" column="1" colspan="3">
-    <widget class="QComboBox" name="encodingCombo">
-     <item>
-      <property name="text">
-       <string>Mac OS Roman</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Shift-JIS</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>ISO-8859-1</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>UTF-8</string>
-      </property>
-     </item>
-    </widget>
-   </item>
-   <item row="7" column="0" colspan="3">
-    <widget class="QPushButton" name="fontButton">
-     <property name="text">
-      <string>Change chat font...</string>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="0" colspan="3">
-    <widget class="QCheckBox" name="debugCheckBox">
-     <property name="text">
-      <string>Enable debug logging</string>
-     </property>
-    </widget>
-   </item>
-   <item row="7" column="3">
-    <widget class="QLineEdit" name="sampleEdit">
-     <property name="text">
-      <string>Sample text</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
-     </property>
-    </widget>
-   </item>
-   <item row="10" column="0">
-    <widget class="QLabel" name="label_4">
-     <property name="text">
-      <string>Upload queue:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="16" column="0">
+   <item>
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -204,40 +225,13 @@
      </property>
     </spacer>
    </item>
-   <item row="2" column="0" colspan="3">
-    <widget class="QCheckBox" name="soundCheckBox">
-     <property name="text">
-      <string>Enable sounds</string>
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
      </property>
-    </widget>
-   </item>
-   <item row="12" column="0" colspan="2">
-    <widget class="QLabel" name="label_5">
-     <property name="text">
-      <string>Max dl speed:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="0">
-    <widget class="QCheckBox" name="checkKeepAlive">
-     <property name="text">
-      <string>Keep connection alive</string>
-     </property>
-    </widget>
-   </item>
-   <item row="9" column="0">
-    <widget class="QLineEdit" name="dlQueueEdit">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="inputMask">
-      <string>0000</string>
-     </property>
-     <property name="text">
-      <string>1</string>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
      </property>
     </widget>
    </item>
