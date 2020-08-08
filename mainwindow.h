@@ -42,6 +42,7 @@ public:
     ~MainWindow();
     ConnectionController *connection;
     void log(QString);
+    void autoConnect();
 
 public slots:
     void openNewConnectionDialog();

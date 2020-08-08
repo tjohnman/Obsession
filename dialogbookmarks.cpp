@@ -18,6 +18,7 @@ DialogBookmarks::DialogBookmarks(QWidget *parent) :
     connect(ui->lineEdit_2, SIGNAL(textEdited(QString)), this, SLOT(saveBookmark()));
     connect(ui->lineEdit_3, SIGNAL(textEdited(QString)), this, SLOT(saveBookmark()));
     connect(ui->lineEdit_4, SIGNAL(textEdited(QString)), this, SLOT(saveBookmark()));
+    connect(ui->autoConnectCheckBox, SIGNAL(clicked(bool)), this, SLOT(changedAutoConnect(bool)));
 
     connect(this, SIGNAL(finished(int)), this, SLOT(saveBookmark()));
 
@@ -58,6 +59,13 @@ void DialogBookmarks::selectedBookmark() {
         ui->lineEdit_2->setText(settings.value("bookmarkaddress"+QString::number(ui->listWidget->currentRow()), "").toString());
         ui->lineEdit_3->setText(settings.value("bookmarklogin"+QString::number(ui->listWidget->currentRow()), "").toString());
         ui->lineEdit_4->setText(settings.value("bookmarkpassword"+QString::number(ui->listWidget->currentRow()), "").toString());
+
+        QString auto_bookmark = settings.value("autoBookmark", "").toString();
+        if(auto_bookmark != "" && auto_bookmark == settings.value("bookmarkaddress"+QString::number(ui->listWidget->currentRow())).toString()) {
+            ui->autoConnectCheckBox->setChecked(true);
+        } else {
+            ui->autoConnectCheckBox->setChecked(false);
+        }
     }
 }
 
@@ -67,6 +75,13 @@ void DialogBookmarks::loadBookmarks() {
     qint32 bookmarkCount = settings.value("bookmarkCount", 0).toInt();
     for(qint32 i=0; i<bookmarkCount; i++) {
         ui->listWidget->addItem(settings.value("bookmarkname"+QString::number(i)).toString());
+
+        QString auto_bookmark = settings.value("autoBookmark", "").toString();
+        if(auto_bookmark != "" && auto_bookmark == settings.value("bookmarkaddress"+QString::number(i)).toString()) {
+            QFont font = ui->listWidget->item(i)->font();
+            font.setBold(true);
+            ui->listWidget->item(i)->setFont(font);
+        }
     }
     ui->listWidget->setCurrentRow(0);
     selectedBookmark();
@@ -127,5 +142,27 @@ void DialogBookmarks::saveBookmark() {
         settings.setValue("bookmarkpassword"+QString::number(ui->listWidget->currentRow()), ui->lineEdit_4->text());
 
         ui->listWidget->item(ui->listWidget->currentRow())->setText(ui->lineEdit->text());
+    }
+}
+
+void DialogBookmarks::changedAutoConnect(bool checked) {
+    QSettings settings("mir", "Contra");
+
+    if(checked) {
+        settings.setValue("autoBookmark", ui->lineEdit_2->text());
+    } else {
+        settings.setValue("autoBookmark", "");
+    }
+
+    qint32 bookmarkCount = settings.value("bookmarkCount", 0).toInt();
+    for(qint32 i=0; i<bookmarkCount; i++) {
+        QString auto_bookmark = settings.value("autoBookmark", "").toString();
+        QFont font = ui->listWidget->item(i)->font();
+        if(auto_bookmark == settings.value("bookmarkaddress"+QString::number(i)).toString()) {
+            font.setBold(true);
+        } else {
+            font.setBold(false);
+        }
+        ui->listWidget->item(i)->setFont(font);
     }
 }

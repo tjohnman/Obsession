@@ -22,6 +22,7 @@ public slots:
     void selectedBookmark();
     void saveBookmark();
     void clearFields();
+    void changedAutoConnect(bool);
 
 protected:
     void changeEvent(QEvent *e);

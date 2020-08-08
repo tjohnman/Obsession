@@ -113,15 +113,15 @@ MainWindow::MainWindow(QWidget *parent, bool checkForUpdates) :
     onPreferencesSaved();
 
     // Check for updates
-    pUpdateCheckReply = NULL;
+    /*pUpdateCheckReply = NULL;
     pNetworkAccessManager = new QNetworkAccessManager(this);
     pUpdateCheckRequest = NULL;
     if(checkForUpdates)
     {
-        pUpdateCheckRequest = new QNetworkRequest(QUrl("http://www.sumamimasen.com/obsession/version"));
+        pUpdateCheckRequest = new QNetworkRequest(QUrl(""));
         pUpdateCheckReply = pNetworkAccessManager->get(*pUpdateCheckRequest);
         connect(pUpdateCheckReply, SIGNAL(finished()), this, SLOT(onVersionReady()));
-    }
+    }*/
 
     keepAliveTimer.setInterval(120000);
 }
@@ -153,6 +153,28 @@ void MainWindow::setStatus(QString s) {
 
 void MainWindow::log(QString t) {
     debugConsole->addText(t+"\n");
+}
+
+void MainWindow::autoConnect() {
+    bool auto_connected = false;
+    QSettings settings("mir", "Contra");
+    qDebug() << settings.fileName();
+    QString auto_bookmark = settings.value("autoBookmark", "").toString();
+    int bookmark_count = settings.value("bookmarkCount", 0).toInt();
+    qDebug() << "Auto: " << auto_bookmark;
+    if(auto_bookmark != "") for(int i=0; i<bookmark_count; ++i) {
+        qDebug() << "Bookmark: " << settings.value("bookmarkaddress"+QString::number(i));
+        if(settings.value("bookmarkaddress"+QString::number(i)) == auto_bookmark) {
+            auto_connected = true;
+            this->connection->connectToServer(settings.value("bookmarkaddress"+QString::number(i), "localhost").toString(),
+                                          settings.value("bookmarklogin"+QString::number(i), "").toString(),
+                                          settings.value("bookmarkpassword"+QString::number(i), "").toString());
+        }
+    }
+
+    if(!auto_connected) {
+        this->openNewConnectionDialog();
+    }
 }
 
 void MainWindow::onConnected() {
