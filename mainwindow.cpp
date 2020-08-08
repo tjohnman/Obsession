@@ -185,6 +185,8 @@ void MainWindow::onConnected() {
         connect(&keepAliveTimer, SIGNAL(timeout()), connection, SLOT(requestUserList()));
         keepAliveTimer.start();
     }
+
+    this->clearChat();
 }
 
 void MainWindow::playChatSound() {
