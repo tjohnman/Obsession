@@ -67,6 +67,7 @@ private:
     QString pServerAgreement;
 
     QString pPlainLogin, pPlainPassword;
+    QTimer pTimeoutTimer;
 
     qint32 pTaskIDCounter;
 
@@ -96,6 +97,7 @@ public slots:
     void onSocketData();
     void onNameChanged();
     void requestUserList();
+    void onConnectionTimedOut();
 
 signals:
     void gotServerName();
