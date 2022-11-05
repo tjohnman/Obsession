@@ -16,6 +16,7 @@ ConnectionController::ConnectionController()
     pSocket.open(QIODevice::ReadWrite);
     connect(&pSocket, SIGNAL(connected()), this, SLOT(onSocketConnected()));
     connect(&pSocket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(onSocketError(QAbstractSocket::SocketError)));
+    connect(&pTimeoutTimer, SIGNAL(timeout()), this, SLOT(onConnectionTimedOut()));
 
     pServerAgreement = QString();
 
@@ -32,6 +33,9 @@ ConnectionController::ConnectionController()
 
     pReconnectionAttempts = 0;
     receivedTransaction = NULL;
+
+    pTimeoutTimer.setSingleShot(true);
+    pTimeoutTimer.setInterval(10000);
 }
 
 bool ConnectionController::isConnected() {
@@ -80,6 +84,7 @@ qint32 ConnectionController::connectToServer(QString address, QString login, QSt
         pPassword[i] = 255 - pPassword[i];
     }
 
+    pTimeoutTimer.start();
     pSocket.connectToHost(addr, port);
 
     serverIdent = addr;
@@ -237,6 +242,7 @@ void ConnectionController::requestUserList()
 void ConnectionController::onSocketConnected() {
     pSocket.setSocketOption(QAbstractSocket::KeepAliveOption, 1);
 
+    pTimeoutTimer.stop();
     emit connected();
 
     t_protocolExtensions protocol_extensions = this->checkForProtocolExtensions();
@@ -284,8 +290,10 @@ void ConnectionController::onSocketConnected() {
 ConnectionController::t_protocolExtensions ConnectionController::checkForProtocolExtensions() {
     QTcpSocket * sock = new QTcpSocket();
 
+    // Pitbull extension is disabled because it broke file downloads and it is not properly documented.
+
     // Check for Pitbull
-    sock->connectToHost(pSocket.peerAddress(), pSocket.peerPort() + 1);
+    /*sock->connectToHost(pSocket.peerAddress(), pSocket.peerPort() + 1);
     sock->waitForConnected();
 
     sock->write("VERS\0\0\0\0\0\0\0\0\0\0\0\0", 16);
@@ -294,10 +302,10 @@ ConnectionController::t_protocolExtensions ConnectionController::checkForProtoco
     sock->waitForReadyRead();
     QByteArray response = sock->readAll().left(4);
 
-    //pServerProtocolExtensions.pitbull = response == "YES.";
+    pServerProtocolExtensions.pitbull = response == "YES.";
 
     sock->disconnect();
-    delete sock;
+    delete sock;*/
     // -- check for Pitbull
 
     return pServerProtocolExtensions;
@@ -375,15 +383,25 @@ void ConnectionController::onSocketError(QAbstractSocket::SocketError e) {
     {
         emit socketError(string+"<br>Reconnecting...");
         closeConnection();
-        QTimer * reconnectTimer = new QTimer();
-        reconnectTimer->setSingleShot(true);
-        reconnectTimer->setInterval(2000);
-        connect(reconnectTimer, SIGNAL(timeout()), this, SLOT(reconnect()));
-        connect(reconnectTimer, SIGNAL(timeout()), reconnectTimer, SLOT(deleteLater()));
-        reconnectTimer->start();
+        QTimer::singleShot(2000, this, SLOT(reconnect()));
     } else
     {
         emit socketError(string);
+        closeConnection();
+    }
+}
+
+void ConnectionController::onConnectionTimedOut()
+{
+    QSettings settings("mir", "Contra");
+    if(settings.value("autoReconnect", false).toBool() && pReconnectionAttempts < 3)
+    {
+        emit socketError("Connection timed out.<br>Reconnecting...");
+        closeConnection();
+        QTimer::singleShot(2000, this, SLOT(reconnect()));
+    } else
+    {
+        emit socketError("Connection timed out.");
         closeConnection();
     }
 }
