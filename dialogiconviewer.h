@@ -20,10 +20,6 @@ public:
     DialogIconViewer(QWidget *parent = 0);
     ~DialogIconViewer();
 
-public slots:
-    void updateProgress(qint32 n, QListWidgetItem * item);
-    void startIconCount(qint32);
-
 protected:
     void changeEvent(QEvent *e);
 
