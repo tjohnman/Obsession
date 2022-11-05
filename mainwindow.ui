@@ -51,7 +51,7 @@
      <x>0</x>
      <y>0</y>
      <width>900</width>
-     <height>22</height>
+     <height>30</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuConnection">
@@ -85,6 +85,7 @@
     <property name="title">
      <string>Server</string>
     </property>
+    <addaction name="actionChat"/>
     <addaction name="actionServer_Agreement"/>
     <addaction name="actionFiles"/>
     <addaction name="actionLinear_News"/>
@@ -263,6 +264,11 @@
   <action name="actionBroadcast">
    <property name="text">
     <string>Broadcast..</string>
+   </property>
+  </action>
+  <action name="actionChat">
+   <property name="text">
+    <string>Chat</string>
    </property>
   </action>
  </widget>

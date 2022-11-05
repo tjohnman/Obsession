@@ -68,11 +68,13 @@ public slots:
     void clearUserList();
     void openLinearNews();
     void openConsole();
+    void openChat();
     void onConnecting();
     void openDownloads();
     void openUploads();
     void removeTab(qint32);
     void slotCloseTab();
+    void onCloseTabRequested(int index);
     void onDownloadQueueUpdated();
     void openThreadedNews();
     void changedTab();

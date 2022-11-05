@@ -60,6 +60,7 @@ MainWindow::MainWindow(QWidget *parent, bool checkForUpdates) :
     connect(ui->actionTrackers, SIGNAL(triggered()), this, SLOT(openTrackersDialog()));
     connect(ui->actionServer_Agreement, SIGNAL(triggered()), SLOT(showServerAgreement()));
     connect(ui->actionFiles, SIGNAL(triggered()), this, SLOT(openFileBrowser()));
+    connect(ui->actionChat, SIGNAL(triggered()), this, SLOT(openChat()));
     connect(ui->actionLinear_News, SIGNAL(triggered()), this, SLOT(openLinearNews()));
     connect(ui->actionDownloads, SIGNAL(triggered()), this, SLOT(openDownloads()));
     connect(ui->actionThreaded_News, SIGNAL(triggered()), this, SLOT(openThreadedNews()));
@@ -98,6 +99,7 @@ MainWindow::MainWindow(QWidget *parent, bool checkForUpdates) :
     connect(chatWidget, SIGNAL(userInfoSignal(quint16)), this, SLOT(requestUserInfo(quint16)));
     connect(chatWidget, SIGNAL(kickUserSignal(quint16)), this, SLOT(kickUser(quint16)));
     connect(ui->tabWidget, SIGNAL(currentChanged(qint32)), this, SLOT(changedTab()));
+    connect(ui->tabWidget, SIGNAL(tabCloseRequested(int)), this, SLOT(onCloseTabRequested(int)));
 
     statusLabel = new QLabel(ui->statusBar);
     ui->statusBar->addWidget(statusLabel);
@@ -111,17 +113,6 @@ MainWindow::MainWindow(QWidget *parent, bool checkForUpdates) :
     chatWidget->connection = connection;
 
     onPreferencesSaved();
-
-    // Check for updates
-    /*pUpdateCheckReply = NULL;
-    pNetworkAccessManager = new QNetworkAccessManager(this);
-    pUpdateCheckRequest = NULL;
-    if(checkForUpdates)
-    {
-        pUpdateCheckRequest = new QNetworkRequest(QUrl(""));
-        pUpdateCheckReply = pNetworkAccessManager->get(*pUpdateCheckRequest);
-        connect(pUpdateCheckReply, SIGNAL(finished()), this, SLOT(onVersionReady()));
-    }*/
 
     keepAliveTimer.setInterval(120000);
 }
@@ -259,7 +250,13 @@ void MainWindow::onConnecting() {
     ui->tabWidget->clear();
     threadedNewsWidget->clear();
     fileBrowserDialog->resetPath();
+    this->openChat();
+}
+
+void MainWindow::openChat()
+{
     ui->tabWidget->addTab(chatWidget, "Public Chat");
+    ui->tabWidget->setCurrentIndex(ui->tabWidget->count()-1);
 }
 
 void MainWindow::openLinearNews() {
@@ -329,6 +326,15 @@ void MainWindow::slotCloseTab() {
         }
         ui->tabWidget->removeTab(ui->tabWidget->count()-1);
     }
+}
+
+void MainWindow::onCloseTabRequested(int index)
+{
+    if (ui->tabWidget->widget(index) == downloadsDialog)
+    {
+        downloadsDialog->open = false;
+    }
+    ui->tabWidget->removeTab(index);
 }
 
 void MainWindow::slotCloseWindow() {
