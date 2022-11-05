@@ -294,7 +294,7 @@ ConnectionController::t_protocolExtensions ConnectionController::checkForProtoco
     sock->waitForReadyRead();
     QByteArray response = sock->readAll().left(4);
 
-    pServerProtocolExtensions.pitbull = response == "YES.";
+    //pServerProtocolExtensions.pitbull = response == "YES.";
 
     sock->disconnect();
     delete sock;

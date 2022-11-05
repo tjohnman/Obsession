@@ -57,6 +57,7 @@ public slots:
     uint cleanIdle();
     void onDownloadFinished();
     void onForcedDownload(CDownload *);
+    void onDownloadError(QString errorString);
 
 signals:
     void newItem(QListWidgetItem *);

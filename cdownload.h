@@ -57,7 +57,7 @@ public slots:
     void queueDownload();
 
 signals:
-    void gotError();
+    void gotError(QString);
     void downloadFinished();
     void forcedDownload(CDownload *);
 };

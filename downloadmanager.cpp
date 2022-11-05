@@ -42,6 +42,16 @@ uint DownloadManager::cleanIdle() {
     return deleted;
 }
 
+void DownloadManager::onDownloadError(QString errorString)
+{
+    if (errorString.length() > 0)
+    {
+        DialogError * dialog = new DialogError(errorString, 0);
+        dialog->show();
+        connect(dialog, SIGNAL(finished(int)), dialog, SLOT(deleteLater()));
+    }
+}
+
 void DownloadManager::onDownloadFinished() {
     quint32 active = 0;
 
@@ -194,6 +204,7 @@ void DownloadManager::onRequestedFile(QString name, qint32 size, QString path) {
     newDownload->updateName();
     connect(newDownload, SIGNAL(downloadFinished()), this, SLOT(onDownloadFinished()));
     connect(newDownload, SIGNAL(forcedDownload(CDownload *)), this, SLOT(onForcedDownload(CDownload*)));
+    connect(newDownload, SIGNAL(gotError(QString)), this, SLOT(onDownloadError(QString)));
 
     downloads.push_back(newDownload);
     onDownloadFinished();

@@ -2,6 +2,7 @@
 #include <QAbstractSocket>
 #include <QIODevice>
 #include <QHostAddress>
+#include "dialogerror.h"
 #include "downloadmanager.h"
 
 #include "TextHelper.h"
@@ -246,7 +247,7 @@ void CDownload::serverReady() {
         if(strncmp(flatHeader, "FILP", 4)) {
             socket.close();
             downloadInProgress = false;
-            emit gotError();
+            emit gotError("Received incorrect flat header from server.");
             return;
         }
 
@@ -255,7 +256,7 @@ void CDownload::serverReady() {
         if(strncmp(forkHeader, "INFO", 4)) {
             socket.close();
             downloadInProgress = false;
-            emit gotError();
+            emit gotError("Received incorrect fork header from server.");
             return;
         }
 
@@ -290,7 +291,7 @@ void CDownload::serverReady() {
         qDebug() << "DATA header was expected, but got something else (" << dataHeader << ").";
         socket.close();
         downloadInProgress = false;
-        emit gotError();
+        emit gotError("Received incorrect data header from server.");
         return;
     }
 
@@ -306,11 +307,13 @@ void CDownload::serverReady() {
     if(file->exists()) {
         if(!file->open(QIODevice::Append)) {
             qDebug() << "Could not open file for writing!";
+            emit gotError("Could not open file for writting.");
             return;
         }
     } else {
         if(!file->open(QIODevice::WriteOnly)) {
             qDebug() << "Could not open file for writing!";
+            emit gotError("Could not open file for writting.");
             return;
         }
     }
@@ -323,19 +326,81 @@ void CDownload::serverReady() {
 }
 
 void CDownload::gotData() {
-    qint32 read = socket.bytesAvailable();
-    if(read <= 0) {
+    qint32 availableBytes = socket.bytesAvailable();
+    if(availableBytes <= 0) {
         // Still nothing to read.
         return;
     }
-    char * data = socket.read(read).data();
-    qint64 written = file->write(data, read);
-    bytesWritten += written;
-    if(written != read) {
-        qDebug() << "Warning: some data could not be written!";
+    char* data = new char[availableBytes];
+    qint32 readBytes = socket.read(data, availableBytes);
+    qint64 written = file->write(data, availableBytes);
+    delete[] data;
+
+    QFile::FileError error = file->error();
+
+    if (error != QFile::NoError)
+    {
+        QString errorString = "";
+        switch (error)
+        {
+            default:
+                errorString = "No error.";
+                break;
+            case QFile::NoError:
+                errorString = "No error occurred.";
+                break;
+            case QFile::ReadError:
+                errorString = "An error occurred when reading from the file.";
+                break;
+            case QFile::WriteError:
+                errorString = "An error occurred when writing to the file.";
+                break;
+            case QFile::FatalError:
+                errorString = "A fatal error occurred.";
+                break;
+            case QFile::ResourceError:
+                errorString = "Resource error. ";
+                break;
+            case QFile::OpenError:
+                errorString = "The file could not be opened.";
+                break;
+            case QFile::AbortError:
+                errorString = "The operation was aborted.";
+                break;
+            case QFile::TimeOutError:
+                errorString = "A timeout occurred.";
+                break;
+            case QFile::UnspecifiedError:
+                errorString = "An unspecified error occurred.";
+                break;
+            case QFile::RemoveError:
+                errorString = "The file could not be removed.";
+                break;
+            case QFile::RenameError:
+                errorString = "The file could not be renamed.";
+                break;
+            case QFile::PositionError:
+                errorString = "The position in the file could not be changed.";
+                break;
+            case QFile::ResizeError:
+                errorString = "The file could not be resized.";
+                break;
+            case QFile::PermissionsError:
+                errorString = "The file could not be accessed.";
+                break;
+            case QFile::CopyError:
+                errorString = "The file could not be copied.";
+                break;
+        }
+
+        emit gotError(errorString);
+        qDebug() << "Warning: some data could not be written! " << errorString;
+        return;
     }
-    bytesRead += read;
-    bytesReadThisSession += read;
+
+    bytesWritten += written;
+    bytesRead += readBytes;
+    bytesReadThisSession += readBytes;
     widget->progressBar()->setValue(bytesRead);
 
     if(bytesWritten >= fileSize) {
