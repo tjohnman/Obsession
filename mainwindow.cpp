@@ -101,9 +101,9 @@ MainWindow::MainWindow(QWidget *parent, bool checkForUpdates) :
     connect(ui->tabWidget, SIGNAL(currentChanged(qint32)), this, SLOT(changedTab()));
     connect(ui->tabWidget, SIGNAL(tabCloseRequested(int)), this, SLOT(onCloseTabRequested(int)));
 
-    statusLabel = new QLabel(ui->statusBar);
-    ui->statusBar->addWidget(statusLabel);
-
+    QFont font = ui->statusLabel->font();
+    font.setPointSize(font.pointSize() - 1);
+    ui->statusLabel->setFont(font);
     setStatus(QString("Not connected"));
 
     chatSound = new QSound(":/sounds/chat.wav");
@@ -139,7 +139,7 @@ void MainWindow::changeEvent(QEvent *e)
 }
 
 void MainWindow::setStatus(QString s) {
-    statusLabel->setText(s);
+    ui->statusLabel->setText(s);
 }
 
 void MainWindow::log(QString t) {
@@ -342,9 +342,6 @@ void MainWindow::slotCloseWindow() {
     connection->closeConnection();
     if(openConnectionDialog) {
         delete openConnectionDialog;
-    }
-    if(statusLabel) {
-        delete statusLabel;
     }
     if(agreementDialog) {
         delete agreementDialog;
