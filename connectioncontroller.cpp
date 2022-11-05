@@ -305,7 +305,6 @@ ConnectionController::t_protocolExtensions ConnectionController::checkForProtoco
     pServerProtocolExtensions.pitbull = response == "YES.";
 
     sock->disconnect();*/
-    // -- check for Pitbull
 
     delete sock;
     return pServerProtocolExtensions;
