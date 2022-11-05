@@ -1,7 +1,7 @@
 #define _CRT_SECURE_NO_WARNINGS
 #define QT_NO_CAST_FROM_ASCII
 
-#include <QtWidgets/QApplication>
+#include <QApplication>
 #include "mainwindow.h"
 #include <QThreadPool>
 #include <iostream>

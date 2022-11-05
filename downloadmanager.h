@@ -20,7 +20,10 @@
 class DownloadManager : public QObject
 {
     Q_OBJECT
+
 public:
+    static QString GetDownloadsDirectoryPath();
+
     bool downloadInProgress;
     quint32 referenceNumber;
     quint32 fileSize;

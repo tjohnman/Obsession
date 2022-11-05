@@ -2,7 +2,7 @@
 #include <QAbstractSocket>
 #include <QIODevice>
 #include <QHostAddress>
-#include <QStandardPaths>
+#include "downloadmanager.h"
 
 #include "TextHelper.h"
 
@@ -301,7 +301,7 @@ void CDownload::serverReady() {
     widget->progressBar()->setMaximum(fileSize);
     widget->progressBar()->setValue(bytesRead);
 
-    const QString downloadsFolder = QStandardPaths::writableLocation(QStandardPaths::DownloadLocation);
+    const QString downloadsFolder = DownloadManager::GetDownloadsDirectoryPath();
     file->setFileName(downloadsFolder + "/" + currentName);
     if(file->exists()) {
         if(!file->open(QIODevice::Append)) {

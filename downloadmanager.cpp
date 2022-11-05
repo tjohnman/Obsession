@@ -1,6 +1,6 @@
 #include "downloadmanager.h"
 #include <QSettings>
-#include <QStandardPaths>
+#include <QDesktopServices>
 #include "dialogerror.h"
 #include "TextHelper.h"
 
@@ -95,7 +95,7 @@ void DownloadManager::sendDownloadRequestToServer(CDownload * download) {
         path.append("/");
     }
 
-    QStringList levels = path.split("/", Qt::SkipEmptyParts);
+    QStringList levels = path.split("/", QString::SkipEmptyParts);
     quint16 directorylevels = levels.count();
     quint16 pathlen = 2 + directorylevels * 3;
     for(qint32 i=0; i<levels.count(); i++) {
@@ -122,7 +122,7 @@ void DownloadManager::sendDownloadRequestToServer(CDownload * download) {
     // Look for existing data
 
     QFile preFile;
-    preFile.setFileName(QStandardPaths::writableLocation(QStandardPaths::DownloadLocation)+"/"+QString(download->currentName));
+    preFile.setFileName(DownloadManager::GetDownloadsDirectoryPath()+"/"+QString(download->currentName));
     if(preFile.exists()) {
         quint32 preSize = preFile.size();
 
@@ -165,7 +165,7 @@ void DownloadManager::onRequestedFile(QString name, qint32 size, QString path) {
     newDownload->fileSize = size;
 
     QFile preFile;
-    preFile.setFileName(QStandardPaths::writableLocation(QStandardPaths::DownloadLocation)+"/"+QString(newDownload->currentName));
+    preFile.setFileName(DownloadManager::GetDownloadsDirectoryPath()+"/"+QString(newDownload->currentName));
     if(preFile.exists()) {
         quint32 preSize = preFile.size();
         newDownload->bytesRead = preSize;
@@ -225,4 +225,10 @@ void DownloadManager::addDownload(quint32 ref, quint32 size, quint32 queuepos) {
     newDownload->connection = connection;
 
     newDownload->init();
+}
+
+QString DownloadManager::GetDownloadsDirectoryPath()
+{
+    // Qt4 does not offer a standard "Downloads" location. We could define one in the preferences dialog.
+    return QDesktopServices::storageLocation(QDesktopServices::DesktopLocation);
 }

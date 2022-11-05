@@ -1,10 +1,10 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QtWidgets/QMainWindow>
+#include <QMainWindow>
 #include "connectioncontroller.h"
 #include "dialogopenconnection.h"
-#include <QtWidgets/QLabel>
+#include <QLabel>
 #include <QTextCursor>
 #include "dialogagreement.h"
 #include "dialogfilebrowser.h"
@@ -18,7 +18,7 @@
 #include "dialogdownloadqueue.h"
 #include "dialoguploadsqueue.h"
 #include "dialogabout.h"
-#include <QtWidgets/QListWidgetItem>
+#include <QListWidgetItem>
 #include <QTextStream>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>

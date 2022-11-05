@@ -162,12 +162,11 @@
       <font>
        <family>Calibri</family>
        <pointsize>11</pointsize>
-       <weight>50</weight>
        <bold>false</bold>
       </font>
      </property>
      <property name="text">
-      <string>Obsession Hotline Client a107</string>
+      <string>Obsession Hotline Client 109.01-apha-qt4</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
@@ -180,7 +179,6 @@
       <font>
        <family>Calibri</family>
        <pointsize>8</pointsize>
-       <weight>50</weight>
        <bold>false</bold>
       </font>
      </property>
@@ -211,7 +209,6 @@
       <font>
        <family>Calibri</family>
        <pointsize>9</pointsize>
-       <weight>50</weight>
        <bold>false</bold>
       </font>
      </property>
@@ -229,7 +226,6 @@
       <font>
        <family>Calibri</family>
        <pointsize>9</pointsize>
-       <weight>50</weight>
        <bold>false</bold>
       </font>
      </property>
