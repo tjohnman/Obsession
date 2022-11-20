@@ -242,16 +242,34 @@ void CDownload::serverReady() {
         downloadInProgress = true;
         disconnect(&socket, SIGNAL(readyRead()), this, SLOT(serverReady()));
 
-        char * flatHeader = socket.read(24).data();
+        char * flatHeader = new char[24];
+        
+        if (!socket.read(flatHeader, 24))
+        {
+            socket.close();
+            downloadInProgress = false;
+            emit gotError("Read error receiving flat header from server.");
+            return;
+        }
 
         if(strncmp(flatHeader, "FILP", 4)) {
             socket.close();
             downloadInProgress = false;
+            qDebug("Got flat header: %s\n", flatHeader);
             emit gotError("Received incorrect flat header from server.");
             return;
         }
 
-        char * forkHeader = socket.read(16).data();
+        delete[] flatHeader;
+
+        char * forkHeader = new char[16];
+        if (!socket.read(forkHeader, 16))
+        {
+            socket.close();
+            downloadInProgress = false;
+            emit gotError("Read error receiving fork header from server.");
+            return;
+        }
 
         if(strncmp(forkHeader, "INFO", 4)) {
             socket.close();
@@ -263,6 +281,8 @@ void CDownload::serverReady() {
         forkSize = 0;
 
         memcpy(&forkSize, forkHeader+12, 4);
+        delete[] forkHeader;
+
         forkSize = qFromBigEndian(forkSize);
 
         gotForkSize = true;
@@ -285,7 +305,15 @@ void CDownload::serverReady() {
         hxd = true;
     }
 
-    char * dataHeader = socket.read(16).data();
+    char * dataHeader = new char[16];
+    
+    if (!socket.read(dataHeader, 16))
+    {
+        socket.close();
+        downloadInProgress = false;
+        emit gotError("Read error receiving data header from server.");
+        return;
+    }
 
     if(strncmp(dataHeader, "DATA", 4)) {
         qDebug() << "DATA header was expected, but got something else (" << dataHeader << ").";
@@ -296,6 +324,8 @@ void CDownload::serverReady() {
     }
 
     memcpy(&fileSize, dataHeader+12, 4);
+    delete[] dataHeader;
+
     fileSize = qFromBigEndian(fileSize);
 
     bytesRead = 0;
