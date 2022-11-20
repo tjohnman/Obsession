@@ -222,3 +222,4 @@ Obsession.app/
 qrc_resources.cpp
 ui_*.h
 object_script.*
+.vscode
