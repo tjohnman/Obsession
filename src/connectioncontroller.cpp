@@ -6,7 +6,7 @@
 #include <QHostAddress>
 #include <QNetworkAccessManager>
 #include <QTextCodec>
-#include <dialogprivatemessaging.h>
+#include "dialogprivatemessaging.h"
 
 #include "version.h"
 #include "TextHelper.h"
