@@ -107,3 +107,5 @@ FORMS += mainwindow.ui \
     dialogbroadcast.ui \
     dialogpostlinearnews.ui
 RESOURCES += resources.qrc
+RC_ICONS = icon.ico
+ICON = icon.icns
