@@ -26,5 +26,4 @@ What doesn't work
 Posting news is not implemented. Folder uploading and downloading isn't either.
 
 Note this is an alpha build, it's pretty stable but may lack some features.
-Use this program at your own risk. Should you find any bugs, please activate the debugging log (in the preferences dialog) and reproduce the bug (so that it gets registered in the log). Then post a bug report.
-
+Use this program at your own risk. Should you find any bugs, please post a bug report.
