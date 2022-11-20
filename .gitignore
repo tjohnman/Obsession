@@ -217,3 +217,7 @@ pip-log.txt
 *.o
 log.txt
 moc_*
+Makefile*
+Obsession.app/
+qrc_resources.cpp
+ui_*.h
