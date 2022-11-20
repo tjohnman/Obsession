@@ -15,7 +15,10 @@ Building
 
 You might need to download and install [Qt 4.8.7](https://download.qt.io/archive/qt/4.8/4.8.7/) for your platform.
 
-Then create a `build` directory inside the directory where you unpacked the source if it doesn't exist, and run `qmake ../Obsession.pro` from the `build` directory. This will generate a Makefile for you. You can then run `make` normally in order to build your binary.
+- Download this repository and unpack it.
+- Create a `build` directory inside the directory where you unpacked the source if it doesn't exist.
+- Run `qmake ../Obsession.pro` from the `build` directory. This will generate a Makefile for you.
+- You can then run `make` normally from in order to build your binary, which will appear in the `build` directory.
 
 What doesn't work
 -----------------
