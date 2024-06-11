@@ -107,6 +107,8 @@ FORMS += src/mainwindow.ui \
     src/dialogbroadcast.ui \
     src/dialogpostlinearnews.ui
 INCLUDEPATH += src/
-RESOURCES += resources/resources.qrc
+RESOURCES += resources/resources.qrc \
+    resources/icons1.qrc \
+    resources/icons2.qrc
 RC_ICONS = resources/icon.ico
 ICON = resources/icon.icns
