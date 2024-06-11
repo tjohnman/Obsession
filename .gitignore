@@ -223,3 +223,4 @@ qrc_resources.cpp
 ui_*.h
 object_script.*
 .vscode
+.qtc_clangd
