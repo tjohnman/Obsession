@@ -14,8 +14,8 @@ DialogPrivateMessaging::DialogPrivateMessaging(qint16 id, ConnectionController *
 
     user = connection->getUserByUid(uid);
 
-    ui->label->setText(QString("Private chat with ") + QString(user->name));
-    this->setWindowTitle(QString("Private chat with ") + QString(user->name));
+    ui->label->setText(QString("Private chat with ") + QString(user->name).left(user->nameLength));
+    this->setWindowTitle(QString("Private chat with ") + QString(user->name).left(user->nameLength));
 
     connect(ui->lineEdit, SIGNAL(returnPressed()), this, SLOT(sendMessage()));
 
