@@ -26,6 +26,13 @@ You might need to download and build/install [Qt 4.8.7](https://download.qt.io/a
 - Run `qmake -config release ../Obsession.pro` from the `build` directory. This will generate a Makefile for you.
 - You can then run `make` (or `nmake`, etc. depending on your build setup) normally in order to build your binary, which will appear in the `build` directory.
 
+How do I find servers to connect to?
+------------------------------------
+
+You can get started by opening the trackers dialog (Connection -> Trackers...) and adding hltracker.com. This will load a list of servers to which you can connect.
+
+Check out https://hlwiki.com/ for more.
+
 What doesn't work
 -----------------
 
