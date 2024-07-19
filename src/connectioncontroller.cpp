@@ -284,6 +284,8 @@ void ConnectionController::onSocketConnected() {
         loginTransaction->addParameter(164, VERSION_MAJOR*10 + VERSION_MINOR);
     }
 
+    pServerAgreement = "";
+
     sendTransaction(loginTransaction, true);
 }
 
