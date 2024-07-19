@@ -8,7 +8,7 @@ DialogAbout::DialogAbout(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    ui->label->setText(QString("Obsession Hotline Client %1.%2").arg(VERSION_MAJOR).arg(VERSION_MINOR));
+    ui->label->setText(QString("Obsession Hotline Client %1.%2").arg(QString::number(VERSION_MAJOR).rightJustified(3, '0')).arg(QString::number(VERSION_MINOR).rightJustified(2, '0')));
 }
 
 DialogAbout::~DialogAbout()
