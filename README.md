@@ -3,7 +3,7 @@ Obsession
 
 A Hotline client written in Qt featuring Shift-JIS support and other stuff.
 
-The Obsession Hotline client aims to be a modern alternative for Windows and macOS users. It supports Shift-JIS encoding for Japanese users or for browsing Japanese servers. It is written using Qt and should compile and work out of the box on Windows, macOS and Linux. Check out other clients in the [Hotline Wiki](http://hotline.wikia.com/wiki/Clients).
+The Obsession Hotline client aims to be a modern alternative for Windows and macOS users. It supports Shift-JIS and UTF-8 encoding for Japanese users or for browsing Japanese servers. It is written using Qt and should compile and work out of the box on Windows, macOS and Linux. Check out other clients in the [Hotline Wiki](http://hotline.wikia.com/wiki/Clients).
 
 Downloading and installing
 ----------
