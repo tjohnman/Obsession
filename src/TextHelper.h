@@ -10,10 +10,10 @@ public:
     static QString DecodeText(char * str, int length)
     {
         QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
-        QTextCodec * codec = QTextCodec::codecForName(settings.value(QString::fromUtf8("Encoding"), "macintosh").toString().toUtf8());
+        QTextCodec * codec = QTextCodec::codecForName(settings.value(QString::fromUtf8("Encoding"), "Apple Roman").toString().toUtf8());
         if(!codec)
         {
-            codec = QTextCodec::codecForName(QString::fromUtf8("macintosh").toUtf8());
+            codec = QTextCodec::codecForName(QString::fromUtf8("Apple Roman").toUtf8());
         }
         return codec->toUnicode(str, length);
     }
@@ -21,10 +21,10 @@ public:
     static QString DecodeTextAutoUTF8(char * str, int length)
     {
         QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
-        QTextCodec * codec = QTextCodec::codecForName(settings.value(QString::fromUtf8("Encoding"), "macintosh").toString().toUtf8());
+        QTextCodec * codec = QTextCodec::codecForName(settings.value(QString::fromUtf8("Encoding"), "Apple Roman").toString().toUtf8());
         if(!codec)
         {
-            codec = QTextCodec::codecForName("macintosh");
+            codec = QTextCodec::codecForName("Apple Roman");
         }
         QString utf8str = QTextCodec::codecForName("UTF-8")->toUnicode(str, length);
         QString regularStr = codec->toUnicode(str, length);
@@ -36,7 +36,7 @@ public:
         QTextCodec * codec = QTextCodec::codecForName(encoding.toUtf8());
         if(!codec)
         {
-            codec = QTextCodec::codecForName(QString::fromUtf8("macintosh").toUtf8());
+            codec = QTextCodec::codecForName(QString::fromUtf8("Apple Roman").toUtf8());
         }
         return codec->toUnicode(str, length);
     }
@@ -44,10 +44,10 @@ public:
     static QByteArray EncodeText(QString str)
     {
         QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
-        QTextCodec * codec = QTextCodec::codecForName(settings.value(QString::fromUtf8("Encoding"), "macintosh").toString().toUtf8());
+        QTextCodec * codec = QTextCodec::codecForName(settings.value(QString::fromUtf8("Encoding"), "Apple Roman").toString().toUtf8());
         if(!codec)
         {
-            codec = QTextCodec::codecForName(QString::fromUtf8("macintosh").toUtf8());
+            codec = QTextCodec::codecForName(QString::fromUtf8("Apple Roman").toUtf8());
         }
         return codec->fromUnicode(str);
     }
@@ -57,7 +57,7 @@ public:
         QTextCodec * codec = QTextCodec::codecForName(encoding.toUtf8());
         if(!codec)
         {
-            codec = QTextCodec::codecForName(QString::fromUtf8("macintosh").toUtf8());
+            codec = QTextCodec::codecForName(QString::fromUtf8("Apple Roman").toUtf8());
         }
         return codec->fromUnicode(str);
     }

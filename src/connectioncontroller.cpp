@@ -473,7 +473,7 @@ void ConnectionController::onSocketData() {
                         parameterBuffer = receivedTransaction->getParameterById(162);
                         if(parameterBuffer) {
                             if(parameterBuffer->type == TYPE_STRING) {
-                                pServerName = TextHelper::DecodeTextAutoUTF8(parameterBuffer->data, parameterBuffer->length);
+                                pServerName = TextHelper::DecodeText(parameterBuffer->data, parameterBuffer->length);
                                 if(!pServerName.isEmpty() && pServerName != " ")
                                 {
                                     emit gotServerName();
@@ -712,7 +712,7 @@ void ConnectionController::onSocketData() {
                     {
                         parameterBuffer = receivedTransaction->getParameterById(101);
                         if(parameterBuffer) {
-                            emit gotBroadcast(TextHelper::DecodeTextAutoUTF8(parameterBuffer->data, parameterBuffer->length));
+                            emit gotBroadcast(TextHelper::DecodeText(parameterBuffer->data, parameterBuffer->length));
                         }
                     }
                     break;
@@ -1015,7 +1015,7 @@ void ConnectionController::onSocketData() {
                 memcpy(m, receivedTransaction->getParameterById(101)->data, receivedTransaction->getParameterById(101)->length);
                 m[len] = '\0';
 
-                emit gotPM(TextHelper::DecodeTextAutoUTF8(m, len), uid);
+                emit gotPM(TextHelper::DecodeText(m, len), uid);
             } else {
                 parameterBuffer = receivedTransaction->getParameterById(101);
                 if(parameterBuffer) {
@@ -1029,7 +1029,7 @@ void ConnectionController::onSocketData() {
         case 106:
             parameterBuffer = receivedTransaction->getParameterById(101);
             if(parameterBuffer) {
-                emit gotChatMessage(TextHelper::DecodeTextAutoUTF8(parameterBuffer->data, parameterBuffer->length));
+                emit gotChatMessage(TextHelper::DecodeText(parameterBuffer->data, parameterBuffer->length));
             }
             break;
 
@@ -1039,7 +1039,7 @@ void ConnectionController::onSocketData() {
                 char * agreement = (char *) malloc(sizeof(char)*parameterBuffer->length+1);
                 memcpy(agreement, parameterBuffer->data, parameterBuffer->length);
                 agreement[parameterBuffer->length] = '\0';
-                pServerAgreement = QString(agreement);
+                pServerAgreement = TextHelper::DecodeText(agreement, parameterBuffer->length);
             }
             break;
 
@@ -1129,13 +1129,13 @@ void ConnectionController::onSocketData() {
                     parameterBuffer = receivedTransaction->getParameterById(102);
 
                     if(parameterBuffer) {
-                        QString oldName = TextHelper::DecodeTextAutoUTF8(user->name, user->nameLength);
+                        QString oldName = TextHelper::DecodeText(user->name, user->nameLength);
 
                         user->name = (char *) malloc(sizeof(char)*parameterBuffer->length);
                         memcpy(user->name, parameterBuffer->data, parameterBuffer->length);
                         user->nameLength = parameterBuffer->length;
 
-                        QString newName = TextHelper::DecodeTextAutoUTF8(user->name, parameterBuffer->length);
+                        QString newName = TextHelper::DecodeText(user->name, parameterBuffer->length);
                         QString message = QString("                <b>%1 is now known as %2</b>").arg(oldName, newName);
 
                         if(oldName != newName)
@@ -1170,7 +1170,7 @@ void ConnectionController::onSocketData() {
                     }
 
                     pUsers.push_back(newUser);
-                    QString message = QString("                <b>%1 has joined</b>").arg(TextHelper::DecodeTextAutoUTF8(newUser->name, newUser->nameLength));
+                    QString message = QString("                <b>%1 has joined</b>").arg(TextHelper::DecodeText(newUser->name, newUser->nameLength));
                     emit gotChatMessage(message);
                 }
                 emit userListChanged();
@@ -1191,7 +1191,7 @@ void ConnectionController::onSocketData() {
 
                 emit userLeft(user);
 
-                QString message = QString("                <b>%1 has left</b>").arg(TextHelper::DecodeTextAutoUTF8(user->name, user->nameLength));
+                QString message = QString("                <b>%1 has left</b>").arg(TextHelper::DecodeText(user->name, user->nameLength));
                 emit gotChatMessage(message);
                 for(quint32 i=0; i<pUsers.size(); i++) {
                     if(pUsers[i]->id == uid) {

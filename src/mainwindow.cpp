@@ -425,7 +425,7 @@ void MainWindow::onUserListChanged() {
         DialogPrivateMessaging * private_messages = this->getUserPrivateChat(user);
         private_messages->user = user;
 
-        QListWidgetItem * item = new QListWidgetItem("           "+TextHelper::DecodeTextAutoUTF8(user->name, user->nameLength));
+        QListWidgetItem * item = new QListWidgetItem("           "+TextHelper::DecodeText(user->name, user->nameLength));
         QFont f = QFont();
 
         f.setBold(true);

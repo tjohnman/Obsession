@@ -1,5 +1,7 @@
 #include "dialogtrackers.h"
 #include "ui_dialogtrackers.h"
+#include "TextHelper.h"
+
 #include <QSettings>
 #include <QtEndian>
 #include <QTextCodec>
@@ -218,7 +220,7 @@ void DialogTrackers::onSocketData() {
         char * nameBuffer = new char[len];
         memset(nameBuffer, 0, len);
         pSocket->read(nameBuffer, len);
-        name = QString::fromLocal8Bit(nameBuffer, len);
+        name = TextHelper::DecodeText(nameBuffer, len);
         delete[] nameBuffer;
 
         pSocket->read((char*)&len, 1);
