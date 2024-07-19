@@ -72,7 +72,7 @@ public slots:
     void onConnecting();
     void openDownloads();
     void openUploads();
-    void removeTab(qint32);
+    void removeTab(int);
     void slotCloseTab();
     void onCloseTabRequested(int index);
     void onDownloadQueueUpdated();

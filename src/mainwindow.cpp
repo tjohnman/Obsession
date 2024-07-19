@@ -20,7 +20,7 @@ MainWindow::MainWindow(QWidget *parent, bool checkForUpdates) :
 {
     ui->setupUi(this);
 
-    connect(ui->tabWidget, SIGNAL(tabCloseRequested(qint32)), this, SLOT(removeTab(qint32)));
+    connect(ui->tabWidget, SIGNAL(tabCloseRequested(int)), this, SLOT(removeTab(int)));
 
     altPressed = false;
 
@@ -98,7 +98,7 @@ MainWindow::MainWindow(QWidget *parent, bool checkForUpdates) :
     connect(chatWidget, SIGNAL(messagingWindowSignal(quint16)), this, SLOT(onOpenMessagingWindow(quint16)));
     connect(chatWidget, SIGNAL(userInfoSignal(quint16)), this, SLOT(requestUserInfo(quint16)));
     connect(chatWidget, SIGNAL(kickUserSignal(quint16)), this, SLOT(kickUser(quint16)));
-    connect(ui->tabWidget, SIGNAL(currentChanged(qint32)), this, SLOT(changedTab()));
+    connect(ui->tabWidget, SIGNAL(currentChanged(int)), this, SLOT(changedTab()));
     connect(ui->tabWidget, SIGNAL(tabCloseRequested(int)), this, SLOT(onCloseTabRequested(int)));
 
     QFont font = ui->statusLabel->font();
@@ -217,7 +217,7 @@ void MainWindow::onDownloadQueueUpdated() {
     }
 }
 
-void MainWindow::removeTab(qint32 i) {
+void MainWindow::removeTab(int i) {
     if(i != 0) {
         ui->tabWidget->removeTab(i);
     }

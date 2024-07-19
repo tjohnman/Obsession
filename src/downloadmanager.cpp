@@ -13,7 +13,7 @@ DownloadManager::DownloadManager(ConnectionController * c)
     bytesRead = 0;
     lastRead = 0;
     downloadSpeed = 0;
-    connect(connection, SIGNAL(serverUpdatedQueue(uint, uint)), this, SLOT(onQueueUpdate(uint,uint)));
+    connect(connection, SIGNAL(serverUpdatedQueue(quint32, quint32)), this, SLOT(onQueueUpdate(quint32,quint32)));
 }
 
 uint DownloadManager::cleanIdle() {
