@@ -8,7 +8,13 @@ The Obsession Hotline client aims to be a modern alternative for Windows and mac
 Downloading and installing
 ----------
 
-You can get release builds [here](https://github.com/tjohnman/Obsession/releases).
+**Windows**
+
+You can get Windows builds [here](https://github.com/tjohnman/Obsession/releases).
+
+**macOS**
+
+You can find Obsession on [MacPorts](https://ports.macports.org/port/Obsession/details/).
 
 Building
 --------
