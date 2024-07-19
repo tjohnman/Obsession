@@ -358,6 +358,7 @@ void MainWindow::slotCloseWindow() {
 void MainWindow::disconnect() {
     connection->closeConnection();
     clearUserList();
+    setWindowTitle("Obsession Hotline Client");
     setStatus("Disconnected");
 }
 
@@ -369,6 +370,7 @@ void MainWindow::showServerAgreement() {
 
 void MainWindow::onGotServerName() {
     setStatus(QString("Connected to ") + connection->serverName());
+    setWindowTitle(connection->serverName() + " | Obsession Hotline Client");
 }
 
 void MainWindow::onGotBroadcast(QString message)
