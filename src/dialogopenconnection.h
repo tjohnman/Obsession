@@ -31,7 +31,7 @@ private:
 public slots:
     void openConnection();
     void updateBookmarkList();
-    void choseBookmark();
+    void choseBookmark(int);
     void bookmarkCurrent();
     void updateAutoConnectStatus();
 };
