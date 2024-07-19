@@ -38,44 +38,6 @@
         <file>interfaceIcons/newsItem.png</file>
     </qresource>
     <qresource prefix="/">
-        <file>sounds/raw recorded hl_data/b00000.au</file>
-        <file>sounds/raw recorded hl_data/b00001.au</file>
-        <file>sounds/raw recorded hl_data/b00002.au</file>
-        <file>sounds/raw recorded hl_data/b00003.au</file>
-        <file>sounds/raw recorded hl_data/b00004.au</file>
-        <file>sounds/raw recorded hl_data/b00005.au</file>
-        <file>sounds/raw recorded hl_data/b00006.au</file>
-        <file>sounds/raw recorded hl_data/b00007.au</file>
-        <file>sounds/raw recorded hl_data/b00008.au</file>
-        <file>sounds/raw recorded hl_data/b00009.au</file>
-        <file>sounds/raw recorded hl_data/b00010.au</file>
-        <file>sounds/raw recorded hl_data/b00011.au</file>
-        <file>sounds/raw recorded hl_data/b00012.au</file>
-        <file>sounds/raw recorded hl_data/b00013.au</file>
-        <file>sounds/raw recorded hl_data/b00014.au</file>
-        <file>sounds/raw recorded hl_data/b00015.au</file>
-        <file>sounds/raw recorded hl_data/b00016.au</file>
-        <file>sounds/raw recorded hl_data/b00017.au</file>
-        <file>sounds/raw recorded hl_data/b00018.au</file>
-        <file>sounds/raw recorded hl_data/b00019.au</file>
-        <file>sounds/raw recorded hl_data/b00020.au</file>
-        <file>sounds/raw recorded hl_data/b00021.au</file>
-        <file>sounds/raw recorded hl_data/b00022.au</file>
-        <file>sounds/raw recorded hl_data/b00023.au</file>
-        <file>sounds/raw recorded hl_data/b00024.au</file>
-        <file>sounds/raw recorded hl_data/b00025.au</file>
-        <file>sounds/raw recorded hl_data/b00026.au</file>
-        <file>sounds/raw recorded hl_data/b00027.au</file>
-        <file>sounds/raw recorded hl_data/b00028.au</file>
-        <file>sounds/raw recorded hl_data/b00029.au</file>
-        <file>sounds/raw recorded hl_data/b00030.au</file>
-        <file>sounds/raw recorded hl_data/b00031.au</file>
-        <file>sounds/raw recorded hl_data/b00032.au</file>
-        <file>sounds/raw recorded hl_data/b00033.au</file>
-        <file>sounds/raw recorded hl_data/b00034.au</file>
-        <file>sounds/raw recorded hl_data/b00035.au</file>
-        <file>sounds/raw recorded hl_data/b00036.au</file>
-        <file>sounds/raw recorded hl_data/b00037.au</file>
         <file>sounds/chat.wav</file>
         <file>sounds/pm.wav</file>
     </qresource>

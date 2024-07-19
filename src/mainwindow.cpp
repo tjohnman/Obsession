@@ -106,8 +106,13 @@ MainWindow::MainWindow(QWidget *parent, bool checkForUpdates) :
     ui->statusLabel->setFont(font);
     setStatus(QString("Not connected"));
 
+    #ifdef Q_OS_WIN32
+    chatSound = new QSound("./sounds/chat.wav");
+    pmSound = new QSound("./sounds/pm.wav");
+    #else
     chatSound = new QSound(":/sounds/chat.wav");
     pmSound = new QSound(":/sounds/pm.wav");
+    #endif
 
     chatWidget->chatSound = chatSound;
     chatWidget->connection = connection;
