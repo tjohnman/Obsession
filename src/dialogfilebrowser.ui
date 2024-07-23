@@ -44,11 +44,14 @@
        <height>16</height>
       </size>
      </property>
+     <property name="toolTip">
+      <string>Go up</string>
+     </property>
      <property name="text">
       <string/>
      </property>
      <property name="icon">
-      <iconset resource="resources.qrc">
+      <iconset resource="../resources/resources.qrc">
        <normaloff>:/files/interfaceIcons/filesUp.png</normaloff>:/files/interfaceIcons/filesUp.png</iconset>
      </property>
      <property name="iconSize">
@@ -73,11 +76,14 @@
        <height>16</height>
       </size>
      </property>
+     <property name="toolTip">
+      <string>Refresh</string>
+     </property>
      <property name="text">
       <string/>
      </property>
      <property name="icon">
-      <iconset resource="resources.qrc">
+      <iconset resource="../resources/resources.qrc">
        <normaloff>:/general/interfaceIcons/generalRefresh.png</normaloff>:/general/interfaceIcons/generalRefresh.png</iconset>
      </property>
      <property name="iconSize">
@@ -109,11 +115,14 @@
        <height>16</height>
       </size>
      </property>
+     <property name="toolTip">
+      <string>Download</string>
+     </property>
      <property name="text">
       <string/>
      </property>
      <property name="icon">
-      <iconset resource="resources.qrc">
+      <iconset resource="../resources/resources.qrc">
        <normaloff>:/files/interfaceIcons/filesDownload.png</normaloff>:/files/interfaceIcons/filesDownload.png</iconset>
      </property>
      <property name="iconSize">
@@ -144,11 +153,14 @@
        <height>16</height>
       </size>
      </property>
+     <property name="toolTip">
+      <string>Upload</string>
+     </property>
      <property name="text">
       <string/>
      </property>
      <property name="icon">
-      <iconset resource="resources.qrc">
+      <iconset resource="../resources/resources.qrc">
        <normaloff>:/files/interfaceIcons/filesUpload.png</normaloff>:/files/interfaceIcons/filesUpload.png</iconset>
      </property>
      <property name="iconSize">
@@ -180,11 +192,14 @@
        <height>16</height>
       </size>
      </property>
+     <property name="toolTip">
+      <string>Delete</string>
+     </property>
      <property name="text">
       <string/>
      </property>
      <property name="icon">
-      <iconset resource="resources.qrc">
+      <iconset resource="../resources/resources.qrc">
        <normaloff>:/files/interfaceIcons/filesDelete.png</normaloff>:/files/interfaceIcons/filesDelete.png</iconset>
      </property>
      <property name="iconSize">
@@ -265,7 +280,7 @@
   </layout>
  </widget>
  <resources>
-  <include location="resources.qrc"/>
+  <include location="../resources/resources.qrc"/>
  </resources>
  <connections/>
 </ui>

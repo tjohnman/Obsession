@@ -129,35 +129,35 @@
    <item>
     <widget class="QCheckBox" name="checkReconnect">
      <property name="text">
-      <string>Auto reconnect.</string>
+      <string>Auto reconnect</string>
      </property>
     </widget>
    </item>
    <item>
     <widget class="QCheckBox" name="soundCheckBox">
      <property name="text">
-      <string>Enable sounds.</string>
+      <string>Enable sounds</string>
      </property>
     </widget>
    </item>
    <item>
     <widget class="QCheckBox" name="debugCheckBox">
      <property name="text">
-      <string>Enable debug logging.</string>
+      <string>Enable debug logging</string>
      </property>
     </widget>
    </item>
    <item>
     <widget class="QCheckBox" name="checkKeepAlive">
      <property name="text">
-      <string>Keep connection alive.</string>
+      <string>Keep connection alive</string>
      </property>
     </widget>
    </item>
    <item>
     <widget class="QCheckBox" name="useLightColorsCheck">
      <property name="text">
-      <string>Use lighter color nick for users with dark icons.</string>
+      <string>Use lighter color nick for users with dark icons</string>
      </property>
     </widget>
    </item>

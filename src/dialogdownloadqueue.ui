@@ -70,7 +70,7 @@
       <string>Clean list</string>
      </property>
      <property name="icon">
-      <iconset resource="resources.qrc">
+      <iconset resource="../resources/resources.qrc">
        <normaloff>:/general/interfaceIcons/generalClean.png</normaloff>:/general/interfaceIcons/generalClean.png</iconset>
      </property>
      <property name="iconSize">
@@ -84,7 +84,7 @@
   </layout>
  </widget>
  <resources>
-  <include location="resources.qrc"/>
+  <include location="../resources/resources.qrc"/>
  </resources>
  <connections/>
 </ui>

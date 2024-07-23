@@ -47,7 +47,7 @@
     <string/>
    </property>
    <property name="pixmap">
-    <pixmap resource="resources.qrc">:/files/interfaceIcons/filesFolder.png</pixmap>
+    <pixmap resource="../resources/resources.qrc">:/files/interfaceIcons/filesFolder.png</pixmap>
    </property>
    <property name="scaledContents">
     <bool>true</bool>
@@ -59,7 +59,7 @@
      <x>10</x>
      <y>470</y>
      <width>361</width>
-     <height>25</height>
+     <height>26</height>
     </rect>
    </property>
    <layout class="QHBoxLayout" name="horizontalLayout">
@@ -124,7 +124,7 @@
     <string/>
    </property>
    <property name="pixmap">
-    <pixmap resource="resources.qrc">:/news/interfaceIcons/newsItem.png</pixmap>
+    <pixmap resource="../resources/resources.qrc">:/news/interfaceIcons/newsItem.png</pixmap>
    </property>
    <property name="scaledContents">
     <bool>true</bool>
@@ -452,7 +452,7 @@
     <string/>
    </property>
    <property name="pixmap">
-    <pixmap resource="resources.qrc">:/files/interfaceIcons/filesExe.png</pixmap>
+    <pixmap resource="../resources/resources.qrc">:/files/interfaceIcons/filesExe.png</pixmap>
    </property>
    <property name="scaledContents">
     <bool>true</bool>
@@ -575,7 +575,7 @@
     <string/>
    </property>
    <property name="pixmap">
-    <pixmap resource="resources.qrc">:/files/interfaceIcons/filesText.png</pixmap>
+    <pixmap resource="../resources/resources.qrc">:/files/interfaceIcons/filesText.png</pixmap>
    </property>
    <property name="scaledContents">
     <bool>true</bool>
@@ -711,7 +711,7 @@
     <string/>
    </property>
    <property name="pixmap">
-    <pixmap resource="resources.qrc">:/main/interfaceIcons/mainConnect.png</pixmap>
+    <pixmap resource="../resources/resources.qrc">:/main/interfaceIcons/serverAccount.png</pixmap>
    </property>
    <property name="scaledContents">
     <bool>true</bool>
@@ -756,7 +756,7 @@
     <string/>
    </property>
    <property name="pixmap">
-    <pixmap resource="resources.qrc">:/general/interfaceIcons/generalQueue.png</pixmap>
+    <pixmap resource="../resources/resources.qrc">:/main/interfaceIcons/serverChat.png</pixmap>
    </property>
    <property name="scaledContents">
     <bool>true</bool>
@@ -803,7 +803,7 @@
   </widget>
  </widget>
  <resources>
-  <include location="resources.qrc"/>
+  <include location="../resources/resources.qrc"/>
  </resources>
  <connections/>
 </ui>

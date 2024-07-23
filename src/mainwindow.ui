@@ -72,7 +72,7 @@
      <x>0</x>
      <y>0</y>
      <width>900</width>
-     <height>30</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuConnection">
@@ -126,7 +126,7 @@
   </widget>
   <action name="actionOpen_Connection">
    <property name="icon">
-    <iconset resource="resources.qrc">
+    <iconset resource="../resources/resources.qrc">
      <normaloff>:/main/interfaceIcons/mainConnect.png</normaloff>:/main/interfaceIcons/mainConnect.png</iconset>
    </property>
    <property name="text">
@@ -141,8 +141,8 @@
   </action>
   <action name="actionQuit">
    <property name="icon">
-    <iconset resource="resources.qrc">
-     <normaloff>:/main/interfaceIcons/mainClose.png</normaloff>:/main/interfaceIcons/mainClose.png</iconset>
+    <iconset resource="../resources/resources.qrc">
+     <normaloff>:/main/interfaceIcons/mainExit.png</normaloff>:/main/interfaceIcons/mainExit.png</iconset>
    </property>
    <property name="text">
     <string>Quit</string>
@@ -158,7 +158,7 @@
   </action>
   <action name="actionDisconnect">
    <property name="icon">
-    <iconset resource="resources.qrc">
+    <iconset resource="../resources/resources.qrc">
      <normaloff>:/main/interfaceIcons/mainDisconnect.png</normaloff>:/main/interfaceIcons/mainDisconnect.png</iconset>
    </property>
    <property name="text">
@@ -166,23 +166,35 @@
    </property>
   </action>
   <action name="actionAbout_Contra">
+   <property name="icon">
+    <iconset resource="../resources/resources.qrc">
+     <normaloff>:/main/interfaceIcons/helpAbout.png</normaloff>:/main/interfaceIcons/helpAbout.png</iconset>
+   </property>
    <property name="text">
     <string>About Obsession...</string>
    </property>
   </action>
   <action name="actionPreferences">
+   <property name="icon">
+    <iconset resource="../resources/resources.qrc">
+     <normaloff>:/main/interfaceIcons/optionsPreferences.png</normaloff>:/main/interfaceIcons/optionsPreferences.png</iconset>
+   </property>
    <property name="text">
     <string>Preferences...</string>
    </property>
   </action>
   <action name="actionServer_Agreement">
+   <property name="icon">
+    <iconset resource="../resources/resources.qrc">
+     <normaloff>:/main/interfaceIcons/serverAgreement.png</normaloff>:/main/interfaceIcons/serverAgreement.png</iconset>
+   </property>
    <property name="text">
     <string>Agreement</string>
    </property>
   </action>
   <action name="actionTrackers">
    <property name="icon">
-    <iconset resource="resources.qrc">
+    <iconset resource="../resources/resources.qrc">
      <normaloff>:/main/interfaceIcons/mainTrackers.png</normaloff>:/main/interfaceIcons/mainTrackers.png</iconset>
    </property>
    <property name="text">
@@ -194,7 +206,7 @@
   </action>
   <action name="actionNew_Window">
    <property name="icon">
-    <iconset resource="resources.qrc">
+    <iconset resource="../resources/resources.qrc">
      <normaloff>:/main/interfaceIcons/mainNew.png</normaloff>:/main/interfaceIcons/mainNew.png</iconset>
    </property>
    <property name="text">
@@ -205,6 +217,10 @@
    </property>
   </action>
   <action name="actionFiles">
+   <property name="icon">
+    <iconset resource="../resources/resources.qrc">
+     <normaloff>:/files/interfaceIcons/filesUnknown.png</normaloff>:/files/interfaceIcons/filesUnknown.png</iconset>
+   </property>
    <property name="text">
     <string>Files</string>
    </property>
@@ -213,16 +229,28 @@
    </property>
   </action>
   <action name="actionIcons">
+   <property name="icon">
+    <iconset resource="../resources/resources.qrc">
+     <normaloff>:/main/interfaceIcons/optionsIcons.png</normaloff>:/main/interfaceIcons/optionsIcons.png</iconset>
+   </property>
    <property name="text">
     <string>Icons...</string>
    </property>
   </action>
   <action name="actionLinear_News">
+   <property name="icon">
+    <iconset resource="../resources/resources.qrc">
+     <normaloff>:/main/interfaceIcons/serverMessageBoard.png</normaloff>:/main/interfaceIcons/serverMessageBoard.png</iconset>
+   </property>
    <property name="text">
     <string>Message Board</string>
    </property>
   </action>
   <action name="actionDownloads">
+   <property name="icon">
+    <iconset resource="../resources/resources.qrc">
+     <normaloff>:/main/interfaceIcons/serverDownloads.png</normaloff>:/main/interfaceIcons/serverDownloads.png</iconset>
+   </property>
    <property name="text">
     <string>Downloads</string>
    </property>
@@ -230,6 +258,10 @@
   <action name="actionClose_Tab">
    <property name="enabled">
     <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../resources/resources.qrc">
+     <normaloff>:/main/interfaceIcons/mainClose.png</normaloff>:/main/interfaceIcons/mainClose.png</iconset>
    </property>
    <property name="text">
     <string>Close Tab</string>
@@ -242,6 +274,10 @@
    </property>
   </action>
   <action name="actionThreaded_News">
+   <property name="icon">
+    <iconset resource="../resources/resources.qrc">
+     <normaloff>:/news/interfaceIcons/newsItem.png</normaloff>:/news/interfaceIcons/newsItem.png</iconset>
+   </property>
    <property name="text">
     <string>News</string>
    </property>
@@ -255,6 +291,10 @@
    </property>
   </action>
   <action name="actionBookmarks">
+   <property name="icon">
+    <iconset resource="../resources/resources.qrc">
+     <normaloff>:/main/interfaceIcons/optionsBookmarks.png</normaloff>:/main/interfaceIcons/optionsBookmarks.png</iconset>
+   </property>
    <property name="text">
     <string>Bookmarks...</string>
    </property>
@@ -265,21 +305,37 @@
    </property>
   </action>
   <action name="actionView_account">
+   <property name="icon">
+    <iconset resource="../resources/resources.qrc">
+     <normaloff>:/main/interfaceIcons/serverAccount.png</normaloff>:/main/interfaceIcons/serverAccount.png</iconset>
+   </property>
    <property name="text">
     <string>View account...</string>
    </property>
   </action>
   <action name="actionNew_account">
+   <property name="icon">
+    <iconset resource="../resources/resources.qrc">
+     <normaloff>:/main/interfaceIcons/serverNewAccount.png</normaloff>:/main/interfaceIcons/serverNewAccount.png</iconset>
+   </property>
    <property name="text">
     <string>New account...</string>
    </property>
   </action>
   <action name="actionBroadcast">
+   <property name="icon">
+    <iconset resource="../resources/resources.qrc">
+     <normaloff>:/main/interfaceIcons/serverBroadcast.png</normaloff>:/main/interfaceIcons/serverBroadcast.png</iconset>
+   </property>
    <property name="text">
     <string>Broadcast..</string>
    </property>
   </action>
   <action name="actionChat">
+   <property name="icon">
+    <iconset resource="../resources/resources.qrc">
+     <normaloff>:/main/interfaceIcons/serverChat.png</normaloff>:/main/interfaceIcons/serverChat.png</iconset>
+   </property>
    <property name="text">
     <string>Chat</string>
    </property>
@@ -287,7 +343,7 @@
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>
-  <include location="resources.qrc"/>
+  <include location="../resources/resources.qrc"/>
  </resources>
  <connections/>
 </ui>
