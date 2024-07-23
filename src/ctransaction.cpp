@@ -245,7 +245,7 @@ char * CTransaction::bytes() {
     return b;
 }
 
-void CTransaction::addParameter(qint16 parameterID, qint16 parameterLength, char * parameterData) {
+void CTransaction::addParameter(qint16 parameterID, qint16 parameterLength, const char * parameterData) {
     s_parameter newParameter;
     newParameter.type = TYPE_STRING;
     newParameter.id = parameterID;

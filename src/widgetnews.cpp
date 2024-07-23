@@ -3,17 +3,31 @@
 #include "ctransaction.h"
 #include <QSettings>
 #include "TextHelper.h"
+#include "dialognewnewsmessage.h"
 
 WidgetNews::WidgetNews(ConnectionController * c, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::WidgetNews)
 {
     ui->setupUi(this);
+
+    ui->pushButtonNew->setEnabled(false);
+    ui->pushButtonDelete->setEnabled(false);
+    ui->pushButtonReply->setEnabled(false);
+    ui->pushButtonNewCategory->setEnabled(false); //true);
+    ui->pushButtonNewFolder->setEnabled(false); //true);
+
     connection = c;
     connect(connection, SIGNAL(gotNewsCategory(unsigned char, QString)), this, SLOT(onNewsCategory(unsigned char,QString)));
     connect(connection, SIGNAL(gotNewsItem(QString, quint32, quint32)), this, SLOT(onNewsItems(QString, quint32, quint32)));
     connect(connection, SIGNAL(gotNewsArticleText(QString, QString, QString)), this, SLOT(onNewsArticleText(QString, QString, QString)));
+
     connect(ui->treeWidget, SIGNAL(clicked(QModelIndex)), this, SLOT(getNews()));
+    connect(ui->treeWidget, SIGNAL(currentItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)), this, SLOT(onItemSelectionChanged()));
+
+    connect(ui->pushButtonDelete, SIGNAL(clicked()), this, SLOT(onDeleteClicked()));
+    connect(ui->pushButtonNew, SIGNAL(clicked()), this, SLOT(onNewClicked()));
+    connect(ui->pushButtonReply, SIGNAL(clicked()), this, SLOT(onReplyClicked()));
 }
 
 void WidgetNews::clear() {
@@ -161,6 +175,8 @@ void WidgetNews::onNewsItems(QString _name, quint32 id, quint32 pid) {
     }
 
     ui->treeWidget->setEnabled(true);
+
+    ui->pushButtonNew->setEnabled(true);
 }
 
 void WidgetNews::onNewsCategory(unsigned char _type, QString _name) {
@@ -194,3 +210,87 @@ void WidgetNews::onNewsCategory(unsigned char _type, QString _name) {
 
     ui->treeWidget->setEnabled(true);
 }
+
+void WidgetNews::onItemSelectionChanged() {
+    const QTreeWidgetItem * item = ui->treeWidget->currentItem();
+
+    /*if (item) {
+        ui->pushButtonDelete->setEnabled(true);
+        ui->pushButtonReply->setEnabled(true);
+    } else {
+        ui->pushButtonDelete->setEnabled(false);
+        ui->pushButtonReply->setEnabled(false);
+    }*/
+}
+
+void WidgetNews::onDeleteClicked() {
+
+}
+
+void WidgetNews::onReplyClicked() {
+
+}
+
+void WidgetNews::onNewClicked() {
+    DialogNewNewsMessage * dialog = new DialogNewNewsMessage(this);
+
+    connect(dialog, SIGNAL(accepted()), dialog, SLOT(deleteLater()));
+    connect(dialog, SIGNAL(rejected()), dialog, SLOT(deleteLater()));
+    connect(dialog, SIGNAL(messageSubmitted(QString,QString,QString,quint32)), this, SLOT(onMessageSubmitted(QString,QString,QString,quint32)));
+
+    dialog->show();
+}
+
+void WidgetNews::onMessageSubmitted(const QString title, const QString message, const QString path, const quint32 parentId)
+{
+    CTransaction * transaction = connection->createTransaction(410);
+
+    const QByteArray pathData = TextHelper::EncodeText(path);
+    transaction->addParameter(325, pathData.length(), pathData.constData());
+
+    if (parentId) transaction->addParameter(326, parentId);
+
+    const QByteArray flavorData = TextHelper::EncodeText("text/plain");
+    transaction->addParameter(327, flavorData.length(), flavorData.constData());
+
+    const QByteArray titleData = TextHelper::EncodeText(title);
+    transaction->addParameter(328, titleData.length(), titleData.constData());
+
+    const QByteArray messageData = TextHelper::EncodeText(message);
+    transaction->addParameter(333, messageData.length(), messageData.constData());
+
+    connection->sendTransaction(transaction);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

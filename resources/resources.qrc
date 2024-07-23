@@ -47,6 +47,12 @@
     <qresource prefix="/news">
         <file>interfaceIcons/newsCategory.png</file>
         <file>interfaceIcons/newsItem.png</file>
+        <file>interfaceIcons/newsWrite.png</file>
+        <file>interfaceIcons/newsReply.png</file>
+        <file>interfaceIcons/newsSend.png</file>
+        <file>interfaceIcons/newsDelete.png</file>
+        <file>interfaceIcons/newNewsCategory.png</file>
+        <file>interfaceIcons/newNewsFolder.png</file>
     </qresource>
     <qresource prefix="/">
         <file>sounds/chat.wav</file>

@@ -24,6 +24,11 @@ public slots:
     void onNewsItems(QString, quint32, quint32);
     void getNews();
     void onNewsArticleText(QString, QString, QString);
+    void onItemSelectionChanged();
+    void onDeleteClicked();
+    void onReplyClicked();
+    void onNewClicked();
+    void onMessageSubmitted(const QString title, const QString message, const QString path, const quint32 parentId);
 
 protected:
     void changeEvent(QEvent *e);

@@ -8,6 +8,7 @@ CONFIG += resources_big
 TARGET = Obsession
 TEMPLATE = app
 SOURCES += src/main.cpp \
+    src/dialognewnewsmessage.cpp \
     src/mainwindow.cpp \
     src/ctransaction.cpp \
     src/connectioncontroller.cpp \
@@ -45,6 +46,7 @@ SOURCES += src/main.cpp \
     src/dialogbroadcast.cpp \
     src/dialogpostlinearnews.cpp
 HEADERS += src/mainwindow.h \
+    src/dialognewnewsmessage.h \
     src/ctransaction.h \
     src/defines.h \
     src/connectioncontroller.h \
@@ -84,6 +86,7 @@ HEADERS += src/mainwindow.h \
     src/dialogbroadcast.h \
     src/dialogpostlinearnews.h
 FORMS += src/mainwindow.ui \
+    src/dialognewnewsmessage.ui \
     src/dialogopenconnection.ui \
     src/dialogpreferences.ui \
     src/dialogagreement.ui \

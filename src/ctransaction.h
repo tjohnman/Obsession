@@ -14,7 +14,7 @@ public:
     void addData(const char * data);
 
     char * bytes();
-    void addParameter(qint16 parameterID, qint16 parameterLength, char * parameterData);
+    void addParameter(qint16 parameterID, qint16 parameterLength, const char * parameterData);
     void addParameter(qint16 parameterID, qint32 parameterData);
 
     quint16 isReply();
