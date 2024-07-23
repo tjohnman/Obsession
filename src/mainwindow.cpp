@@ -73,12 +73,12 @@ MainWindow::MainWindow(QWidget *parent, bool checkForUpdates) :
     connect(connection, SIGNAL(gotChatMessage(QString)), this, SLOT(onGotChatMessage(QString)));
     connect(connection, SIGNAL(gotBroadcast(QString)), this, SLOT(onGotBroadcast(QString)));
     connect(connection, SIGNAL(userListChanged()), this, SLOT(onUserListChanged()));
-    connect(connection, SIGNAL(gotPM(QString, qint16)), this, SLOT(onGotPM(QString, qint16)));
+    connect(connection, SIGNAL(gotPM(QString,qint16)), this, SLOT(onGotPM(QString,qint16)));
     connect(connection, SIGNAL(gotUserInfo(QString,QString,quint16)), this, SLOT(onOpenUserInfo(QString,QString,quint16)));
-    connect(connection, SIGNAL(gotPermissions(QString, QString, quint8, quint8, quint8, quint8, quint8, quint8, quint8, quint8)), this, SLOT(gotPermissions(QString, QString, quint8, quint8, quint8, quint8, quint8, quint8, quint8, quint8)));
+    connect(connection, SIGNAL(gotPermissions(QString,QString,quint8,quint8,quint8,quint8,quint8,quint8,quint8,quint8)), this, SLOT(gotPermissions(QString,QString,quint8,quint8,quint8,quint8,quint8,quint8,quint8,quint8)));
 
-    connect(connection, SIGNAL(userLeft(s_user *)), this, SLOT(onUserLeft(s_user *)));
-    connect(connection, SIGNAL(userChangedName(QString, QString)), this, SLOT(onUserChangedName(QString, QString)));
+    connect(connection, SIGNAL(userLeft(s_user*)), this, SLOT(onUserLeft(s_user*)));
+    connect(connection, SIGNAL(userChangedName(QString,QString)), this, SLOT(onUserChangedName(QString,QString)));
 
     connect(connection, SIGNAL(serverError(QString)), this, SLOT(onError(QString)));
     connect(connection, SIGNAL(socketError(QString)), this, SLOT(onError(QString)));
@@ -92,7 +92,7 @@ MainWindow::MainWindow(QWidget *parent, bool checkForUpdates) :
     connect(connection, SIGNAL(connecting()), this, SLOT(onConnecting()));
     connect(connection, SIGNAL(connected()), this, SLOT(onConnected()));
 
-    connect(connection, SIGNAL(gotFile(quint32, quint32, quint32)), downloadManager, SLOT(addDownload(quint32, quint32, quint32)));
+    connect(connection, SIGNAL(gotFile(quint32,quint32,quint32)), downloadManager, SLOT(addDownload(quint32,quint32,quint32)));
     connect(connection, SIGNAL(gotUpload(quint32)), uploadManager, SLOT(addUpload(quint32)));
 
     connect(chatWidget, SIGNAL(messagingWindowSignal(quint16)), this, SLOT(onOpenMessagingWindow(quint16)));

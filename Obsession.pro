@@ -8,7 +8,6 @@ CONFIG += resources_big
 TARGET = Obsession
 TEMPLATE = app
 SOURCES += src/main.cpp \
-    src/connectionparameter.cpp \
     src/mainwindow.cpp \
     src/ctransaction.cpp \
     src/connectioncontroller.cpp \
@@ -27,6 +26,7 @@ SOURCES += src/main.cpp \
     src/downloadmanager.cpp \
     src/dialogdownloadqueue.cpp \
     src/dialogabout.cpp \
+    src/transactionparameter.cpp \
     src/widgetchat.cpp \
     src/widgetnews.cpp \
     src/dialogbookmarks.cpp \
@@ -45,7 +45,6 @@ SOURCES += src/main.cpp \
     src/dialogbroadcast.cpp \
     src/dialogpostlinearnews.cpp
 HEADERS += src/mainwindow.h \
-    src/connectionparameter.h \
     src/ctransaction.h \
     src/defines.h \
     src/connectioncontroller.h \
@@ -64,6 +63,7 @@ HEADERS += src/mainwindow.h \
     src/downloadmanager.h \
     src/dialogdownloadqueue.h \
     src/dialogabout.h \
+    src/transactionparameter.h \
     src/widgetchat.h \
     src/widgetnews.h \
     src/dialogbookmarks.h \

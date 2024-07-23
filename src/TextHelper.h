@@ -7,7 +7,7 @@
 class TextHelper
 {
 public:
-    static QString DecodeText(char * str, int length)
+    static QString DecodeText(const char * str, int length)
     {
         QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
         QTextCodec * codec = QTextCodec::codecForName(settings.value(QString::fromUtf8("Encoding"), "Apple Roman").toString().toUtf8());
@@ -18,7 +18,7 @@ public:
         return codec->toUnicode(str, length);
     }
 
-    static QString DecodeTextAutoUTF8(char * str, int length)
+    static QString DecodeTextAutoUTF8(const char * str, int length)
     {
         QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
         QTextCodec * codec = QTextCodec::codecForName(settings.value(QString::fromUtf8("Encoding"), "Apple Roman").toString().toUtf8());

@@ -2,15 +2,16 @@
 #define CTRANSACTION_H
 
 #include <vector>
-#include "defines.h"
+#include "transactionparameter.h"
 
 class CTransaction
 {
 public:
-    CTransaction(char * headerData);
+    CTransaction(const char * headerData);
     CTransaction(qint16 tranID, qint32 taskID);
+    ~CTransaction();
 
-    void addData(char * data);
+    void addData(const char * data);
 
     char * bytes();
     void addParameter(qint16 parameterID, qint16 parameterLength, char * parameterData);
@@ -28,8 +29,8 @@ public:
 
     quint32 length();
 
-    s_parameter * getParameterById(qint16 parameterID);
-    s_parameter * getParameter(quint32 i);
+    TransactionParameter * getParameterById(qint16 parameterID);
+    TransactionParameter * getParameter(quint32 i);
 
 private:
     quint16 pIsReply;
@@ -39,7 +40,7 @@ private:
     quint32 pDataLength;
     quint16 pNumberOfParameters;
 
-    std::vector<s_parameter *> pParameters;
+    std::vector<TransactionParameter *> pParameters;
 };
 
 #endif // CTRANSACTION_H

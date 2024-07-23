@@ -8,6 +8,7 @@
 #include <QTextCodec>
 #include "dialogprivatemessaging.h"
 
+#include "transactionparameter.h"
 #include "version.h"
 #include "TextHelper.h"
 
@@ -417,13 +418,10 @@ void ConnectionController::onNameChanged() {
 }
 
 void ConnectionController::onSocketData() {
-    char * dataBuffer;
-
     if(receivedTransaction == NULL) {
         QByteArray dataArray = pSocket.read(22);
-        dataBuffer = dataArray.data();
 
-        receivedTransaction = new CTransaction(dataBuffer);
+        receivedTransaction = new CTransaction(dataArray.constData());
 
         if(receivedTransaction->errorCode() == -1) {
             qDebug() << "Transaction error.";
@@ -435,19 +433,15 @@ void ConnectionController::onSocketData() {
         return;
     }
 
-    receivedTransaction->addData(pSocket.read(receivedTransaction->dataLength()-2).data());
+    QByteArray bytes = pSocket.read(receivedTransaction->dataLength()-2);
+    receivedTransaction->addData(bytes.constData());
 
-    s_parameter * parameterBuffer;
+    TransactionParameter * parameterBuffer;
 
     if(receivedTransaction->errorCode() != 0) {
         parameterBuffer = receivedTransaction->getParameterById(100);
         if(parameterBuffer) {
-            QString errStr = QString(parameterBuffer->data);
-            errStr.truncate(parameterBuffer->length);
-            char * errorstring = (char *) malloc(sizeof(char)*parameterBuffer->length+1);
-            memcpy(errorstring, parameterBuffer->data, parameterBuffer->length);
-            errorstring[parameterBuffer->length] = '\0';
-            emit serverError(QString(errorstring));
+            emit serverError(parameterBuffer->toString());
         }
     }
 
@@ -458,10 +452,7 @@ void ConnectionController::onSocketData() {
                 case 101:
                     parameterBuffer = receivedTransaction->getParameterById(101);
                     if(parameterBuffer) {
-                        char * msg = (char *) malloc(parameterBuffer->length);
-                        memcpy(msg, parameterBuffer->data, parameterBuffer->length);
-                        msg[parameterBuffer->length] = '\0';
-                        emit gotLinearNews(QString(msg));
+                        emit gotLinearNews(parameterBuffer->toString());
                     }
                     break;
                 case 107:
@@ -474,8 +465,8 @@ void ConnectionController::onSocketData() {
                     if(receivedTransaction->errorCode() == 0) {
                         parameterBuffer = receivedTransaction->getParameterById(162);
                         if(parameterBuffer) {
-                            if(parameterBuffer->type == TYPE_STRING) {
-                                pServerName = TextHelper::DecodeText(parameterBuffer->data, parameterBuffer->length);
+                            if(parameterBuffer->type() == TYPE_STRING) {
+                                pServerName = parameterBuffer->toString();
                                 if(!pServerName.isEmpty() && pServerName != " ")
                                 {
                                     emit gotServerName();
@@ -486,6 +477,11 @@ void ConnectionController::onSocketData() {
                                     pServerName = "";
                                     emit gotChatMessage(QString("                <b>Connected to %1</b>").arg(pServerAddress));
                                 }
+                            }
+                            else
+                            {
+                                pServerName = "";
+                                emit gotChatMessage("                <b>Connection established</b>");
                             }
                         }
                         else
@@ -541,22 +537,22 @@ void ConnectionController::onSocketData() {
                     for(quint32 i=0; i<receivedTransaction->numberOfParameters(); i++) {
                         parameterBuffer = receivedTransaction->getParameter(i);
                         if(parameterBuffer) {
-                            if(parameterBuffer->id == 200) {
+                            if(parameterBuffer->id() == 200) {
                                 s_hotlineFile * file = (s_hotlineFile *) malloc(sizeof(s_hotlineFile));
 
                                 file->type = (char *) malloc(5);
 
-                                memcpy(file->type, parameterBuffer->data, 4);
+                                memcpy(file->type, parameterBuffer->data(), 4);
                                 file->type[4] = '\0';
 
-                                memcpy(&file->size, parameterBuffer->data+8, 4);
+                                memcpy(&file->size, parameterBuffer->data()+8, 4);
                                 file->size = qFromBigEndian(file->size);
 
-                                memcpy(&file->nameSize, parameterBuffer->data+18, 2);
+                                memcpy(&file->nameSize, parameterBuffer->data()+18, 2);
                                 file->nameSize = qFromBigEndian(file->nameSize);
 
                                 file->name = (char *) malloc(sizeof(char)*file->nameSize+1);
-                                memcpy(file->name, parameterBuffer->data+20, file->nameSize);
+                                memcpy(file->name, parameterBuffer->data()+20, file->nameSize);
                                 file->name[file->nameSize] = '\0';
 
                                 fileList.push_back(file);
@@ -574,19 +570,16 @@ void ConnectionController::onSocketData() {
 
                     parameterBuffer = receivedTransaction->getParameterById(207);
                     if(parameterBuffer) {
-                        memcpy(&transferSize, &parameterBuffer->intValue, 4);
-                        transferSize = qFromBigEndian(transferSize);
+                        transferSize = parameterBuffer->toInt();
                     } else {
                         parameterBuffer = receivedTransaction->getParameterById(108);
                         if(parameterBuffer) {
-                            memcpy(&transferSize, &parameterBuffer->intValue, 4);
-                            transferSize = qFromBigEndian(transferSize);
+                            transferSize = parameterBuffer->toInt();
                         }
                     }
                     parameterBuffer = receivedTransaction->getParameterById(107);
                     if(parameterBuffer) {
-                        memcpy(&referenceNumber, &parameterBuffer->intValue, 4);
-                        referenceNumber = qFromBigEndian(referenceNumber);
+                        referenceNumber = parameterBuffer->toInt();
                     }
 
                     parameterBuffer = receivedTransaction->getParameterById(116);
@@ -594,12 +587,10 @@ void ConnectionController::onSocketData() {
                     if(parameterBuffer) {
                         quint16 squeue = 0;
                         quint32 iqueue = 0;
-                        if(parameterBuffer->type == TYPE_SHORT) {
-                            squeue = parameterBuffer->shortValue;
-                            squeue = qFromBigEndian(squeue);
+                        if(parameterBuffer->type() == TYPE_SHORT) {
+                            squeue = parameterBuffer->toShort();
                         } else {
-                            iqueue = parameterBuffer->intValue;
-                            iqueue = qFromBigEndian(iqueue);
+                            iqueue = parameterBuffer->toInt();
                         }
                         if(squeue > 0) {
                             queuePosition = squeue;
@@ -617,10 +608,7 @@ void ConnectionController::onSocketData() {
                     {
                         parameterBuffer = receivedTransaction->getParameterById(107);
                         if(parameterBuffer) {
-                            quint32 reference;
-                            memcpy(&reference, &parameterBuffer->intValue, 4);
-                            reference = qFromBigEndian(reference);
-                            emit gotUpload(reference);
+                            emit gotUpload(parameterBuffer->toInt());
                         }
                     }
                     break;
@@ -639,27 +627,27 @@ void ConnectionController::onSocketData() {
                     for(quint32 i=0; i<receivedTransaction->numberOfParameters(); i++) {
                         parameterBuffer = receivedTransaction->getParameter(i);
                         if(parameterBuffer) {
-                            if(parameterBuffer->id == 300) {
+                            if(parameterBuffer->id() == 300) {
                                 s_user * newUser = (s_user *) malloc(sizeof(s_user));
 
-                                memcpy(&newUser->id, parameterBuffer->data, 2);
+                                memcpy(&newUser->id, parameterBuffer->data(), 2);
                                 newUser->id = qFromBigEndian(newUser->id);
 
-                                memcpy(&newUser->icon, parameterBuffer->data + 2, 2);
+                                memcpy(&newUser->icon, parameterBuffer->data() + 2, 2);
                                 newUser->icon = qFromBigEndian(newUser->icon);
 
                                 newUser->doesCET = false;
 
                                 newUser->iconPath = new QString(QString(":/icons/") + QString::number(newUser->icon) + QString(".png"));
 
-                                memcpy(&newUser->flags, parameterBuffer->data + 4, 2);
+                                memcpy(&newUser->flags, parameterBuffer->data() + 4, 2);
                                 newUser->flags = qFromBigEndian(newUser->flags);
 
-                                memcpy(&newUser->nameLength, parameterBuffer->data + 6, 2);
+                                memcpy(&newUser->nameLength, parameterBuffer->data() + 6, 2);
                                 newUser->nameLength = qFromBigEndian(newUser->nameLength);
 
                                 newUser->name = (char *) malloc(sizeof(char)*newUser->nameLength+1);
-                                memcpy(newUser->name, parameterBuffer->data + 8, newUser->nameLength);
+                                memcpy(newUser->name, parameterBuffer->data() + 8, newUser->nameLength);
                                 newUser->name[newUser->nameLength] = '\0';
 
                                 newUser->infoWindow = NULL;
@@ -674,39 +662,42 @@ void ConnectionController::onSocketData() {
                  break;
                 case 303:
                 {
-                    s_parameter * paramu = receivedTransaction->getParameterById(102);
-                    s_parameter * parami = receivedTransaction->getParameterById(101);
-                    if(paramu && parami) {
-                        emit gotUserInfo(TextHelper::DecodeText(paramu->data, paramu->length), TextHelper::DecodeText(parami->data, parami->length), m_UserInfoTaskMap[receivedTransaction->taskID()]);
+                    TransactionParameter * userNameParameter = receivedTransaction->getParameterById(102);
+                    TransactionParameter * userInfoParameter = receivedTransaction->getParameterById(101);
+
+                    if(userNameParameter && userInfoParameter) {
+                        emit gotUserInfo(userNameParameter->toString(), userInfoParameter->toString(), m_UserInfoTaskMap[receivedTransaction->taskID()]);
                     }
                 }
                 break;
                 case 352:
                 {
                     parameterBuffer = receivedTransaction->getParameterById(110);
-                    s_parameter * loginPar = receivedTransaction->getParameterById(105);
-                    if(parameterBuffer && loginPar)
+                    TransactionParameter * loginParameter = receivedTransaction->getParameterById(105);
+                    if(parameterBuffer && loginParameter)
                     {
-                        for(int i=0; i<loginPar->length; ++i)
+                        for(int i=0; i<loginParameter->length(); ++i)
                         {
-                            loginPar->data[i] = 255 - loginPar->data[i];
+                            loginParameter->setData(i, 255 - loginParameter->data()[i]);
                         }
-                        QString login = TextHelper::DecodeText(loginPar->data, loginPar->length);
+                        QString login = TextHelper::DecodeText(loginParameter->data(), loginParameter->length());
 
                         quint8 permissions[8];
                         memset(permissions, 0, 8);
-                        memcpy(&permissions[0], parameterBuffer->data, 1);
-                        memcpy(&permissions[1], parameterBuffer->data+1, 1);
-                        memcpy(&permissions[2], parameterBuffer->data+2, 1);
-                        memcpy(&permissions[3], parameterBuffer->data+3, 1);
-                        memcpy(&permissions[4], parameterBuffer->data+4, 1);
-                        memcpy(&permissions[5], parameterBuffer->data+5, 1);
-                        memcpy(&permissions[6], parameterBuffer->data+6, 1);
-                        memcpy(&permissions[7], parameterBuffer->data+7, 1);
+                        memcpy(&permissions[0], parameterBuffer->data(), 1);
+                        memcpy(&permissions[1], parameterBuffer->data()+1, 1);
+                        memcpy(&permissions[2], parameterBuffer->data()+2, 1);
+                        memcpy(&permissions[3], parameterBuffer->data()+3, 1);
+                        memcpy(&permissions[4], parameterBuffer->data()+4, 1);
+                        memcpy(&permissions[5], parameterBuffer->data()+5, 1);
+                        memcpy(&permissions[6], parameterBuffer->data()+6, 1);
+                        memcpy(&permissions[7], parameterBuffer->data()+7, 1);
 
-                        s_parameter * passPar = receivedTransaction->getParameterById(106);
-                        QString password = TextHelper::DecodeText(passPar->data, passPar->length);
-                        emit gotPermissions(login, password, permissions[0], permissions[1], permissions[2], permissions[3], permissions[4], permissions[5], permissions[6], permissions[7]);
+                        TransactionParameter * passwordParameter = receivedTransaction->getParameterById(106);
+                        if (passwordParameter) {
+                            QString password = passwordParameter->toString();
+                            emit gotPermissions(login, password, permissions[0], permissions[1], permissions[2], permissions[3], permissions[4], permissions[5], permissions[6], permissions[7]);
+                        }
                     }
                 }
                     break;
@@ -714,7 +705,7 @@ void ConnectionController::onSocketData() {
                     {
                         parameterBuffer = receivedTransaction->getParameterById(101);
                         if(parameterBuffer) {
-                            emit gotBroadcast(TextHelper::DecodeText(parameterBuffer->data, parameterBuffer->length));
+                            emit gotBroadcast(parameterBuffer->toString());
                         }
                     }
                     break;
@@ -724,49 +715,49 @@ void ConnectionController::onSocketData() {
                         for(quint32 i=0; i<receivedTransaction->numberOfParameters(); i++) {
                             parameterBuffer = receivedTransaction->getParameter(i);
                             if(parameterBuffer) {
-                                if(parameterBuffer->id == 320) {
+                                if(parameterBuffer->id() == 320) {
                                     qDebug() << "Warning: Ignoring old-style threaded news!";
                                 }
-                                if(parameterBuffer->id == 321) { // Got news items
+                                if(parameterBuffer->id() == 321) { // Got news items
                                     QString _name = "";
                                     QString _poster = "";
 
                                     quint32 count;
-                                    memcpy(&count, parameterBuffer->data+4, 4);
+                                    memcpy(&count, parameterBuffer->data()+4, 4);
                                     count = qFromBigEndian(count);
 
                                     char size;
-                                    memcpy(&size, parameterBuffer->data+8, 1);
+                                    memcpy(&size, parameterBuffer->data()+8, 1);
 
                                     char size2;
-                                    memcpy(&size2, parameterBuffer->data+9+size, 1);
+                                    memcpy(&size2, parameterBuffer->data()+9+size, 1);
 
                                     qint32 offset = 10+size+size2;
                                     for(quint32 j=0; j<count; j++) {
                                         quint32 articleID;
-                                        memcpy(&articleID, parameterBuffer->data+offset, 4);
+                                        memcpy(&articleID, parameterBuffer->data()+offset, 4);
                                         articleID = qFromBigEndian(articleID);
 
                                         quint32 parentArticleID;
-                                        memcpy(&parentArticleID, parameterBuffer->data+offset+12, 4);
+                                        memcpy(&parentArticleID, parameterBuffer->data()+offset+12, 4);
                                         parentArticleID = qFromBigEndian(parentArticleID);
 
                                         quint16 fcount;
-                                        memcpy(&fcount, parameterBuffer->data+offset+20, 2);
+                                        memcpy(&fcount, parameterBuffer->data()+offset+20, 2);
                                         fcount = qFromBigEndian(fcount);
 
                                         char tsize;
-                                        memcpy(&tsize, parameterBuffer->data+offset+22, 1);
+                                        memcpy(&tsize, parameterBuffer->data()+offset+22, 1);
                                         char * atitle = (char *) malloc(tsize+1);
-                                        memcpy(atitle, parameterBuffer->data+offset+23, tsize);
+                                        memcpy(atitle, parameterBuffer->data()+offset+23, tsize);
                                         atitle[(quint16)tsize] = '\0';
                                         _name = QString(atitle);
                                         free(atitle);
 
                                         char psize;
-                                        memcpy(&psize, parameterBuffer->data+offset+23+tsize, 1);
+                                        memcpy(&psize, parameterBuffer->data()+offset+23+tsize, 1);
                                         char * aposter = (char *) malloc(psize+1);
-                                        memcpy(aposter, parameterBuffer->data+offset+24+tsize, psize);
+                                        memcpy(aposter, parameterBuffer->data()+offset+24+tsize, psize);
                                         aposter[(quint16)psize] = '\0';
                                         _poster = QString(aposter);
                                         free(aposter);
@@ -775,16 +766,16 @@ void ConnectionController::onSocketData() {
 
                                         for(quint32 f=0; f<fcount; f++) {
                                             char fsize;
-                                            memcpy(&fsize, parameterBuffer->data+offset2, 1);
+                                            memcpy(&fsize, parameterBuffer->data()+offset2, 1);
                                             offset2 += 1;
                                             // char * mime = (char *) malloc(fsize+1);
-                                            // memcpy(mime, parameterBuffer->data+offset2, fsize);
+                                            // memcpy(mime, parameterBuffer->data()+offset2, fsize);
                                             // mime[(quint16)fsize] = '\0';
                                             // free(mime);
 
                                             offset2+= fsize;
                                             quint16 asize;
-                                            memcpy(&asize, parameterBuffer->data+offset2, 2);
+                                            memcpy(&asize, parameterBuffer->data()+offset2, 2);
                                             asize = qFromBigEndian(asize);
 
                                             offset2 += 2;
@@ -795,12 +786,12 @@ void ConnectionController::onSocketData() {
                                         emit gotNewsItem(_name, articleID, parentArticleID);
                                     }
                                 }
-                                if(parameterBuffer->id == 323) { // Got news categories/bundles
+                                if(parameterBuffer->id() == 323) { // Got news categories/bundles
                                     unsigned char _type = 0;
                                     QString _name = "";
 
                                     quint16 _typeshort;
-                                    memcpy(&_typeshort, parameterBuffer->data, 2);
+                                    memcpy(&_typeshort, parameterBuffer->data(), 2);
                                     _typeshort = qFromBigEndian(_typeshort);
                                     _type = (unsigned char) _typeshort;
 
@@ -808,9 +799,9 @@ void ConnectionController::onSocketData() {
 
                                     if(_typeshort == 2) { // Bundle
                                         unsigned char ns;
-                                        memcpy(&ns, parameterBuffer->data+4, 1);
+                                        memcpy(&ns, parameterBuffer->data()+4, 1);
                                         buffer = (char *) malloc(ns+1);
-                                        memcpy(buffer, parameterBuffer->data+5, ns);
+                                        memcpy(buffer, parameterBuffer->data()+5, ns);
                                         buffer[ns] = '\0';
                                         _name = QString(buffer);
                                         free(buffer);
@@ -818,9 +809,9 @@ void ConnectionController::onSocketData() {
 
                                     if(_typeshort == 3) { // Category
                                         unsigned char ns;
-                                        memcpy(&ns, parameterBuffer->data+28, 1);
+                                        memcpy(&ns, parameterBuffer->data()+28, 1);
                                         buffer = (char *) malloc(ns+1);
-                                        memcpy(buffer, parameterBuffer->data+29, ns);
+                                        memcpy(buffer, parameterBuffer->data()+29, ns);
                                         buffer[ns] = '\0';
                                         _name = QString(buffer);
                                         free(buffer);
@@ -839,30 +830,30 @@ void ConnectionController::onSocketData() {
 
                         parameterBuffer = receivedTransaction->getParameterById(333);
                         if(parameterBuffer) {
-                            t = (char *) malloc(parameterBuffer->length+1);
-                            memcpy(t, parameterBuffer->data, parameterBuffer->length);
-                            t[parameterBuffer->length] = '\0';
+                            t = (char *) malloc(parameterBuffer->length()+1);
+                            memcpy(t, parameterBuffer->data(), parameterBuffer->length());
+                            t[parameterBuffer->length()] = '\0';
                             text = QString(t);
                             free(t);
                         }
                         parameterBuffer = receivedTransaction->getParameterById(329);
                         if(parameterBuffer) {
-                            t = (char *) malloc(parameterBuffer->length+1);
-                            memcpy(t, parameterBuffer->data, parameterBuffer->length);
-                            t[parameterBuffer->length] = '\0';
+                            t = (char *) malloc(parameterBuffer->length()+1);
+                            memcpy(t, parameterBuffer->data(), parameterBuffer->length());
+                            t[parameterBuffer->length()] = '\0';
                             poster = QString(t);
                             free(t);
                         }
                         parameterBuffer = receivedTransaction->getParameterById(330);
                         if(parameterBuffer) {
                             quint16 year;
-                            memcpy(&year, parameterBuffer->data, 2);
+                            memcpy(&year, parameterBuffer->data(), 2);
                             year = qFromBigEndian(year);
                             quint16 millis;
-                            memcpy(&millis, parameterBuffer->data+2, 2);
+                            memcpy(&millis, parameterBuffer->data()+2, 2);
                             millis = qFromBigEndian(millis);
                             quint32 seconds;
-                            memcpy(&seconds, parameterBuffer->data+4, 4);
+                            memcpy(&seconds, parameterBuffer->data()+4, 4);
                             seconds = qFromBigEndian(seconds);
 
                             quint32 d = 1, M = 1, h = 0, m = 0, s = 0;
@@ -1007,53 +998,34 @@ void ConnectionController::onSocketData() {
         case 104:
             parameterBuffer = receivedTransaction->getParameterById(103);
             if(parameterBuffer && receivedTransaction->getParameterById(101)) {
-                quint16 uid;
-                memcpy(&uid, &parameterBuffer->shortValue, parameterBuffer->length);
-                uid = qFromBigEndian(uid);
-
-                quint16 len = receivedTransaction->getParameterById(101)->length;
-                char * m = (char *) malloc(sizeof(char)*len+1);
-                memcpy(m, receivedTransaction->getParameterById(101)->data, receivedTransaction->getParameterById(101)->length);
-                m[len] = '\0';
-
-                QString pm = TextHelper::DecodeText(m, len);
-                emit gotPM(pm, uid);
-                free(m);
+                quint16 uid = parameterBuffer->toShort();
+                emit gotPM(receivedTransaction->getParameterById(101)->toString(), uid);
             } else {
                 parameterBuffer = receivedTransaction->getParameterById(101);
                 if(parameterBuffer) {
-                    char * msg = (char *) malloc(parameterBuffer->length+1);
-                    memcpy(msg, parameterBuffer->data, parameterBuffer->length);
-                    msg[parameterBuffer->length] = '\0';
-                    emit serverError(QString(msg));
-                    free(msg);
+                    emit serverError(parameterBuffer->toString());
                 }
             }
             break;
         case 106:
             parameterBuffer = receivedTransaction->getParameterById(101);
             if(parameterBuffer) {
-                emit gotChatMessage(TextHelper::DecodeText(parameterBuffer->data, parameterBuffer->length));
+                emit gotChatMessage(parameterBuffer->toString());
             }
             break;
 
         case 109:
             parameterBuffer = receivedTransaction->getParameterById(101);
             if(parameterBuffer) {
-                char * agreement = (char *) malloc(sizeof(char)*parameterBuffer->length+1);
-                memcpy(agreement, parameterBuffer->data, parameterBuffer->length);
-                agreement[parameterBuffer->length] = '\0';
-                pServerAgreement = TextHelper::DecodeText(agreement, parameterBuffer->length);
-                free(agreement);
+                pServerAgreement = parameterBuffer->toString();
             }
             break;
 
         case 113:
             parameterBuffer = receivedTransaction->getParameterById(103);
             if(parameterBuffer) {
-                quint16 uid = 0;
-                memcpy(&uid, &parameterBuffer->shortValue, parameterBuffer->length);
-                uid = qFromBigEndian(uid);
+                quint16 uid = parameterBuffer->toShort();
+
                 if(uid) {
                     sendPMToUser(uid, QString("I'm sorry, this client does not support private chats yet. Please use private messages\0"), true);
                 }
@@ -1063,16 +1035,11 @@ void ConnectionController::onSocketData() {
         case 122:
             parameterBuffer = receivedTransaction->getParameterById(152);
             if (parameterBuffer) {
-                quint32 bannerType;
-                memcpy(&bannerType, &parameterBuffer->intValue, parameterBuffer->length);
+                quint32 bannerType = parameterBuffer->toInt();
 
                 if (bannerType == 1) {
                     parameterBuffer = receivedTransaction->getParameterById(153);
-                    char * bannerURL = (char *) malloc(sizeof(char)*parameterBuffer->length + 1);
-                    memcpy(bannerURL, parameterBuffer->data, parameterBuffer->length);
-                    bannerURL[parameterBuffer->length] = '\0';
-                    pServerBannerURL = QString(bannerURL);
-                    free(bannerURL);
+                    pServerBannerURL = parameterBuffer->toString();
                     emit gotServerBannerURL(pServerBannerURL);
                 }
             }
@@ -1083,8 +1050,7 @@ void ConnectionController::onSocketData() {
                 quint32 referenceNumber = -1;
                 parameterBuffer = receivedTransaction->getParameterById(107);
                 if(parameterBuffer) {
-                    memcpy(&referenceNumber, &parameterBuffer->intValue, 4);
-                    referenceNumber = qFromBigEndian(referenceNumber);
+                    referenceNumber = parameterBuffer->toInt();
                 }
 
                 parameterBuffer = receivedTransaction->getParameterById(116);
@@ -1092,12 +1058,10 @@ void ConnectionController::onSocketData() {
                 if(parameterBuffer) {
                     quint16 squeue = 0;
                     quint32 iqueue = 0;
-                    if(parameterBuffer->type == TYPE_SHORT) {
-                        squeue = parameterBuffer->shortValue;
-                        squeue = qFromBigEndian(squeue);
+                    if(parameterBuffer->type() == TYPE_SHORT) {
+                        squeue = parameterBuffer->toShort();
                     } else {
-                        iqueue = parameterBuffer->intValue;
-                        iqueue = qFromBigEndian(iqueue);
+                        iqueue = parameterBuffer->toInt();
                     }
                     if(squeue > 0) {
                         queuePosition = squeue;
@@ -1113,23 +1077,19 @@ void ConnectionController::onSocketData() {
 
         case 301:
             if(receivedTransaction->getParameterById(103)) {
-                quint16 uid = 0;
-
                 parameterBuffer = receivedTransaction->getParameterById(103);
+
                 if(!parameterBuffer) {
                     break;
                 }
-                memcpy(&uid, &parameterBuffer->shortValue, parameterBuffer->length);
 
-                uid = qFromBigEndian(uid);
+                quint16 uid = parameterBuffer->toShort();
 
                 s_user * user = getUserByUid(uid);
                 if(user) { // Update user
                     parameterBuffer = receivedTransaction->getParameterById(104);
                     if(parameterBuffer) {
-                        quint16 newIcon = 0;
-                        memcpy(&newIcon, &parameterBuffer->shortValue, parameterBuffer->length);
-                        newIcon = qFromBigEndian(newIcon);
+                        quint16 newIcon = parameterBuffer->toShort();
 
                         if(user->icon == 3520 && newIcon != 3520) {
                             user->doesCET = true;
@@ -1138,16 +1098,13 @@ void ConnectionController::onSocketData() {
                             user->doesCET = false;
                         }
 
-
                         user->icon = newIcon;
-
                         user->iconPath = new QString(QString(":/icons/") + QString::number(user->icon) + QString(".png"));
                     }
 
                     parameterBuffer = receivedTransaction->getParameterById(112);
                     if(parameterBuffer) {
-                        memcpy(&(user->flags), &parameterBuffer->shortValue, parameterBuffer->length);
-                        user->flags = qFromBigEndian(user->flags);
+                        user->flags = parameterBuffer->toShort();
                     }
 
                     parameterBuffer = receivedTransaction->getParameterById(102);
@@ -1155,11 +1112,11 @@ void ConnectionController::onSocketData() {
                     if(parameterBuffer) {
                         QString oldName = TextHelper::DecodeText(user->name, user->nameLength);
 
-                        user->name = (char *) malloc(sizeof(char)*parameterBuffer->length);
-                        memcpy(user->name, parameterBuffer->data, parameterBuffer->length);
-                        user->nameLength = parameterBuffer->length;
+                        user->name = (char *) malloc(sizeof(char)*parameterBuffer->length());
+                        memcpy(user->name, parameterBuffer->data(), parameterBuffer->length());
+                        user->nameLength = parameterBuffer->length();
 
-                        QString newName = TextHelper::DecodeText(user->name, parameterBuffer->length);
+                        QString newName = TextHelper::DecodeText(user->name, parameterBuffer->length());
                         QString message = QString("                <b>%1 is now known as %2</b>").arg(oldName, newName);
 
                         if(oldName != newName)
@@ -1175,22 +1132,20 @@ void ConnectionController::onSocketData() {
 
                     parameterBuffer = receivedTransaction->getParameterById(104);
                     if(parameterBuffer) {
-                        memcpy(&newUser->icon, &parameterBuffer->shortValue, parameterBuffer->length);
-                        newUser->icon = qFromBigEndian(newUser->icon);
+                        newUser->icon = parameterBuffer->toShort();
                         newUser->iconPath = new QString(QString("icons/") + QString::number(newUser->icon) + QString(".png"));
                     }
 
                     parameterBuffer = receivedTransaction->getParameterById(112);
                     if(parameterBuffer) {
-                        memcpy(&newUser->flags, &parameterBuffer->shortValue, parameterBuffer->length);
-                        newUser->flags = qFromBigEndian(newUser->flags);
+                        newUser->flags = parameterBuffer->toShort();
                     }
 
                     parameterBuffer = receivedTransaction->getParameterById(102);
                     if(parameterBuffer) {
-                        newUser->name = (char *) malloc(sizeof(char)*parameterBuffer->length);
-                        memcpy(newUser->name, parameterBuffer->data, parameterBuffer->length);
-                        newUser->nameLength = parameterBuffer->length;
+                        newUser->name = (char *) malloc(sizeof(char)*parameterBuffer->length());
+                        memcpy(newUser->name, parameterBuffer->data(), parameterBuffer->length());
+                        newUser->nameLength = parameterBuffer->length();
                     }
 
                     pUsers.push_back(newUser);
@@ -1203,13 +1158,11 @@ void ConnectionController::onSocketData() {
         case 302:
             parameterBuffer = receivedTransaction->getParameterById(103);
             if(parameterBuffer) {
-                quint16 uid;
-                memcpy(&uid, &parameterBuffer->shortValue, parameterBuffer->length);
-                uid = qFromBigEndian(uid);
+                quint16 uid = parameterBuffer->toShort();
                 s_user * user = getUserByUid(uid);
 
                 if(!user) {
-                    // Server reported user left, but it doesn't exist.
+                    // Server reported user left, but it was never here to begin with.
                     break;
                 }
 
@@ -1233,7 +1186,6 @@ void ConnectionController::onSocketData() {
         }
     }
 
-    dataBuffer = NULL;
     parameterBuffer = NULL;
     delete receivedTransaction;
     receivedTransaction = NULL;

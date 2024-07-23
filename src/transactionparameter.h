@@ -1,15 +1,15 @@
-#ifndef CONNECTIONPARAMETER_H
-#define CONNECTIONPARAMETER_H
+#ifndef TRANSACTIONPARAMETER_H
+#define TRANSACTIONPARAMETER_H
 
 #include <QObject>
 #include "defines.h"
 
-class ConnectionParameter : public QObject
+class TransactionParameter : public QObject
 {
     Q_OBJECT
 public:
-    ConnectionParameter(s_parameter parameterData);
-    ~ConnectionParameter();
+    TransactionParameter(s_parameter parameterData);
+    ~TransactionParameter();
 
     quint16 id();
     quint16 length();
@@ -18,6 +18,8 @@ public:
     quint16 toShort();
     quint32 toInt();
     QVariant value();
+    const char * data();
+    void setData(size_t offset, char byte);
 
 private:
     quint16 pId;
@@ -26,4 +28,4 @@ private:
     char * pData;
 };
 
-#endif // CONNECTIONPARAMETER_H
+#endif // TRANSACTIONPARAMETER_H
