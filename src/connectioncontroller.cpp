@@ -730,8 +730,6 @@ void ConnectionController::onSocketData() {
                                 if(parameterBuffer->id == 321) { // Got news items
                                     QString _name = "";
                                     QString _poster = "";
-                                    QString _description = "";
-                                    QString _article = "";
 
                                     quint32 count;
                                     memcpy(&count, parameterBuffer->data+4, 4);
@@ -779,9 +777,10 @@ void ConnectionController::onSocketData() {
                                             char fsize;
                                             memcpy(&fsize, parameterBuffer->data+offset2, 1);
                                             offset2 += 1;
-                                            char * mime = (char *) malloc(fsize+1);
-                                            memcpy(mime, parameterBuffer->data+offset2, fsize);
-                                            mime[(quint16)fsize] = '\0';
+                                            // char * mime = (char *) malloc(fsize+1);
+                                            // memcpy(mime, parameterBuffer->data+offset2, fsize);
+                                            // mime[(quint16)fsize] = '\0';
+                                            // free(mime);
 
                                             offset2+= fsize;
                                             quint16 asize;
@@ -1017,7 +1016,9 @@ void ConnectionController::onSocketData() {
                 memcpy(m, receivedTransaction->getParameterById(101)->data, receivedTransaction->getParameterById(101)->length);
                 m[len] = '\0';
 
-                emit gotPM(TextHelper::DecodeText(m, len), uid);
+                QString pm = TextHelper::DecodeText(m, len);
+                emit gotPM(pm, uid);
+                free(m);
             } else {
                 parameterBuffer = receivedTransaction->getParameterById(101);
                 if(parameterBuffer) {
@@ -1025,6 +1026,7 @@ void ConnectionController::onSocketData() {
                     memcpy(msg, parameterBuffer->data, parameterBuffer->length);
                     msg[parameterBuffer->length] = '\0';
                     emit serverError(QString(msg));
+                    free(msg);
                 }
             }
             break;
@@ -1042,6 +1044,7 @@ void ConnectionController::onSocketData() {
                 memcpy(agreement, parameterBuffer->data, parameterBuffer->length);
                 agreement[parameterBuffer->length] = '\0';
                 pServerAgreement = TextHelper::DecodeText(agreement, parameterBuffer->length);
+                free(agreement);
             }
             break;
 
@@ -1069,6 +1072,7 @@ void ConnectionController::onSocketData() {
                     memcpy(bannerURL, parameterBuffer->data, parameterBuffer->length);
                     bannerURL[parameterBuffer->length] = '\0';
                     pServerBannerURL = QString(bannerURL);
+                    free(bannerURL);
                     emit gotServerBannerURL(pServerBannerURL);
                 }
             }
