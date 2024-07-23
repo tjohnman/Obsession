@@ -110,7 +110,7 @@ void ConnectionController::requestAccount(QString login)
 
 void ConnectionController::sendTransaction(CTransaction * t, bool expectReply) {
     if(isConnected()) {
-        qint64 written = pSocket.write(t->bytes(), t->length());
+        pSocket.write(t->bytes(), t->length());
         if(expectReply) {
             pPendingTransactions.push_back(t);
         } else {
@@ -250,7 +250,7 @@ void ConnectionController::onSocketConnected() {
     char clientMagicBytes[12] = {0x54, 0x52, 0x54, 0x50, 0x48, 0x4f, 0x54, 0x4c, 0x00, 0x01, 0x00, 0x02};
     char serverMagicBytes[8] = {0x54, 0x52, 0x54, 0x50, 0x00, 0x00, 0x00, 0x00};
 
-    qint32 bytes = pSocket.write(clientMagicBytes, 12);
+    pSocket.write(clientMagicBytes, 12);
     pSocket.waitForReadyRead(30000);
     QByteArray response = pSocket.readAll();
 
@@ -1053,6 +1053,23 @@ void ConnectionController::onSocketData() {
                 uid = qFromBigEndian(uid);
                 if(uid) {
                     sendPMToUser(uid, QString("I'm sorry, this client does not support private chats yet. Please use private messages\0"), true);
+                }
+            }
+            break;
+
+        case 122:
+            parameterBuffer = receivedTransaction->getParameterById(152);
+            if (parameterBuffer) {
+                quint32 bannerType;
+                memcpy(&bannerType, &parameterBuffer->intValue, parameterBuffer->length);
+
+                if (bannerType == 1) {
+                    parameterBuffer = receivedTransaction->getParameterById(153);
+                    char * bannerURL = (char *) malloc(sizeof(char)*parameterBuffer->length + 1);
+                    memcpy(bannerURL, parameterBuffer->data, parameterBuffer->length);
+                    bannerURL[parameterBuffer->length] = '\0';
+                    pServerBannerURL = QString(bannerURL);
+                    emit gotServerBannerURL(pServerBannerURL);
                 }
             }
             break;

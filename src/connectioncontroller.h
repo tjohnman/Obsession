@@ -65,6 +65,7 @@ private:
     QString pServerName;
     qint16 pServerVersion;
     QString pServerAgreement;
+    QString pServerBannerURL;
 
     QString pPlainLogin, pPlainPassword;
     QTimer pTimeoutTimer;
@@ -122,6 +123,7 @@ signals:
     void gotPermissions(QString login, QString password, quint8 p1, quint8 p2, quint8 p3, quint8 p4, quint8, quint8, quint8, quint8);
     void userChangedName(QString old_name, QString new_name);
     void userLeft(s_user * user);
+    void gotServerBannerURL(const QString url);
 };
 
 #endif // CONNECTIONCONTROLLER_H

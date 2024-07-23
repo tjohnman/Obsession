@@ -110,8 +110,7 @@ INCLUDEPATH += src/
 RESOURCES += resources/resources.qrc \
     resources/icons1.qrc \
     resources/icons2.qrc \
-    resources/resources.qrc \
-    src/resources.qrc
+    resources/resources.qrc
 RC_ICONS = resources/icon.ico
 ICON = resources/icon.icns
 win32:RC_FILE += Obsession.rc
