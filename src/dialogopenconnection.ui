@@ -167,6 +167,15 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>lineEdit</tabstop>
+  <tabstop>lineEdit_2</tabstop>
+  <tabstop>lineEdit_3</tabstop>
+  <tabstop>checkBox</tabstop>
+  <tabstop>autoConnectCheckbox</tabstop>
+  <tabstop>comboBox</tabstop>
+  <tabstop>pushButton</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>
