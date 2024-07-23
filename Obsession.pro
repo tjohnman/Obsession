@@ -8,6 +8,7 @@ CONFIG += resources_big
 TARGET = Obsession
 TEMPLATE = app
 SOURCES += src/main.cpp \
+    src/connectionparameter.cpp \
     src/mainwindow.cpp \
     src/ctransaction.cpp \
     src/connectioncontroller.cpp \
@@ -44,6 +45,7 @@ SOURCES += src/main.cpp \
     src/dialogbroadcast.cpp \
     src/dialogpostlinearnews.cpp
 HEADERS += src/mainwindow.h \
+    src/connectionparameter.h \
     src/ctransaction.h \
     src/defines.h \
     src/connectioncontroller.h \
