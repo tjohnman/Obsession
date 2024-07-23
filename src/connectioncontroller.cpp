@@ -1045,6 +1045,18 @@ void ConnectionController::onSocketData() {
             }
             break;
 
+        case 113:
+            parameterBuffer = receivedTransaction->getParameterById(103);
+            if(parameterBuffer) {
+                quint16 uid = 0;
+                memcpy(&uid, &parameterBuffer->shortValue, parameterBuffer->length);
+                uid = qFromBigEndian(uid);
+                if(uid) {
+                    sendPMToUser(uid, QString("I'm sorry, this client does not support private chats yet. Please use private messages\0"), true);
+                }
+            }
+            break;
+
         case 211:
             {
                 quint32 referenceNumber = -1;
@@ -1077,17 +1089,6 @@ void ConnectionController::onSocketData() {
                 emit serverUpdatedQueue(referenceNumber, queuePosition);
                 break;
             }
-        case 113:
-            parameterBuffer = receivedTransaction->getParameterById(103);
-            if(parameterBuffer) {
-                quint16 uid = 0;
-                memcpy(&uid, &parameterBuffer->shortValue, parameterBuffer->length);
-                uid = qFromBigEndian(uid);
-                if(uid) {
-                    sendPMToUser(uid, QString("I'm sorry, this client does not support private chats yet. Please use private messages\0"), true);
-                }
-            }
-            break;
 
         case 301:
             if(receivedTransaction->getParameterById(103)) {
