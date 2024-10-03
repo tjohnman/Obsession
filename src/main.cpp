@@ -9,16 +9,16 @@
 #include "connectioncontroller.h"
 
 void kill_threads( void );
-void * __gxx_personality_v0=0;
+/*void * __gxx_personality_v0=0; */
 
 qint32 main(qint32 argc, char *argv[])
 {
-    FILE * debugLog = fopen("log.txt", "a");
-    if(debugLog)
-    {
-        fwrite("\n", 1, 1, debugLog);
-        fclose(debugLog);
-    }
+    // FILE * debugLog = fopen("log.txt", "a");
+    // if(debugLog)
+    // {
+    //     fwrite("\n", 1, 1, debugLog);
+    //     fclose(debugLog);
+    // }
 
     QApplication a(argc, argv);
     MainWindow w(0, true);

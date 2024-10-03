@@ -24,9 +24,9 @@ DialogTrackers::DialogTrackers(ConnectionController * c, QWidget *parent) :
 
     addTrackerDialog = new DialogAddTracker(this);
 
-    ui->treeWidget->header()->setResizeMode(0, QHeaderView::ResizeToContents);
-    ui->treeWidget->header()->setResizeMode(1, QHeaderView::ResizeToContents);
-    ui->treeWidget->header()->setResizeMode(2, QHeaderView::Stretch);
+    ui->treeWidget->header()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
+    ui->treeWidget->header()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
+    ui->treeWidget->header()->setSectionResizeMode(2, QHeaderView::Stretch);
 
     connect(ui->comboBox, SIGNAL(currentIndexChanged(QString)), this, SLOT(updateServerList(QString)));
     connect(ui->pushButton, SIGNAL(clicked()), addTrackerDialog, SLOT(show()));

@@ -240,6 +240,5 @@ void DownloadManager::addDownload(quint32 ref, quint32 size, quint32 queuepos) {
 
 QString DownloadManager::GetDownloadsDirectoryPath()
 {
-    // Qt4 does not offer a standard "Downloads" location. We could define one in the preferences dialog.
-    return QDesktopServices::storageLocation(QDesktopServices::DesktopLocation);
+    return QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
 }
