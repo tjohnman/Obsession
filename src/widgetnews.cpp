@@ -212,9 +212,9 @@ void WidgetNews::onNewsCategory(unsigned char _type, QString _name) {
 }
 
 void WidgetNews::onItemSelectionChanged() {
-    const QTreeWidgetItem * item = ui->treeWidget->currentItem();
+    /*const QTreeWidgetItem * item = ui->treeWidget->currentItem();
 
-    /*if (item) {
+    if (item) {
         ui->pushButtonDelete->setEnabled(true);
         ui->pushButtonReply->setEnabled(true);
     } else {

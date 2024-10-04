@@ -212,7 +212,7 @@ void CDownload::startDownloading() {
     if(connection->pSocket.isValid() && connection->pSocket.state() == QAbstractSocket::ConnectedState) {
         socket.connectToHost(connection->pSocket.peerAddress(), connection->pSocket.peerPort()+1, QIODevice::ReadWrite);
         socket.waitForConnected();
-        if(socket.state() == !QAbstractSocket::ConnectedState) {
+        if(socket.state() != QAbstractSocket::ConnectedState) {
             return;
         }
 
@@ -296,14 +296,14 @@ void CDownload::serverReady() {
 
     qint32 nameSize = forkSize - 72;
 
-    bool hxd = false;
-
     char * reportedName = (char *)malloc(nameSize);
     memcpy(reportedName, forkInfo+72, nameSize);
 
+    /*bool hxd = false;
+
     if(!strncmp(reportedName, "hxd", 3)) {
         hxd = true;
-    }
+    }*/
 
     char * dataHeader = new char[16];
     
