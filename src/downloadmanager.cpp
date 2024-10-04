@@ -105,7 +105,7 @@ void DownloadManager::sendDownloadRequestToServer(CDownload * download) {
         path.append("/");
     }
 
-    QStringList levels = path.split("/", QString::SkipEmptyParts);
+    QStringList levels = path.split("/", Qt::SkipEmptyParts);
     quint16 directorylevels = levels.count();
     quint16 pathlen = 2 + directorylevels * 3;
     for(qint32 i=0; i<levels.count(); i++) {

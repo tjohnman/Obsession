@@ -123,6 +123,7 @@ void CTransaction::addData(const char * data) {
         case 110:
         case 115:
             newParameter.type = TYPE_STRING;
+            break;
         case 116:
             if(size <= 2) {
                 newParameter.type = TYPE_SHORT;

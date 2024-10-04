@@ -90,7 +90,7 @@ void DialogFileBrowser::load() {
     CTransaction * fileListTransaction = connection->createTransaction(200);
 
     if(path.length() > 1) {
-        QStringList levels = path.split("/", QString::SkipEmptyParts);
+        QStringList levels = path.split("/", Qt::SkipEmptyParts);
         quint16 directorylevels = levels.count();
         quint16 pathlen = 2 + directorylevels * 3;
         for(qint32 i=0; i<levels.count(); i++) {
@@ -332,7 +332,7 @@ void DialogFileBrowser::goDirectoryUp() {
         path = "/";
         return;
     }
-    QStringList levels = path.split("/", QString::SkipEmptyParts);
+    QStringList levels = path.split("/", Qt::SkipEmptyParts);
     levels.pop_back();
     path = levels.join("/");
     load();
@@ -365,7 +365,7 @@ void DialogFileBrowser::requestFileDelete()
     CTransaction * transaction = connection->createTransaction(204);
     transaction->addParameter(201, TextHelper::EncodeText(ui->treeWidget->currentItem()->data(0, 0).toString()).size(), TextHelper::EncodeText(ui->treeWidget->currentItem()->data(0, 0).toString()).data());
 
-    QStringList levels = path.split("/", QString::SkipEmptyParts);
+    QStringList levels = path.split("/", Qt::SkipEmptyParts);
     quint16 directorylevels = levels.count();
     quint16 pathlen = 2 + directorylevels * 3;
     for(qint32 i=0; i<levels.count(); i++) {
@@ -423,7 +423,7 @@ void DialogFileBrowser::requestUpload() {
         path.append("/");
     }
 
-    QStringList levels = path.split("/", QString::SkipEmptyParts);
+    QStringList levels = path.split("/", Qt::SkipEmptyParts);
     quint16 directorylevels = levels.count();
     quint16 pathlen = 2 + directorylevels * 3;
     for(qint32 i=0; i<levels.count(); i++) {
