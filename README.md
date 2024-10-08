@@ -18,6 +18,10 @@ You can get Windows builds [here](https://github.com/tjohnman/Obsession/releases
 
 You can find Obsession on [MacPorts](https://ports.macports.org/port/Obsession/details/).
 
+### Arch Linux
+
+You can find Obsession on the [AUR](https://aur.archlinux.org/packages/obsession-git/).
+
 Building
 --------
 
