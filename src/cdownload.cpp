@@ -292,21 +292,9 @@ void CDownload::serverReady() {
         return;
     }
 
-    char * forkInfo = socket.read(forkSize).data();
-
-    qint32 nameSize = forkSize - 72;
-
-    bool hxd = false;
-
-    char * reportedName = (char *)malloc(nameSize);
-    memcpy(reportedName, forkInfo+72, nameSize);
-
-    if(!strncmp(reportedName, "hxd", 3)) {
-        hxd = true;
-    }
+    char * _forkInfo = socket.read(forkSize).data();
 
     char * dataHeader = new char[16];
-    
     if (!socket.read(dataHeader, 16))
     {
         socket.close();
