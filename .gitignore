@@ -224,3 +224,5 @@ ui_*.h
 object_script.*
 .vscode
 .qtc_clangd
+deploy.ps1
+obsession-alpha-qt4-windows.zip
