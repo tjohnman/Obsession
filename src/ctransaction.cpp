@@ -123,6 +123,7 @@ void CTransaction::addData(const char * data) {
         case 110:
         case 115:
             newParameter.type = TYPE_STRING;
+            break;
         case 116:
             if(size <= 2) {
                 newParameter.type = TYPE_SHORT;
@@ -223,7 +224,9 @@ char * CTransaction::bytes() {
         qint16 plen = qToBigEndian(pParameters[i]->length());
         memcpy(b+24+offset, &plen, 2);
 
-        qint16 sval, ival;
+        qint16 sval;
+        qint32 ival;
+        
         switch(pParameters[i]->type()) {
         case TYPE_STRING:
             for(qint32 j=0; j<pParameters[i]->length(); j++) {

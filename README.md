@@ -32,6 +32,7 @@ This repository includes a convenience script that deploys a release package on 
 - Download and install [MinGW 4.8.2](http://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win32/Personal%20Builds/mingw-builds/4.8.2/threads-posix/dwarf/i686-4.8.2-release-posix-dwarf-rt_v3-rev3.7z/download).
 - Download and install [Qt 4.8.7](https://download.qt.io/archive/qt/4.8/4.8.7/qt-opensource-windows-x86-mingw482-4.8.7.exe).
 - Download this repository and unpack it.
+- Copy `deploy.ps1.example` with the name `deploy.ps1`.
 - Open `deploy.ps1` with your text editor, and adjust the `$mingwPath` and `$qtPath` variables to point to the `bin` directories for your MinGW and Qt installations, respectively.
 - Run `.\deploy.ps1` from the root directory of the repository.
 
