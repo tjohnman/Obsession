@@ -212,7 +212,7 @@ void CDownload::startDownloading() {
     if(connection->pSocket.isValid() && connection->pSocket.state() == QAbstractSocket::ConnectedState) {
         socket.connectToHost(connection->pSocket.peerAddress(), connection->pSocket.peerPort()+1, QIODevice::ReadWrite);
         socket.waitForConnected();
-        if(socket.state() == !QAbstractSocket::ConnectedState) {
+        if(socket.state() != QAbstractSocket::ConnectedState) {
             return;
         }
 
