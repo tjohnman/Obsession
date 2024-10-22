@@ -36,7 +36,7 @@ This repository includes a convenience script that deploys a release package on 
 - Open `deploy.ps1` with your text editor, and adjust the `$mingwPath` and `$qtPath` variables to point to the `bin` directories for your MinGW and Qt installations, respectively.
 - Run `.\deploy.ps1` from the root directory of the repository.
 
-This will produce a `obsession-alpha-qt4-windows.zip` file, ready for distribution.
+This will produce an `obsession-alpha-qt4-windows.zip` file, ready for distribution.
 
 _Note: In order to be able to run the script, you might have to enable unsigned script execution by running the following command in an elevated PowerShell prompt: `Set-ExecutionPolicy -ExecutionPolicy RemoteSigned`._
 
