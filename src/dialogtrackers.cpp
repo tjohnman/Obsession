@@ -7,6 +7,7 @@
 #include <QTextCodec>
 #include <QTextStream>
 #include <QHostAddress>
+#include <QMessageBox>
 
 DialogTrackers::DialogTrackers(ConnectionController * c, QWidget *parent) :
     QDialog(parent),
@@ -34,6 +35,7 @@ DialogTrackers::DialogTrackers(ConnectionController * c, QWidget *parent) :
     connect(ui->pushButton_3, SIGNAL(clicked()), this, SLOT(openConnectionWindow()));
     connect(addTrackerDialog, SIGNAL(accepted()), this, SLOT(addTracker()));
     connect(ui->treeWidget, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(openConnectionWindow()));
+    connect(ui->treeWidget, SIGNAL(itemSelectionChanged()), this, SLOT(onServerSelectionChanged()));
     connect(pSocket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(socketError(QAbstractSocket::SocketError)));
     connect(ui->buttonRefresh, SIGNAL(clicked()), this, SLOT(updateCurrentList()));
 }
@@ -65,7 +67,15 @@ void DialogTrackers::addTracker() {
     }
 }
 
+void DialogTrackers::onServerSelectionChanged() {
+    ui->pushButton_3->setEnabled(ui->treeWidget->topLevelItemCount() > 0);
+}
+
 void DialogTrackers::deleteTracker() {
+    if (QMessageBox::question(this, "Delete tracker", "Are you sure you want to permanently remove this tracker from the list of saved trackers?", QMessageBox::Yes | QMessageBox::No, QMessageBox::No) != QMessageBox::Yes) {
+        return;
+    }
+
     if(ui->comboBox->count() > 0) {
         for(quint32 i=0; i<pTrackerNames.size(); i++) {
             if(pTrackerNames[i] == ui->comboBox->currentText()) {
@@ -79,9 +89,12 @@ void DialogTrackers::deleteTracker() {
         }
         saveTrackerList();
         updateTrackerList();
+        
         if(ui->comboBox->count() > 0)
         {
             ui->comboBox->setCurrentIndex(ui->comboBox->count()-1);
+        } else {
+            ui->pushButton_3->setEnabled(false);
         }
     }
 }
@@ -109,6 +122,14 @@ void DialogTrackers::updateTrackerList() {
         pTrackerAddresses.push_back(settings.value(QString("trackeradd")+QString::number(i)).toString());
         ui->comboBox->addItem(pTrackerNames.back());
     }
+
+    if (numTrackers == 0 && QMessageBox::question(this, "No trackers found", "Your trackers list is empty. Do you want to add hltracker.com to the list?", QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
+        pTrackerNames.push_back("hltracker.com");
+        pTrackerAddresses.push_back("hltracker.com");
+        ui->comboBox->addItem("hltracker.com");
+
+        saveTrackerList();
+    }
 }
 
 void DialogTrackers::updateCurrentList() {
@@ -116,11 +137,18 @@ void DialogTrackers::updateCurrentList() {
 }
 
 void DialogTrackers::updateServerList(QString tracker) {
-    ui->label->setText("loading...");
+    ui->buttonRefresh->setEnabled(false);
+    ui->pushButton_3->setEnabled(false);
 
     if(ui->comboBox->count() == 0) {
+        ui->label->setText("");
+        ui->pushButton_2->setEnabled(false);
+        ui->treeWidget->clear();
+        ui->pushButton_2->setText("Remove");
         return;
     }
+
+    ui->pushButton_2->setEnabled(true);
     QString address;
 
     ui->treeWidget->clear();
@@ -128,6 +156,7 @@ void DialogTrackers::updateServerList(QString tracker) {
     for(quint32 i=0; i<pTrackerNames.size(); i++) {
         if(pTrackerNames[i] == tracker) {
             address = pTrackerAddresses[i];
+            ui->pushButton_2->setText("Remove " + pTrackerNames[i]);
         }
     }
 
@@ -137,6 +166,8 @@ void DialogTrackers::updateServerList(QString tracker) {
     pSocket = new QTcpSocket();
 
     connect(pSocket, SIGNAL(connected()), this, SLOT(sendRequest()));
+    
+    ui->label->setText("loading...");
     pSocket->connectToHost(address, 5498, QIODevice::ReadWrite);
 }
 
@@ -241,6 +272,7 @@ void DialogTrackers::onSocketData() {
         item->setTextAlignment(1, Qt::AlignHCenter);
         ui->treeWidget->addTopLevelItem(item);
         ui->label->setText(QString::number(ui->treeWidget->topLevelItemCount())+" servers");
+        ui->buttonRefresh->setEnabled(true);
     }
     numServers = ui->treeWidget->topLevelItemCount();
 }

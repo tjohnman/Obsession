@@ -47,6 +47,7 @@ private slots:
     void socketError(QAbstractSocket::SocketError);
     void connectToServer(QModelIndex);
     void openConnectionWindow();
+    void onServerSelectionChanged();
 };
 
 #endif // DIALOGTRACKERS_H
