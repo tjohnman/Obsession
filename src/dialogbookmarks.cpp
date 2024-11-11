@@ -66,6 +66,8 @@ void DialogBookmarks::selectedBookmark() {
         } else {
             ui->autoConnectCheckBox->setChecked(false);
         }
+    } else {
+        clearFields();
     }
 }
 
