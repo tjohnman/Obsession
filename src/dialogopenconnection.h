@@ -28,6 +28,8 @@ private:
 
     DialogBookmarks * bookmarksDialog;
 
+    void _clearFields();
+
 public slots:
     void openConnection();
     void updateBookmarkList();

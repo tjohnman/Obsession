@@ -50,8 +50,12 @@ void DialogOpenConnection::changeEvent(QEvent *e)
 }
 
 void DialogOpenConnection::clear() {
+    ui->comboBox->setCurrentIndex(0);
+}
+
+void DialogOpenConnection::_clearFields() {
     ui->autoConnectCheckbox->setDisabled(true);
-    ui->comboBox->setCurrentIndex(-1);
+    ui->autoConnectCheckbox->setChecked(false);
     ui->lineEdit->setText("");
     ui->lineEdit_2->setText("");
     ui->lineEdit_3->setText("");
@@ -80,13 +84,17 @@ void DialogOpenConnection::bookmarkCurrent() {
     bookmarkCount++;
     settings.setValue("bookmarkCount", bookmarkCount);
     updateBookmarkList();
-    ui->comboBox->setCurrentIndex(bookmarkCount-1);
+    ui->comboBox->setCurrentIndex(ui->comboBox->count() - 1);
 }
 
 void DialogOpenConnection::choseBookmark(int selectedIndex) {
     QSettings settings("mir", "Contra");
 
-    if (selectedIndex == 0) return; // Blank entry
+    if (selectedIndex == 0) {
+        this->_clearFields();
+        ui->lineEdit->setFocus();
+        return;
+    }
 
     ui->autoConnectCheckbox->setDisabled(false);
     ui->lineEdit->setText(settings.value("bookmarkaddress"+QString::number(selectedIndex-1)).toString());
@@ -115,8 +123,8 @@ void DialogOpenConnection::updateAutoConnectStatus()
 
 void DialogOpenConnection::updateBookmarkList() {
     QSettings settings("mir", "Contra");
-    ui->comboBox->clear();
 
+    ui->comboBox->clear();
     ui->comboBox->addItem("");
 
     qint32 bookmarkCount = settings.value("bookmarkCount", 0).toInt();
