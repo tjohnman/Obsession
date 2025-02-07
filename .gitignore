@@ -226,3 +226,9 @@ object_script.*
 .qtc_clangd
 deploy.ps1
 obsession-alpha-qt4-windows.zip
+
+
+*.orig
+*.rej
+*.patch
+*.stash
