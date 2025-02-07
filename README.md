@@ -40,6 +40,10 @@ This will produce an `obsession-alpha-qt4-windows.zip` file, ready for distribut
 
 _Note: In order to be able to run the script, you might have to enable unsigned script execution by running the following command in an elevated PowerShell prompt: `Set-ExecutionPolicy -ExecutionPolicy RemoteSigned`._
 
+### Linux
+
+This repository includes a convenience script that applies the Qt5 patch made by [Josh Ellithorpe](https://github.com/zquestz) and builds a binary. Simply clone this repository and run `./build-linux-qt5.sh`. Make sure you have `path` and `qmake` or `qmake-qt5` available in your PATH. This will build an Obsession binary inside a newly created `build` directory.
+
 ### Other
 
 You might need to download and build/install [Qt 4](https://download.qt.io/archive/qt/4.8/4.8.7/) for your platform, as well as other libraries or frameworks necessary to build Qt projects.
