@@ -4,7 +4,6 @@
 
 #include <QSettings>
 #include <QtEndian>
-#include <QTextCodec>
 #include <QTextStream>
 #include <QHostAddress>
 #include <QMessageBox>
@@ -25,18 +24,18 @@ DialogTrackers::DialogTrackers(ConnectionController * c, QWidget *parent) :
 
     addTrackerDialog = new DialogAddTracker(this);
 
-    ui->treeWidget->header()->setResizeMode(0, QHeaderView::ResizeToContents);
-    ui->treeWidget->header()->setResizeMode(1, QHeaderView::ResizeToContents);
-    ui->treeWidget->header()->setResizeMode(2, QHeaderView::Stretch);
+    ui->treeWidget->header()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
+    ui->treeWidget->header()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
+    ui->treeWidget->header()->setSectionResizeMode(2, QHeaderView::Stretch);
 
-    connect(ui->comboBox, SIGNAL(currentIndexChanged(QString)), this, SLOT(updateServerList(QString)));
+    connect(ui->comboBox, SIGNAL(currentTextChanged(QString)), this, SLOT(updateServerList(QString)));
     connect(ui->pushButton, SIGNAL(clicked()), addTrackerDialog, SLOT(show()));
     connect(ui->pushButton_2, SIGNAL(clicked()), this, SLOT(deleteTracker()));
     connect(ui->pushButton_3, SIGNAL(clicked()), this, SLOT(openConnectionWindow()));
     connect(addTrackerDialog, SIGNAL(accepted()), this, SLOT(addTracker()));
     connect(ui->treeWidget, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(openConnectionWindow()));
     connect(ui->treeWidget, SIGNAL(itemSelectionChanged()), this, SLOT(onServerSelectionChanged()));
-    connect(pSocket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(socketError(QAbstractSocket::SocketError)));
+    connect(pSocket, SIGNAL(errorOccurred(QAbstractSocket::SocketError)), this, SLOT(socketError(QAbstractSocket::SocketError)));
     connect(ui->buttonRefresh, SIGNAL(clicked()), this, SLOT(updateCurrentList()));
 }
 

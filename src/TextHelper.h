@@ -2,7 +2,8 @@
 #define TEXTHELPER_H
 
 #include <QSettings>
-#include <QTextCodec>
+#include <QStringDecoder>
+#include <QStringEncoder>
 
 class TextHelper
 {
@@ -10,56 +11,35 @@ public:
     static QString DecodeText(const char * str, int length)
     {
         QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
-        QTextCodec * codec = QTextCodec::codecForName(settings.value(QString::fromUtf8("Encoding"), "Apple Roman").toString().toUtf8());
-        if(!codec)
-        {
-            codec = QTextCodec::codecForName(QString::fromUtf8("Apple Roman").toUtf8());
-        }
-        return codec->toUnicode(str, length);
+        QStringDecoder decoder(settings.value(QString::fromUtf8("Encoding"), "macintosh").toString().toUtf8());
+        return decoder.decode(QByteArray::fromRawData(str, length));
     }
 
     static QString DecodeTextAutoUTF8(const char * str, int length)
     {
-        QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
-        QTextCodec * codec = QTextCodec::codecForName(settings.value(QString::fromUtf8("Encoding"), "Apple Roman").toString().toUtf8());
-        if(!codec)
-        {
-            codec = QTextCodec::codecForName("Apple Roman");
-        }
-        QString utf8str = QTextCodec::codecForName("UTF-8")->toUnicode(str, length);
-        QString regularStr = codec->toUnicode(str, length);
-        return utf8str.length() < regularStr.length() ? utf8str : regularStr;
+        return TextHelper::DecodeText(str, length);
     }
 
     static QString DecodeText(char * str, int length, QString encoding)
     {
-        QTextCodec * codec = QTextCodec::codecForName(encoding.toUtf8());
-        if(!codec)
-        {
-            codec = QTextCodec::codecForName(QString::fromUtf8("Apple Roman").toUtf8());
-        }
-        return codec->toUnicode(str, length);
+        QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
+        QStringDecoder decoder(encoding.toUtf8());
+        return decoder.decode(QByteArray::fromRawData(str, length));
     }
 
     static QByteArray EncodeText(QString str)
     {
         QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
-        QTextCodec * codec = QTextCodec::codecForName(settings.value(QString::fromUtf8("Encoding"), "Apple Roman").toString().toUtf8());
-        if(!codec)
-        {
-            codec = QTextCodec::codecForName(QString::fromUtf8("Apple Roman").toUtf8());
-        }
-        return codec->fromUnicode(str);
+        QStringEncoder encoder(settings.value(QString::fromUtf8("Encoding"), "macintosh").toString().toUtf8());
+        return encoder.encode(str);
     }
 
     static QByteArray EncodeText(QString str, QString encoding)
     {
-        QTextCodec * codec = QTextCodec::codecForName(encoding.toUtf8());
-        if(!codec)
-        {
-            codec = QTextCodec::codecForName(QString::fromUtf8("Apple Roman").toUtf8());
-        }
-        return codec->fromUnicode(str);
+
+        QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
+        QStringEncoder encoder(encoding.toUtf8());
+        return encoder.encode(str);
     }
 
     static QString FormatMessageToHTML(QString str)

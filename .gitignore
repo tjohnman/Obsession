@@ -232,3 +232,6 @@ obsession-alpha-qt4-windows.zip
 *.rej
 *.patch
 *.stash
+
+CMakeLists.txt.user
+Makefile

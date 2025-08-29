@@ -54,12 +54,12 @@
         <file>interfaceIcons/newNewsCategory.png</file>
         <file>interfaceIcons/newNewsFolder.png</file>
     </qresource>
-    <qresource prefix="/">
-        <file>sounds/chat.wav</file>
-        <file>sounds/pm.wav</file>
-    </qresource>
     <qresource prefix="/bookmarks">
         <file>interfaceIcons/bookmarksAdd.png</file>
         <file>interfaceIcons/bookmarksRemove.png</file>
+    </qresource>
+    <qresource prefix="/">
+        <file>sounds/chat.mp3</file>
+        <file>sounds/pm.mp3</file>
     </qresource>
 </RCC>

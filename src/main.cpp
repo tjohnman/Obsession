@@ -4,9 +4,7 @@
 #include <QApplication>
 #include "mainwindow.h"
 #include <QThreadPool>
-#include <iostream>
 #include <QSettings>
-#include "connectioncontroller.h"
 
 void kill_threads( void );
 void * __gxx_personality_v0=0;

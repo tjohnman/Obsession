@@ -8,8 +8,7 @@
 #include <QTextCursor>
 #include "dialogagreement.h"
 #include "dialogfilebrowser.h"
-#include "dialogerror.h"
-#include <QSound>
+#include <QSoundEffect>
 #include "dialogiconviewer.h"
 #include "dialoglinearnews.h"
 #include <QFocusEvent>
@@ -24,6 +23,8 @@
 #include <QNetworkReply>
 #include <QNetworkRequest>
 #include <QTimer>
+#include <QMediaPlayer>
+#include <QAudioOutput>
 
 #include "dialogbookmarks.h"
 #include "widgetchat.h"
@@ -82,7 +83,6 @@ public slots:
     void playPMSound();
     void onPreferencesSaved();
     void onConnected();
-    void onVersionReady();
     void openBookmarksDialog();
     void requestUserInfo(quint16 id);
     void openRequestPermissions();
@@ -111,8 +111,6 @@ private:
     QLabel * statusLabel;
     DialogAgreement * agreementDialog;
     DialogFileBrowser * fileBrowserDialog;
-    QSound * chatSound;
-    QSound * pmSound;
     DialogIconViewer * iconViewer;
     DialogLinearNews * linearNews;
     DownloadManager * downloadManager;
@@ -127,6 +125,9 @@ private:
     WidgetChat * chatWidget;
     WidgetNews * threadedNewsWidget;
     WidgetConsole * debugConsole;
+
+    QMediaPlayer mediaPlayer;
+    QAudioOutput audioOutput;
 
     std::map<std::string, DialogPrivateMessaging *> pPrivateChats;
 };

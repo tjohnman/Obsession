@@ -1,6 +1,7 @@
 #include "downloadmanager.h"
 #include <QSettings>
 #include <QDesktopServices>
+#include <QStandardPaths>
 #include "dialogerror.h"
 #include "TextHelper.h"
 
@@ -105,7 +106,7 @@ void DownloadManager::sendDownloadRequestToServer(CDownload * download) {
         path.append("/");
     }
 
-    QStringList levels = path.split("/", QString::SkipEmptyParts);
+    QStringList levels = path.split("/", Qt::SkipEmptyParts);
     quint16 directorylevels = levels.count();
     quint16 pathlen = 2 + directorylevels * 3;
     for(qint32 i=0; i<levels.count(); i++) {
@@ -240,6 +241,6 @@ void DownloadManager::addDownload(quint32 ref, quint32 size, quint32 queuepos) {
 
 QString DownloadManager::GetDownloadsDirectoryPath()
 {
-    // Qt4 does not offer a standard "Downloads" location. We could define one in the preferences dialog.
-    return QDesktopServices::storageLocation(QDesktopServices::DesktopLocation);
+    return QStandardPaths::writableLocation(QStandardPaths::DownloadLocation);
+
 }

@@ -65,34 +65,34 @@ void CDownload::updateSpeed() {
     QString sizeString, readString, timeString;
     if(size > 1024) {
         if(size > 1024*1024*1024) {
-            sizeString = sizeString.sprintf("%.2f GB", size/1024/1024/1024);
-            readString = readString.sprintf("%.2f GB", read/1024/1024/1024);
+            sizeString = sizeString.asprintf("%.2f GB", size/1024/1024/1024);
+            readString = readString.asprintf("%.2f GB", read/1024/1024/1024);
         } else {
             if(size > 1024*1024) {
-                sizeString = sizeString.sprintf("%.2f MB", size/1024/1024);
-                readString = readString.sprintf("%.2f MB", read/1024/1024);
+                sizeString = sizeString.asprintf("%.2f MB", size/1024/1024);
+                readString = readString.asprintf("%.2f MB", read/1024/1024);
             } else {
-                sizeString = sizeString.sprintf("%.2f KB", size/1024);
-                readString = readString.sprintf("%.2f KB", read/1024);
+                sizeString = sizeString.asprintf("%.2f KB", size/1024);
+                readString = readString.asprintf("%.2f KB", read/1024);
             }
         }
     } else {
-        sizeString = sizeString.sprintf("%.0f bytes", size);
-        readString = readString.sprintf("%.0f bytes", read);
+        sizeString = sizeString.asprintf("%.0f bytes", size);
+        readString = readString.asprintf("%.0f bytes", read);
     }
 
     if(speed > 1024) {
         if(speed > 1024*1024*1024) {
-            speedString = speedString.sprintf("%.2f GB/s", speed/1024/1024/1024); // Would love to live to see this :P
+            speedString = speedString.asprintf("%.2f GB/s", speed/1024/1024/1024); // Would love to live to see this :P
         } else {
             if(speed > 1024*1024) {
-                speedString = speedString.sprintf("%.2f MB/s", speed/1024/1024);
+                speedString = speedString.asprintf("%.2f MB/s", speed/1024/1024);
             } else {
-                speedString = speedString.sprintf("%.2f KB/s", speed/1024);
+                speedString = speedString.asprintf("%.2f KB/s", speed/1024);
             }
         }
     } else {
-        speedString = speedString.sprintf("%.0f bytes/s", speed);
+        speedString = speedString.asprintf("%.0f bytes/s", speed);
     }
 
     timeElapsed++;

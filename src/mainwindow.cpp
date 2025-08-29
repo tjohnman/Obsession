@@ -1,6 +1,5 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include <QTextCodec>
 #include "dialogpreferences.h"
 #include "dialogprivatemessaging.h"
 #include "dialoguserinfo.h"
@@ -8,11 +7,13 @@
 #include "version.h"
 #include <QDesktopServices>
 #include <QMessageBox>
+#include "dialogerror.h"
 #include "dialogprivileges.h"
 #include "dialogrequestaccount.h"
 #include "dialogcreateaccount.h"
 #include "dialogbroadcast.h"
 #include "TextHelper.h"
+#include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent, bool checkForUpdates) :
     QMainWindow(parent),
@@ -106,15 +107,8 @@ MainWindow::MainWindow(QWidget *parent, bool checkForUpdates) :
     ui->statusLabel->setFont(font);
     setStatus(QString("Not connected"));
 
-    #ifdef Q_OS_WIN32
-    chatSound = new QSound("./sounds/chat.wav");
-    pmSound = new QSound("./sounds/pm.wav");
-    #else
-    chatSound = new QSound(":/sounds/chat.wav");
-    pmSound = new QSound(":/sounds/pm.wav");
-    #endif
+    mediaPlayer.setAudioOutput(&audioOutput);
 
-    chatWidget->chatSound = chatSound;
     chatWidget->connection = connection;
 
     onPreferencesSaved();
@@ -126,8 +120,6 @@ MainWindow::~MainWindow()
 {
     delete ui;
     delete connection;
-    delete chatSound;
-    delete pmSound;
     delete bookmarksDialog;
 }
 
@@ -188,14 +180,18 @@ void MainWindow::onConnected() {
 void MainWindow::playChatSound() {
     QSettings settings("mir", "Contra");
     if(settings.value("soundsEnabled", true).toBool()) {
-        chatSound->play();
+        mediaPlayer.setSource(QUrl::fromLocalFile(":/sounds/chat.mp3"));
+        audioOutput.setVolume(100);
+        mediaPlayer.play();
     }
 }
 
 void MainWindow::playPMSound() {
     QSettings settings("mir", "Contra");
     if(settings.value("soundsEnabled", true).toBool()) {
-        pmSound->play();
+        mediaPlayer.setSource(QUrl::fromLocalFile(":/sounds/pm.mp3"));
+        audioOutput.setVolume(100);
+        mediaPlayer.play();
     }
 }
 
@@ -599,36 +595,6 @@ void MainWindow::onOpenUserInfo(QString username, QString info, quint16 uid) {
         user->infoWindow->gotUserInfo(username, info);
         user->infoWindow->show();
     }
-}
-
-void MainWindow::onVersionReady()
-{
-    if(pUpdateCheckReply->error() != QNetworkReply::NoError)
-    {
-        qDebug() << "Error retrieving last version number";
-        pUpdateCheckReply->deleteLater();
-        return;
-    }
-
-    QByteArray versionArray = pUpdateCheckReply->readAll();
-    qDebug() << "Current version: " << QString("%1.%2").arg(VERSION_MAJOR).arg(VERSION_MINOR);
-    qDebug() << "Latest version: " << versionArray;
-
-    QList<QByteArray> splitArray = versionArray.split('.');
-    if(splitArray[0].toInt() > VERSION_MAJOR || splitArray[1].toInt() > VERSION_MINOR)
-    {
-        qDebug() << "Update needed.";
-        switch(QMessageBox::information(this, "Update available",
-                                        "There is a new version of Obsession ready for download."
-                                        " Do you want to launch your web browser to download it?", "Yes", "No"))
-        {
-            case 0:
-            QDesktopServices::openUrl(QUrl(""));
-            break;
-        }
-    }
-
-    pUpdateCheckReply->deleteLater();
 }
 
 
