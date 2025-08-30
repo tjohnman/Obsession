@@ -2,7 +2,7 @@
 
 #include <QtEndian>
 #include <QSettings>
-#include <QStringDecoder>
+#include <QTextCodec>
 
 TransactionParameter::TransactionParameter(s_parameter parameterData) {
     QObject();
@@ -38,8 +38,12 @@ QString TransactionParameter::toString() {
     QString string = QString(buff);
 
     QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
-    QStringDecoder decoder(settings.value(QString::fromUtf8("Encoding"), "macintosh").toString().toUtf8());
-    string = decoder.decode(QByteArray::fromRawData(buff, pLength));
+    QTextCodec * codec = QTextCodec::codecForName(settings.value(QString::fromUtf8("Encoding"), "Apple Roman").toString().toUtf8());
+    if(!codec)
+    {
+        codec = QTextCodec::codecForName(QString::fromUtf8("Apple Roman").toUtf8());
+    }
+    string = codec->toUnicode(buff, pLength);
     free(buff);
 
     return string;

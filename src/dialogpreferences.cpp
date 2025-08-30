@@ -11,8 +11,8 @@ DialogPreferences::DialogPreferences(QWidget *parent) :
     QSettings settings("mir", "Contra");
     ui->lineEdit->setText(settings.value(QString("nick"), "unnamed").toString());
 
-    QString encoding = settings.value(QString::fromUtf8("Encoding"), "macintosh").toString();
-    if(encoding == "macintosh") ui->encodingCombo->setCurrentIndex(0);
+    QString encoding = settings.value(QString::fromUtf8("Encoding"), "Mac Roman").toString();
+    if(encoding == "Mac Roman") ui->encodingCombo->setCurrentIndex(0);
     if(encoding == "Shift_JIS") ui->encodingCombo->setCurrentIndex(1);
     if(encoding == "ISO-8859-1") ui->encodingCombo->setCurrentIndex(2);
     if(encoding == "UTF-8") ui->encodingCombo->setCurrentIndex(3);
@@ -101,7 +101,7 @@ void DialogPreferences::acceptSettings() {
     {
         default:
         case 0:
-            settings.setValue("Encoding", "macintosh");
+            settings.setValue("Encoding", "Mac Roman");
         break;
         case 1:
             settings.setValue("Encoding", "Shift_JIS");
