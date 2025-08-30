@@ -124,18 +124,18 @@ set(UI_FILES
 	src/widgetnews.ui
 )
 
-set(RCC_FILES
-	resources/icons1.qrc
-	resources/icons2.qrc
-	resources/resources.qrc
+qt_add_resources(RCC_FILES
+	"${CMAKE_CURRENT_SOURCE_DIR}/resources/resources.qrc"
+	"${CMAKE_CURRENT_SOURCE_DIR}/resources/icons1.qrc"
+	"${CMAKE_CURRENT_SOURCE_DIR}/resources/icons2.qrc"
 )
 
-set(app_icon_resource_windows "${CMAKE_CURRENT_SOURCE_DIR}/Obsession.rc")
+set(app_icon_resource_windows "${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}.rc")
 
-add_executable(Obsession ${SOURCES} ${HEADERS} ${UI_FILES} ${RCC_FILES} ${app_icon_resource_windows})
-target_link_libraries(Obsession PUBLIC Qt6::Widgets Qt6::Network Qt6::Multimedia Qt6::Core5Compat)
+add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS} ${UI_FILES} ${RCC_FILES} ${app_icon_resource_windows})
+target_link_libraries(${PROJECT_NAME} PUBLIC Qt6::Widgets Qt6::Network Qt6::Multimedia Qt6::Core5Compat)
 
-set_target_properties(Obsession PROPERTIES
+set_target_properties(${PROJECT_NAME} PROPERTIES
     WIN32_EXECUTABLE TRUE
     MACOSX_BUNDLE TRUE
 )
