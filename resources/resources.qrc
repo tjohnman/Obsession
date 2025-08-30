@@ -61,5 +61,7 @@
     <qresource prefix="/">
         <file>sounds/chat.mp3</file>
         <file>sounds/pm.mp3</file>
+        <file>sounds/chat.wav</file>
+        <file>sounds/pm.wav</file>
     </qresource>
 </RCC>

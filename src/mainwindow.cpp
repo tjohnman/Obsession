@@ -180,7 +180,7 @@ void MainWindow::onConnected() {
 void MainWindow::playChatSound() {
     QSettings settings("mir", "Contra");
     if(settings.value("soundsEnabled", true).toBool()) {
-        mediaPlayer.setSource(QUrl::fromLocalFile(":/sounds/chat.mp3"));
+        mediaPlayer.setSource(QUrl("qrc:/sounds/chat.wav"));
         audioOutput.setVolume(100);
         mediaPlayer.play();
     }
@@ -189,7 +189,7 @@ void MainWindow::playChatSound() {
 void MainWindow::playPMSound() {
     QSettings settings("mir", "Contra");
     if(settings.value("soundsEnabled", true).toBool()) {
-        mediaPlayer.setSource(QUrl::fromLocalFile(":/sounds/pm.mp3"));
+        mediaPlayer.setSource(QUrl("qrc:/sounds/pm.wav"));
         audioOutput.setVolume(100);
         mediaPlayer.play();
     }
