@@ -4,7 +4,7 @@ project(Obsession)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(Qt6 REQUIRED COMPONENTS Widgets Core Network Multimedia Core5Compat)
+find_package(Qt6 REQUIRED COMPONENTS Widgets Core Network Multimedia MultimediaWidgets Core5Compat)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
@@ -131,4 +131,9 @@ set(RCC_FILES
 )
 
 add_executable(Obsession ${SOURCES} ${HEADERS} ${UI_FILES} ${RCC_FILES})
-target_link_libraries(Obsession PRIVATE Qt6::Widgets Qt6::Network Qt6::Multimedia Qt6::Core5Compat)
+target_link_libraries(Obsession PUBLIC Qt6::Widgets Qt6::Network Qt6::Multimedia Qt6::Core5Compat)
+
+set_target_properties(Obsession PROPERTIES
+    WIN32_EXECUTABLE TRUE
+    MACOSX_BUNDLE TRUE
+)

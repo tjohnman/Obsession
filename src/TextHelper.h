@@ -64,6 +64,10 @@ public:
 
     static QString FormatMessageToHTML(QString str)
     {
+        if (str.length() == 0) {
+            return "";
+        }
+
         while(str.at(0) == '\n' || str.at(0) == '\r') {
             str = str.right(str.length()-1);
         }
