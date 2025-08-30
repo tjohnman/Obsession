@@ -130,7 +130,9 @@ set(RCC_FILES
 	resources/resources.qrc
 )
 
-add_executable(Obsession ${SOURCES} ${HEADERS} ${UI_FILES} ${RCC_FILES})
+set(app_icon_resource_windows "${CMAKE_CURRENT_SOURCE_DIR}/Obsession.rc")
+
+add_executable(Obsession ${SOURCES} ${HEADERS} ${UI_FILES} ${RCC_FILES} ${app_icon_resource_windows})
 target_link_libraries(Obsession PUBLIC Qt6::Widgets Qt6::Network Qt6::Multimedia Qt6::Core5Compat)
 
 set_target_properties(Obsession PROPERTIES
