@@ -6,6 +6,7 @@
 #include <QHostAddress>
 #include <QNetworkAccessManager>
 #include <QTextCodec>
+#include <QDirIterator>
 #include "dialogprivatemessaging.h"
 
 #include "transactionparameter.h"
@@ -635,10 +636,20 @@ void ConnectionController::onSocketData() {
 
                                 memcpy(&newUser->icon, parameterBuffer->data() + 2, 2);
                                 newUser->icon = qFromBigEndian(newUser->icon);
+                                newUser->iconPath = 0;
 
                                 newUser->doesCET = false;
 
-                                newUser->iconPath = new QString(QString(":/icons/") + QString::number(newUser->icon) + QString(".png"));
+                                QDirIterator dir(":/icons");
+                                while (dir.hasNext()) {
+                                    QString filename = dir.next();
+                                    QFileInfo file(filename);
+                                    if (file.fileName().startsWith(QString::number(newUser->icon) + ".") && file.fileName().endsWith(".png")) {
+                                        newUser->iconPath = new char[filename.length() + 1];
+                                        strncpy(newUser->iconPath, filename.toStdString().c_str(), filename.length());
+                                        newUser->iconPath[filename.length()] = 0;
+                                    }
+                                }
 
                                 memcpy(&newUser->flags, parameterBuffer->data() + 4, 2);
                                 newUser->flags = qFromBigEndian(newUser->flags);
@@ -1099,7 +1110,22 @@ void ConnectionController::onSocketData() {
                         }
 
                         user->icon = newIcon;
-                        user->iconPath = new QString(QString(":/icons/") + QString::number(user->icon) + QString(".png"));
+
+                        if (user->iconPath) {
+                            delete[] user->iconPath;
+                            user->iconPath = 0;
+                        }
+
+                        QDirIterator dir(":/icons");
+                        while (dir.hasNext()) {
+                            QString filename = dir.next();
+                            QFileInfo file(filename);
+                            if (file.fileName().startsWith(QString::number(user->icon) + ".") && file.fileName().endsWith(".png")) {
+                                user->iconPath = new char[filename.length() + 1];
+                                strncpy(user->iconPath, filename.toStdString().c_str(), filename.length());
+                                user->iconPath[filename.length()] = 0;
+                            }
+                        }
                     }
 
                     parameterBuffer = receivedTransaction->getParameterById(112);
@@ -1133,7 +1159,18 @@ void ConnectionController::onSocketData() {
                     parameterBuffer = receivedTransaction->getParameterById(104);
                     if(parameterBuffer) {
                         newUser->icon = parameterBuffer->toShort();
-                        newUser->iconPath = new QString(QString("icons/") + QString::number(newUser->icon) + QString(".png"));
+                        newUser->iconPath = 0;
+
+                        QDirIterator dir(":/icons");
+                        while (dir.hasNext()) {
+                            QString filename = dir.next();
+                            QFileInfo file(filename);
+                            if (file.fileName().startsWith(QString::number(newUser->icon) + ".") && file.fileName().endsWith(".png")) {
+                                newUser->iconPath = new char[filename.length() + 1];
+                                strncpy(newUser->iconPath, filename.toStdString().c_str(), filename.length());
+                                newUser->iconPath[filename.length()] = 0;
+                            }
+                        }
                     }
 
                     parameterBuffer = receivedTransaction->getParameterById(112);
@@ -1176,6 +1213,14 @@ void ConnectionController::onSocketData() {
                         pUsers.pop_back();
                         break;
                     }
+                }
+
+                if (user->name) {
+                    delete[] user->name;
+                }
+
+                if (user->iconPath) {
+                    delete[] user->iconPath;
                 }
 
                 delete user;

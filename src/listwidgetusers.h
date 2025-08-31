@@ -6,6 +6,9 @@
 #include <QAction>
 #include <QContextMenuEvent>
 #include <map>
+#include <qpainter.h>
+#include <QStyledItemDelegate>
+#include <QApplication>
 
 class ListWidgetUsers : public QListWidget
 {
@@ -32,5 +35,39 @@ public slots:
     void sendInfoRequest();
     void sendKickRequest();
 };
+
+class CenterIconDelegate : public QStyledItemDelegate {
+public:
+    void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const override {
+        QStyleOptionViewItemV4 opt = option;
+        initStyleOption(&opt, index);
+
+        QStyle *style = QApplication::style();
+        style->drawPrimitive(QStyle::PE_PanelItemViewItem, &opt, painter);
+
+        QIcon icon = opt.icon;
+        QString text = opt.text;
+        QRect rect = opt.rect;
+
+        opt.icon = QIcon();
+        opt.text = QString();
+
+        QSize actualIconSize = icon.actualSize(QSize(32, 32));
+
+        icon.paint(painter, rect.left() + 16 - actualIconSize.width() * 0.5, rect.top() + rect.height() * 0.5 - actualIconSize.height() * 0.5, actualIconSize.width(), actualIconSize.height());
+
+        QFontMetrics fm(opt.font);
+        QRect textRect(rect.left() + 32 + 5, rect.top(), rect.width() - 32 - 5, rect.height());
+        painter->setFont(opt.font);
+        painter->setPen(opt.palette.color(QPalette::Text));
+        painter->drawText(textRect, Qt::AlignLeft | Qt::AlignVCenter, text);
+    }
+
+    QSize sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const override {
+        QSize size = QStyledItemDelegate::sizeHint(option, index);
+        return size;
+    }
+};
+
 
 #endif // LISTWIDGETUSERS_H

@@ -8,6 +8,9 @@
 ListWidgetUsers::ListWidgetUsers(QWidget *parent) :
     QListWidget(parent)
 {
+    this->setIconSize(QSize(32, 16));
+    this->setItemDelegate(new CenterIconDelegate());
+
     PMAction = new QAction("Send PM to user", this);
     PMAction->setIcon(QIcon(":/main/interfaceIcons/mainNew.png"));
     infoAction = new QAction("Get user info", this);
