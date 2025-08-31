@@ -26,8 +26,6 @@ public:
 
     void addUser(QListWidgetItem *, quint16 id);
 
-    QSound * chatSound;
-
     ConnectionController * connection;
 
 public slots:

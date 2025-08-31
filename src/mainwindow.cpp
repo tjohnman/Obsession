@@ -13,6 +13,7 @@
 #include "dialogcreateaccount.h"
 #include "dialogbroadcast.h"
 #include "TextHelper.h"
+#include <Phonon/MediaSource>
 
 MainWindow::MainWindow(QWidget *parent, bool checkForUpdates) :
     QMainWindow(parent),
@@ -106,15 +107,10 @@ MainWindow::MainWindow(QWidget *parent, bool checkForUpdates) :
     ui->statusLabel->setFont(font);
     setStatus(QString("Not connected"));
 
-    #ifdef Q_OS_WIN32
-    chatSound = new QSound("./sounds/chat.wav");
-    pmSound = new QSound("./sounds/pm.wav");
-    #else
-    chatSound = new QSound(":/sounds/chat.wav");
-    pmSound = new QSound(":/sounds/pm.wav");
-    #endif
+    media = new Phonon::MediaObject(this);
+    audioOutput = new Phonon::AudioOutput(Phonon::VideoCategory, this);
+    Phonon::createPath(media, audioOutput);
 
-    chatWidget->chatSound = chatSound;
     chatWidget->connection = connection;
 
     onPreferencesSaved();
@@ -126,8 +122,6 @@ MainWindow::~MainWindow()
 {
     delete ui;
     delete connection;
-    delete chatSound;
-    delete pmSound;
     delete bookmarksDialog;
 }
 
@@ -188,14 +182,18 @@ void MainWindow::onConnected() {
 void MainWindow::playChatSound() {
     QSettings settings("mir", "Contra");
     if(settings.value("soundsEnabled", true).toBool()) {
-        chatSound->play();
+        media->stop();
+        media->setCurrentSource(Phonon::MediaSource(":/sounds/chat.wav"));
+        media->play();
     }
 }
 
 void MainWindow::playPMSound() {
     QSettings settings("mir", "Contra");
     if(settings.value("soundsEnabled", true).toBool()) {
-        pmSound->play();
+        media->stop();
+        media->setCurrentSource(Phonon::MediaSource(":/sounds/pm.wav"));
+        media->play();
     }
 }
 

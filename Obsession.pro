@@ -1,7 +1,7 @@
 # -------------------------------------------------
 # Project created by QtCreator 2010-03-23T06:24:26
 # -------------------------------------------------
-QT += core gui network
+QT += core gui network phonon
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets multimedia
 CONFIG -= exceptions rtti
 CONFIG += resources_big

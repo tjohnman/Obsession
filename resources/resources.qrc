@@ -54,9 +54,9 @@
         <file>interfaceIcons/newNewsCategory.png</file>
         <file>interfaceIcons/newNewsFolder.png</file>
     </qresource>
-    <qresource prefix="/">
-        <file>sounds/chat.wav</file>
-        <file>sounds/pm.wav</file>
+    <qresource prefix="/sounds">
+        <file>chat.wav</file>
+        <file>pm.wav</file>
     </qresource>
     <qresource prefix="/bookmarks">
         <file>interfaceIcons/bookmarksAdd.png</file>

@@ -24,6 +24,8 @@
 #include <QNetworkReply>
 #include <QNetworkRequest>
 #include <QTimer>
+#include <Phonon/MediaObject>
+#include <Phonon/AudioOutput>
 
 #include "dialogbookmarks.h"
 #include "widgetchat.h"
@@ -111,8 +113,6 @@ private:
     QLabel * statusLabel;
     DialogAgreement * agreementDialog;
     DialogFileBrowser * fileBrowserDialog;
-    QSound * chatSound;
-    QSound * pmSound;
     DialogIconViewer * iconViewer;
     DialogLinearNews * linearNews;
     DownloadManager * downloadManager;
@@ -129,6 +129,9 @@ private:
     WidgetConsole * debugConsole;
 
     std::map<std::string, DialogPrivateMessaging *> pPrivateChats;
+
+    Phonon::MediaObject *media;
+    Phonon::AudioOutput *audioOutput;
 };
 
 #endif // MAINWINDOW_H
