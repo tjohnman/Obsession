@@ -7,6 +7,8 @@ The Obsession Hotline client aims to be a modern alternative for Windows users. 
 
 ![](https://github.com/tjohnman/Obsession/blob/qt4/screenshot.png?raw=true)
 
+**Note:** This repository includes Qt 4 and Qt 6 branches. Choose the one that best fits your platform.
+
 Downloading and installing
 ----------
 
@@ -25,33 +27,14 @@ You can find Obsession on the [AUR](https://aur.archlinux.org/packages/obsession
 Building
 --------
 
-### Windows
-
-This repository includes a convenience script that deploys a release package on Windows (x86) using Qt 4.8.7 and MinGW 4.8.2.
-
-- Download and install [MinGW 4.8.2](http://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win32/Personal%20Builds/mingw-builds/4.8.2/threads-posix/dwarf/i686-4.8.2-release-posix-dwarf-rt_v3-rev3.7z/download).
-- Download and install [Qt 4.8.7](https://download.qt.io/archive/qt/4.8/4.8.7/qt-opensource-windows-x86-mingw482-4.8.7.exe).
-- Download this repository and unpack it.
-- Copy `deploy.ps1.example` with the name `deploy.ps1`.
-- Open `deploy.ps1` with your text editor, and adjust the `$mingwPath` and `$qtPath` variables to point to the `bin` directories for your MinGW and Qt installations, respectively.
-- Run `.\deploy.ps1` from the root directory of the repository.
-
-This will produce an `obsession-alpha-qt4-windows.zip` file, ready for distribution.
-
-_Note: In order to be able to run the script, you might have to enable unsigned script execution by running the following command in an elevated PowerShell prompt: `Set-ExecutionPolicy -ExecutionPolicy RemoteSigned`._
-
-### Linux
-
-This repository includes a convenience script that applies the Qt5 patch made by [Josh Ellithorpe](https://github.com/zquestz) and builds a binary. Simply clone this repository and run `./build-linux-qt5.sh`. Make sure you have `path` and `qmake` or `qmake-qt5` available in your PATH. This will build an Obsession binary inside a newly created `build` directory.
-
-### Other
-
-You might need to download and build/install [Qt 4](https://download.qt.io/archive/qt/4.8/4.8.7/) for your platform, as well as other libraries or frameworks necessary to build Qt projects.
+You might need to download and build/install [Qt 4](https://download.qt.io/archive/qt/4.8/4.8.7/) for your platform, as well as other libraries or frameworks necessary to build Qt projects. On Windows download [MinGW](http://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win32/Personal%20Builds/mingw-builds/4.8.2/threads-posix/dwarf/i686-4.8.2-release-posix-dwarf-rt_v3-rev3.7z/download), and use the MinGW variant from the previous link.
 
 - Download this repository and unpack it.
 - Create a `build` directory inside the directory where you unpacked the source if it doesn't exist.
 - Run `qmake -config release ../Obsession.pro` from the `build` directory. This will generate a Makefile for you.
 - You can then run `make` (or `nmake`, etc. depending on your build setup) normally in order to build your binary, which will appear in the `build` directory.
+
+You can also set up modern Qt Creator by creating a kit with Qt 4.8.7 after you have installed it from the link above.
 
 How do I find servers to connect to?
 ------------------------------------
