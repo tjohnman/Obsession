@@ -124,15 +124,12 @@ set(UI_FILES
 	src/widgetnews.ui
 )
 
-qt_add_resources(RCC_FILES
-	"${CMAKE_CURRENT_SOURCE_DIR}/resources/resources.qrc"
-	"${CMAKE_CURRENT_SOURCE_DIR}/resources/icons1.qrc"
-	"${CMAKE_CURRENT_SOURCE_DIR}/resources/icons2.qrc"
-)
-
 set(app_icon_resource_windows "${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}.rc")
 
-add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS} ${UI_FILES} ${RCC_FILES} ${app_icon_resource_windows})
+add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS} ${UI_FILES} ${app_icon_resource_windows}
+	resources/icons.qrc
+	resources/resources.qrc)
+
 target_link_libraries(${PROJECT_NAME} PUBLIC Qt6::Widgets Qt6::Network Qt6::Multimedia Qt6::Core5Compat)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES

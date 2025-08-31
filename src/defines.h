@@ -36,10 +36,10 @@ typedef struct {
 typedef struct {
     quint16 id;
     quint16 icon;
-    QString * iconPath;
+    char* iconPath;
     quint16 flags;
     quint16 nameLength;
-    char * name;
+    char* name;
     bool doesCET;
     DialogUserInfo * infoWindow;
     quint32 orderInList;

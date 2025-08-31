@@ -423,34 +423,45 @@ void MainWindow::onUserListChanged() {
         DialogPrivateMessaging * private_messages = this->getUserPrivateChat(user);
         private_messages->user = user;
 
-        QListWidgetItem * item = new QListWidgetItem("           "+TextHelper::DecodeText(user->name, user->nameLength));
+        QListWidgetItem * item;
         QFont f = QFont();
-
         f.setBold(true);
-        item->setFont(f);
 
-        QString path = *(users->at(i)->iconPath);
-        QImage image = QImage(path);
+        QString path = users->at(i)->iconPath;
+        QImage image;
+        image.load(path);
         bool use_light_color = false;
 
         if(!image.isNull()) {
-            item->setBackground(QBrush(image));
-            item->setSizeHint(QSize(232, image.size().height()));
+            if (image.size().width() > 32) {
+                QRect rect(200, 0, image.size().width(), image.size().height());
+                QImage cropped = image.copy(rect);
 
-            if(settings.value("useLightColorNames", true).toBool()) {
-                qreal average = 0;
-                int height = image.height();
-                int width = image.width();
-                for(int y=0; y<height; y+=4) {
-                    QRgb * rgb = (QRgb *) image.scanLine(y);
-                    for(int x=0; x<width; x+=4) {
-                        average += 0.2126*qRed(rgb[x]) + 0.7152*qGreen(rgb[x]) + 0.0722*qBlue(rgb[x]);
+                item = new QListWidgetItem(TextHelper::DecodeText(user->name, user->nameLength));
+                item->setBackground(QBrush(cropped));
+                item->setSizeHint(QSize(230, cropped.size().height()));
+
+                if(settings.value("useLightColorNames", true).toBool()) {
+                    qreal average = 0;
+                    int height = image.height();
+                    int width = image.width();
+                    for(int y=0; y<height; y+=4) {
+                        QRgb * rgb = (QRgb *) image.scanLine(y);
+                        for(int x=0; x<width; x+=4) {
+                            average += 0.2126*qRed(rgb[x]) + 0.7152*qGreen(rgb[x]) + 0.0722*qBlue(rgb[x]);
+                        }
                     }
+                    average /= (image.width()/4) * (image.height()/4);
+                    use_light_color = average < 100;
                 }
-                average /= (image.width()/4) * (image.height()/4);
-                use_light_color = average < 100;
+            } else {
+                item = new QListWidgetItem(TextHelper::DecodeText(user->name, user->nameLength));
+                item->setIcon(QIcon(users->at(i)->iconPath));
+                item->setSizeHint(QSize(230, image.size().height()));
             }
         }
+
+        item->setFont(f);
 
         switch(user->flags%4) {
         default:

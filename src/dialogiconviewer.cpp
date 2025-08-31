@@ -1,6 +1,5 @@
 #include "dialogiconviewer.h"
 #include "ui_dialogiconviewer.h"
-#include "threadiconloader.h"
 
 DialogIconViewer::DialogIconViewer(QWidget *parent) :
     QDialog(parent),
@@ -12,7 +11,9 @@ DialogIconViewer::DialogIconViewer(QWidget *parent) :
     connect(ui->listWidget, SIGNAL(clicked(QModelIndex)), this, SLOT(onClicked(QModelIndex)));
 
     QDir iconsFolder = QDir(":/icons");
+    iconsFolder.setSorting(QDir::Name | QDir::LocaleAware);
     QFileInfoList fileList = iconsFolder.entryInfoList();
+
 
     for(quint32 i=2; i<iconsFolder.count(); i++) {
         QListWidgetItem * item = new QListWidgetItem();
@@ -27,7 +28,7 @@ void DialogIconViewer::onClicked(QModelIndex model) {
     QSettings settings("mir", "Contra");
     QString name = model.data(0).toString();
     if(name.endsWith(".png")) {
-        name = name.left(name.length()-4);
+        name = name.left(name.indexOf('.'));
     }
     settings.setValue("icon", name);
 
