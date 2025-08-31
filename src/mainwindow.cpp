@@ -423,7 +423,7 @@ void MainWindow::onUserListChanged() {
         DialogPrivateMessaging * private_messages = this->getUserPrivateChat(user);
         private_messages->user = user;
 
-        QListWidgetItem * item;
+        QListWidgetItem * item = new QListWidgetItem(TextHelper::DecodeText(user->name, user->nameLength));
         QFont f = QFont();
         f.setBold(true);
 
@@ -437,7 +437,6 @@ void MainWindow::onUserListChanged() {
                 QRect rect(200, 0, image.size().width(), image.size().height());
                 QImage cropped = image.copy(rect);
 
-                item = new QListWidgetItem(TextHelper::DecodeText(user->name, user->nameLength));
                 item->setBackground(QBrush(cropped));
                 item->setSizeHint(QSize(230, cropped.size().height()));
 
@@ -455,7 +454,6 @@ void MainWindow::onUserListChanged() {
                     use_light_color = average < 100;
                 }
             } else {
-                item = new QListWidgetItem(TextHelper::DecodeText(user->name, user->nameLength));
                 item->setIcon(QIcon(users->at(i)->iconPath));
                 item->setSizeHint(QSize(230, image.size().height()));
             }
