@@ -51,14 +51,11 @@ public:
         opt.text = QString();
 
         QSize actualIconSize = icon.actualSize(QSize(32, 32));
-        int iconY = rect.top() + (rect.height() - actualIconSize.height()) / 2;
-        QRect iconRect(rect.left(), iconY, 32, actualIconSize.height());
 
-        int iconX = rect.left() + (32 - actualIconSize.width()) / 2;
-        icon.paint(painter, iconX + 1, iconY, actualIconSize.width() + 1, actualIconSize.height());
+        icon.paint(painter, rect.left() + 16 - actualIconSize.width() * 0.5, rect.top() + rect.height() * 0.5 - actualIconSize.height() * 0.5, actualIconSize.width(), actualIconSize.height());
 
         QFontMetrics fm(opt.font);
-        QRect textRect(rect.left() + 32 + 5, rect.top(), rect.width() - 32, rect.height());
+        QRect textRect(rect.left() + 32 + 5, rect.top(), rect.width() - 32 - 5, rect.height());
         painter->setFont(opt.font);
         painter->setPen(opt.palette.color(QPalette::Text));
         painter->drawText(textRect, Qt::AlignLeft | Qt::AlignVCenter, text);
