@@ -10,7 +10,7 @@ DialogAbout::DialogAbout(QWidget *parent) :
     ui->setupUi(this);
     setWindowFlags(Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
 
-    ui->label->setText(QString("Obsession Hotline Client %1.%2").arg(QString::number(VERSION_MAJOR).rightJustified(3, '0'), QString::number(VERSION_MINOR).rightJustified(2, '0')));
+    ui->label->setText(QString::fromUtf8("Obsession Hotline Client %1.%2").arg(QString::number(VERSION_MAJOR).rightJustified(3, QLatin1Char('0')), QString::number(VERSION_MINOR).rightJustified(2, QLatin1Char('0'))));
 
     connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(accept()));
 }

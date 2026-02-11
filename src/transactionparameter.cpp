@@ -35,17 +35,15 @@ QString TransactionParameter::toString() {
     memcpy(buff, pData, pLength);
     buff[pLength] = '\0';
 
-    QString string = QString(buff);
-
     QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
-    QString encodingName = settings.value(QString::fromUtf8("Encoding"), "Apple Roman").toString();
+    QString encodingName = settings.value(QString::fromUtf8("Encoding"), QString::fromUtf8("Apple Roman")).toString();
     
     auto decoder = QStringDecoder(encodingName.toUtf8().constData());
     if(!decoder.isValid())
     {
         decoder = QStringDecoder("Apple Roman");
     }
-    string = decoder.decode(QByteArrayView(buff, pLength));
+    QString string = decoder.decode(QByteArrayView(buff, pLength));
     free(buff);
 
     return string;

@@ -177,7 +177,7 @@ target_link_libraries(Obsession PRIVATE
 # Compiler definitions matching original QMake config
 target_compile_definitions(Obsession PRIVATE
     _CRT_SECURE_NO_WARNINGS
-    QT_NO_CAST_FROM_ASCII
+    # QT_NO_CAST_FROM_ASCII  # Temporarily disabled for Qt 6 migration - needs codebase-wide string literal fixes
 )
 
 # Disable exceptions and RTTI (matching original config)

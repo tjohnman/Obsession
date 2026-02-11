@@ -54,34 +54,34 @@ void CUpload::updateSpeed() {
     QString sizeString, readString;
     if(size > 1024) {
         if(size > 1024*1024*1024) {
-            sizeString = sizeString.sprintf("%.2f GB", size/1024/1024/1024);
-            readString = readString.sprintf("%.2f GB", read/1024/1024/1024);
+            sizeString = QString::asprintf("%.2f GB", size/1024/1024/1024);
+            readString = QString::asprintf("%.2f GB", read/1024/1024/1024);
         } else {
             if(size > 1024*1024) {
-                sizeString = sizeString.sprintf("%.2f MB", size/1024/1024);
-                readString = readString.sprintf("%.2f MB", read/1024/1024);
+                sizeString = QString::asprintf("%.2f MB", size/1024/1024);
+                readString = QString::asprintf("%.2f MB", read/1024/1024);
             } else {
-                sizeString = sizeString.sprintf("%.2f KB", size/1024);
-                readString = readString.sprintf("%.2f KB", read/1024);
+                sizeString = QString::asprintf("%.2f KB", size/1024);
+                readString = QString::asprintf("%.2f KB", read/1024);
             }
         }
     } else {
-        sizeString = sizeString.sprintf("%.0f bytes", size);
-        readString = readString.sprintf("%.0f bytes", read);
+        sizeString = QString::asprintf("%.0f bytes", size);
+        readString = QString::asprintf("%.0f bytes", read);
     }
 
     if(speed > 1024) {
         if(speed > 1024*1024*1024) {
-            speedString = speedString.sprintf("%.2f GB/s", speed/1024/1024/1024); // Would love to live to see this :P
+            speedString = QString::asprintf("%.2f GB/s", speed/1024/1024/1024); // Would love to live to see this :P
         } else {
             if(speed > 1024*1024) {
-                speedString = speedString.sprintf("%.2f MB/s", speed/1024/1024);
+                speedString = QString::asprintf("%.2f MB/s", speed/1024/1024);
             } else {
-                speedString = speedString.sprintf("%.2f KB/s", speed/1024);
+                speedString = QString::asprintf("%.2f KB/s", speed/1024);
             }
         }
     } else {
-        speedString = speedString.sprintf("%.0f bytes/s", speed);
+        speedString = QString::asprintf("%.0f bytes/s", speed);
     }
 
     widget->infoLabel()->setText(readString+" of "+sizeString+" ("+speedString+")");

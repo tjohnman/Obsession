@@ -14,8 +14,8 @@ DialogPrivateMessaging::DialogPrivateMessaging(qint16 id, ConnectionController *
 
     user = connection->getUserByUid(uid);
 
-    ui->label->setText(QString("Private chat with ") + QString(user->name).left(user->nameLength));
-    this->setWindowTitle(QString("Private chat with ") + QString(user->name).left(user->nameLength));
+    ui->label->setText(QString::fromUtf8("Private chat with ") + QString::fromUtf8(user->name).left(user->nameLength));
+    this->setWindowTitle(QString::fromUtf8("Private chat with ") + QString::fromUtf8(user->name).left(user->nameLength));
 
     connect(ui->lineEdit, SIGNAL(returnPressed()), this, SLOT(sendMessage()));
 
@@ -42,14 +42,14 @@ void DialogPrivateMessaging::changeEvent(QEvent *e)
 
 void DialogPrivateMessaging::sendMessage() {
     if(!ui->lineEdit->text().isEmpty()) {
-        QSettings settings("mir", "Contra");
+        QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
         connection->sendPMToUser(uid, ui->lineEdit->text());
         ui->textEdit->moveCursor(QTextCursor::End);
         QString formatted = TextHelper::FormatMessageToHTML(ui->lineEdit->text());
         ui->textEdit->moveCursor(QTextCursor::End);
         ui->textEdit->ensureCursorVisible();
         ui->lineEdit->setFocus();
-        ui->textEdit->insertHtml(QString("<b>") + settings.value("nick", "unnamed").toString()+QString("</b>: ")+formatted+QString("<p />"));
+        ui->textEdit->insertHtml(QString::fromUtf8("<b>") + settings.value(QString::fromUtf8("nick"), QString::fromUtf8("unnamed")).toString()+QString::fromUtf8("</b>: ")+formatted+QString::fromUtf8("<p />"));
         ui->textEdit->moveCursor(QTextCursor::End);
         ui->textEdit->ensureCursorVisible();
         ui->lineEdit->clear();
@@ -63,15 +63,15 @@ void DialogPrivateMessaging::gotMessage(QString m) {
     ui->textEdit->moveCursor(QTextCursor::End);
     ui->textEdit->ensureCursorVisible();
     ui->lineEdit->setFocus();
-    ui->textEdit->insertHtml(QString("<b>") + QString(user->name)+QString("</b>: ")+formatted+QString("<p />"));
+    ui->textEdit->insertHtml(QString::fromUtf8("<b>") + QString::fromUtf8(user->name)+QString::fromUtf8("</b>: ")+formatted+QString::fromUtf8("<p />"));
     ui->textEdit->moveCursor(QTextCursor::End);
     ui->textEdit->ensureCursorVisible();
 }
 
 void DialogPrivateMessaging::onPreferencesSaved() {
     QFont font;
-    QSettings settings("mir", "Contra");
-    font.setFamily(settings.value("fontFamily", "MS Shell Dlg2").toString());
+    QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
+    font.setFamily(settings.value(QString::fromUtf8("fontFamily"), QString::fromUtf8("MS Shell Dlg2")).toString());
     qint32 style = settings.value("fontStyle", 0).toInt();
     switch(style) {
     case 0:
