@@ -151,6 +151,16 @@ QListWidget::item:selected, QListView::item:selected {
     color: #ffffff;
 }
 
+QListWidget::item:selected:!active, QListView::item:selected:!active {
+    background-color: #0078d4;
+    color: #ffffff;
+}
+
+QListWidget::item:selected:active, QListView::item:selected:active {
+    background-color: #0078d4;
+    color: #ffffff;
+}
+
 /* Table Widgets */
 QTableWidget, QTableView {
     background-color: #ffffff;
@@ -208,6 +218,16 @@ QTreeWidget::item:hover, QTreeView::item:hover {
 }
 
 QTreeWidget::item:selected, QTreeView::item:selected {
+    background-color: #0078d4;
+    color: #ffffff;
+}
+
+QTreeWidget::item:selected:!active, QTreeView::item:selected:!active {
+    background-color: #0078d4;
+    color: #ffffff;
+}
+
+QTreeWidget::item:selected:active, QTreeView::item:selected:active {
     background-color: #0078d4;
     color: #ffffff;
 }
