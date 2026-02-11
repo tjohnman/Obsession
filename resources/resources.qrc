@@ -58,6 +58,9 @@
         <file>sounds/chat.wav</file>
         <file>sounds/pm.wav</file>
     </qresource>
+    <qresource prefix="/resources">
+        <file>dark-theme.qss</file>
+    </qresource>
     <qresource prefix="/bookmarks">
         <file>interfaceIcons/bookmarksAdd.png</file>
         <file>interfaceIcons/bookmarksRemove.png</file>

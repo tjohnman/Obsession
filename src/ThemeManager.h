@@ -51,12 +51,14 @@ public:
     {
         QFile styleFile(QString::fromUtf8(":/resources/dark-theme.qss"));
         if (!styleFile.open(QFile::ReadOnly | QFile::Text)) {
-            qWarning("Could not load dark theme stylesheet");
+            qWarning("Could not load dark theme stylesheet from: :/resources/dark-theme.qss");
+            qWarning("Error: %s", qPrintable(styleFile.errorString()));
             return;
         }
         
         QTextStream stream(&styleFile);
         QString stylesheet = stream.readAll();
+        qDebug("Dark theme loaded successfully, %d bytes", stylesheet.length());
         qApp->setStyleSheet(stylesheet);
         styleFile.close();
     }
