@@ -149,7 +149,7 @@ set(FORMS
 set(RESOURCES
     resources/resources.qrc
     resources/icons1.qrc
-    # resources/icons2.qrc  # Temporarily disabled - missing icons/27184.png
+    resources/icons2.qrc
 )
 
 # Compile resources
