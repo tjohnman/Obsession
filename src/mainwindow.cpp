@@ -13,6 +13,7 @@
 #include "dialogcreateaccount.h"
 #include "dialogbroadcast.h"
 #include "TextHelper.h"
+#include "ThemeManager.h"
 
 MainWindow::MainWindow(QWidget *parent, bool checkForUpdates) :
     QMainWindow(parent),
@@ -462,20 +463,29 @@ void MainWindow::onUserListChanged() {
         switch(user->flags%4) {
         default:
         case 0:
-            if(use_light_color) item->setForeground(QColor(255, 255, 255));
-            else item->setForeground(QColor(0, 0, 0));
+            // In dark theme, always use light colors; in light theme, check icon brightness
+            if(ThemeManager::isDarkThemeActive() || use_light_color)
+                item->setForeground(QColor(255, 255, 255));
+            else
+                item->setForeground(QColor(0, 0, 0));
             break;
         case 1:
-            if(use_light_color) item->setForeground(QColor(200, 200, 200));
-            else item->setForeground(QColor(100, 100, 100));
+            if(ThemeManager::isDarkThemeActive() || use_light_color)
+                item->setForeground(QColor(200, 200, 200));
+            else
+                item->setForeground(QColor(100, 100, 100));
             break;
         case 2:
-            if(use_light_color) item->setForeground(QColor(255, 127, 127));
-            else item->setForeground(QColor(127, 0, 0));
+            if(ThemeManager::isDarkThemeActive() || use_light_color)
+                item->setForeground(QColor(255, 127, 127));
+            else
+                item->setForeground(QColor(127, 0, 0));
             break;
         case 3:
-            if(use_light_color) item->setForeground(QColor(255, 127, 255));
-            else item->setForeground(QColor(127, 0, 127));
+            if(ThemeManager::isDarkThemeActive() || use_light_color)
+                item->setForeground(QColor(255, 127, 255));
+            else
+                item->setForeground(QColor(127, 0, 127));
             break;
         }
 

@@ -16,7 +16,16 @@ enum class AppTheme {
 
 class ThemeManager
 {
+private:
+    static inline bool s_isDarkThemeActive = false;
+    
 public:
+    // Check if dark theme is currently active
+    static bool isDarkThemeActive()
+    {
+        return s_isDarkThemeActive;
+    }
+    
     // Apply the specified theme
     static void applyTheme(AppTheme theme)
     {
@@ -54,6 +63,7 @@ public:
     // Apply dark theme from QSS file
     static void applyDarkTheme()
     {
+        s_isDarkThemeActive = true;
         QFile styleFile(QString::fromUtf8(":/resources/dark-theme.qss"));
         if (!styleFile.open(QFile::ReadOnly | QFile::Text)) {
             qWarning("Could not load dark theme stylesheet from: :/resources/dark-theme.qss");
@@ -70,6 +80,7 @@ public:
     // Apply light theme from QSS file
     static void applyLightTheme()
     {
+        s_isDarkThemeActive = false;
         QFile styleFile(QString::fromUtf8(":/resources/light-theme.qss"));
         if (!styleFile.open(QFile::ReadOnly | QFile::Text)) {
             qWarning("Could not load light theme stylesheet from: :/resources/light-theme.qss");
