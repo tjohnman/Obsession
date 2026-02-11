@@ -3,7 +3,7 @@
 
 #include <QWidget>
 #include <QListWidgetItem>
-#include <QSound>
+#include <QSoundEffect>
 #include <QFont>
 
 class ConnectionController;
@@ -26,7 +26,7 @@ public:
 
     void addUser(QListWidgetItem *, quint16 id);
 
-    QSound * chatSound;
+    QSoundEffect * chatSound;
 
     ConnectionController * connection;
 

@@ -5,7 +5,7 @@
 #include <QBrush>
 #include <QHostAddress>
 #include <QNetworkAccessManager>
-#include <QTextCodec>
+#include <QStringConverter>
 #include "dialogprivatemessaging.h"
 
 #include "transactionparameter.h"

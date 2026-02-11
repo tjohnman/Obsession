@@ -2,7 +2,8 @@
 #define TEXTHELPER_H
 
 #include <QSettings>
-#include <QTextCodec>
+#include <QStringConverter>
+#include <optional>
 
 class TextHelper
 {
@@ -10,56 +11,71 @@ public:
     static QString DecodeText(const char * str, int length)
     {
         QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
-        QTextCodec * codec = QTextCodec::codecForName(settings.value(QString::fromUtf8("Encoding"), "Apple Roman").toString().toUtf8());
-        if(!codec)
+        QString encodingName = settings.value(QString::fromUtf8("Encoding"), "Apple Roman").toString();
+        
+        // Try to create decoder with ICU support (provides Apple Roman, Shift-JIS, etc.)
+        auto decoder = QStringDecoder(encodingName.toUtf8().constData());
+        if (!decoder.isValid())
         {
-            codec = QTextCodec::codecForName(QString::fromUtf8("Apple Roman").toUtf8());
+            // Fallback to Apple Roman if encoding not available
+            decoder = QStringDecoder("Apple Roman");
         }
-        return codec->toUnicode(str, length);
+        
+        return decoder.decode(QByteArrayView(str, length));
     }
 
     static QString DecodeTextAutoUTF8(const char * str, int length)
     {
         QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
-        QTextCodec * codec = QTextCodec::codecForName(settings.value(QString::fromUtf8("Encoding"), "Apple Roman").toString().toUtf8());
-        if(!codec)
+        QString encodingName = settings.value(QString::fromUtf8("Encoding"), "Apple Roman").toString();
+        
+        auto decoder = QStringDecoder(encodingName.toUtf8().constData());
+        if (!decoder.isValid())
         {
-            codec = QTextCodec::codecForName("Apple Roman");
+            decoder = QStringDecoder("Apple Roman");
         }
-        QString utf8str = QTextCodec::codecForName("UTF-8")->toUnicode(str, length);
-        QString regularStr = codec->toUnicode(str, length);
+        
+        auto utf8Decoder = QStringDecoder(QStringConverter::Utf8);
+        QString utf8str = utf8Decoder.decode(QByteArrayView(str, length));
+        QString regularStr = decoder.decode(QByteArrayView(str, length));
         return utf8str.length() < regularStr.length() ? utf8str : regularStr;
     }
 
     static QString DecodeText(char * str, int length, QString encoding)
     {
-        QTextCodec * codec = QTextCodec::codecForName(encoding.toUtf8());
-        if(!codec)
+        auto decoder = QStringDecoder(encoding.toUtf8().constData());
+        if (!decoder.isValid())
         {
-            codec = QTextCodec::codecForName(QString::fromUtf8("Apple Roman").toUtf8());
+            // Fallback to Apple Roman if encoding not available
+            decoder = QStringDecoder("Apple Roman");
         }
-        return codec->toUnicode(str, length);
+        return decoder.decode(QByteArrayView(str, length));
     }
 
     static QByteArray EncodeText(QString str)
     {
         QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
-        QTextCodec * codec = QTextCodec::codecForName(settings.value(QString::fromUtf8("Encoding"), "Apple Roman").toString().toUtf8());
-        if(!codec)
+        QString encodingName = settings.value(QString::fromUtf8("Encoding"), "Apple Roman").toString();
+        
+        auto encoder = QStringEncoder(encodingName.toUtf8().constData());
+        if (!encoder.isValid())
         {
-            codec = QTextCodec::codecForName(QString::fromUtf8("Apple Roman").toUtf8());
+            // Fallback to Apple Roman if encoding not available
+            encoder = QStringEncoder("Apple Roman");
         }
-        return codec->fromUnicode(str);
+        
+        return encoder.encode(str);
     }
 
     static QByteArray EncodeText(QString str, QString encoding)
     {
-        QTextCodec * codec = QTextCodec::codecForName(encoding.toUtf8());
-        if(!codec)
+        auto encoder = QStringEncoder(encoding.toUtf8().constData());
+        if (!encoder.isValid())
         {
-            codec = QTextCodec::codecForName(QString::fromUtf8("Apple Roman").toUtf8());
+            // Fallback to Apple Roman if encoding not available
+            encoder = QStringEncoder("Apple Roman");
         }
-        return codec->fromUnicode(str);
+        return encoder.encode(str);
     }
 
     static QString FormatMessageToHTML(QString str)

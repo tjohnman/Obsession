@@ -1,7 +1,7 @@
 #include "dialogpreferences.h"
 #include "ui_dialogpreferences.h"
 #include <QSettings>
-#include <QTextCodec>
+#include <QStringConverter>
 
 DialogPreferences::DialogPreferences(QWidget *parent) :
     QDialog(parent),

@@ -4,7 +4,7 @@
 
 #include <QSettings>
 #include <QtEndian>
-#include <QTextCodec>
+#include <QStringConverter>
 #include <QTextStream>
 #include <QHostAddress>
 #include <QMessageBox>

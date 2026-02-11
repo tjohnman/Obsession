@@ -1,6 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include <QTextCodec>
+#include <QStringConverter>
 #include "dialogpreferences.h"
 #include "dialogprivatemessaging.h"
 #include "dialoguserinfo.h"
@@ -106,12 +106,15 @@ MainWindow::MainWindow(QWidget *parent, bool checkForUpdates) :
     ui->statusLabel->setFont(font);
     setStatus(QString("Not connected"));
 
+    chatSound = new QSoundEffect(this);
+    pmSound = new QSoundEffect(this);
+    
     #ifdef Q_OS_WIN32
-    chatSound = new QSound("./sounds/chat.wav");
-    pmSound = new QSound("./sounds/pm.wav");
+    chatSound->setSource(QUrl::fromLocalFile("./sounds/chat.wav"));
+    pmSound->setSource(QUrl::fromLocalFile("./sounds/pm.wav"));
     #else
-    chatSound = new QSound(":/sounds/chat.wav");
-    pmSound = new QSound(":/sounds/pm.wav");
+    chatSound->setSource(QUrl("qrc:/sounds/chat.wav"));
+    pmSound->setSource(QUrl("qrc:/sounds/pm.wav"));
     #endif
 
     chatWidget->chatSound = chatSound;

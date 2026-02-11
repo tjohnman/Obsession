@@ -9,7 +9,7 @@
 #include "dialogagreement.h"
 #include "dialogfilebrowser.h"
 #include "dialogerror.h"
-#include <QSound>
+#include <QSoundEffect>
 #include "dialogiconviewer.h"
 #include "dialoglinearnews.h"
 #include <QFocusEvent>
@@ -111,8 +111,8 @@ private:
     QLabel * statusLabel;
     DialogAgreement * agreementDialog;
     DialogFileBrowser * fileBrowserDialog;
-    QSound * chatSound;
-    QSound * pmSound;
+    QSoundEffect * chatSound;
+    QSoundEffect * pmSound;
     DialogIconViewer * iconViewer;
     DialogLinearNews * linearNews;
     DownloadManager * downloadManager;
