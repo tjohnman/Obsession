@@ -1,4 +1,5 @@
 #include "listwidgetusers.h"
+#include "UserIconDelegate.h"
 #include <QDebug>
 #include <QStyledItemDelegate>
 #include <QPainter>
@@ -8,8 +9,8 @@
 ListWidgetUsers::ListWidgetUsers(QWidget *parent) :
     QListWidget(parent)
 {
-    // Disable stylesheet for this widget to preserve custom icon backgrounds
-    this->setStyleSheet(QString::fromUtf8(""));
+    // Use custom delegate to paint icon backgrounds
+    this->setItemDelegate(new UserIconDelegate(this));
     
     PMAction = new QAction(QString::fromUtf8("Send PM to user"), this);
     PMAction->setIcon(QIcon(QString::fromUtf8(":/main/interfaceIcons/mainNew.png")));

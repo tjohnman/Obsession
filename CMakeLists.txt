@@ -37,6 +37,7 @@ set(SOURCES
     src/dialogpreferences.cpp
     src/dialogagreement.cpp
     src/listwidgetusers.cpp
+    src/UserIconDelegate.cpp
     src/dialogprivatemessaging.cpp
     src/dialogfilebrowser.cpp
     src/dialogtrackers.cpp
@@ -79,6 +80,7 @@ set(HEADERS
     src/dialogpreferences.h
     src/dialogagreement.h
     src/listwidgetusers.h
+    src/UserIconDelegate.h
     src/dialogprivatemessaging.h
     src/dialogfilebrowser.h
     src/dialogtrackers.h
