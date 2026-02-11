@@ -154,6 +154,27 @@ QListWidget::item:hover, QListView::item:hover {
     /* Note: background-color intentionally not set to preserve user icon backgrounds */
 }
 
+/* Special styling for ListWidgetUsers - preserve custom icon backgrounds */
+ListWidgetUsers {
+    background-color: #252526;
+    border: 1px solid #3f3f46;
+    border-radius: 3px;
+}
+
+ListWidgetUsers::item {
+    padding: 0px;
+    border: none;
+    /* No background set - items have custom icon backgrounds */
+}
+
+ListWidgetUsers::item:hover {
+    /* No background - preserve icon backgrounds */
+}
+
+ListWidgetUsers::item:selected {
+    /* No background override - preserve icon backgrounds even when selected */
+}
+
 QListWidget::item:selected, QListView::item:selected {
     background-color: #007acc;
     color: #ffffff;
