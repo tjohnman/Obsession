@@ -1,6 +1,13 @@
 # -------------------------------------------------
 # Project created by QtCreator 2010-03-23T06:24:26
 # -------------------------------------------------
+#
+# NOTE: CMake is now the primary build system for Qt 6 (see CMakeLists.txt)
+# This .pro file is maintained for Qt 5 compatibility and reference.
+# For Qt 6 builds, use build-cmake.sh or cmake directly.
+# Qt 6 builds require ICU library for extended text encoding support
+# (Apple Roman, Shift-JIS) needed for Hotline protocol compatibility.
+#
 QT += core gui network
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets multimedia
 CONFIG -= exceptions rtti
@@ -84,7 +91,8 @@ HEADERS += src/mainwindow.h \
     src/dialogrequestaccount.h \
     src/dialogcreateaccount.h \
     src/dialogbroadcast.h \
-    src/dialogpostlinearnews.h
+    src/dialogpostlinearnews.h \
+    src/ThemeManager.h
 FORMS += src/mainwindow.ui \
     src/dialognewnewsmessage.ui \
     src/dialogopenconnection.ui \
@@ -118,4 +126,4 @@ RESOURCES += resources/resources.qrc \
 RC_ICONS = resources/icon.ico
 ICON = resources/icon.icns
 win32:RC_FILE += Obsession.rc
-QMAKE_CXXFLAGS += -std=gnu++11
+QMAKE_CXXFLAGS += -std=gnu++23
