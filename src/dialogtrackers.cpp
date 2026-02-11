@@ -36,7 +36,7 @@ DialogTrackers::DialogTrackers(ConnectionController * c, QWidget *parent) :
     connect(addTrackerDialog, SIGNAL(accepted()), this, SLOT(addTracker()));
     connect(ui->treeWidget, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(openConnectionWindow()));
     connect(ui->treeWidget, SIGNAL(itemSelectionChanged()), this, SLOT(onServerSelectionChanged()));
-    connect(pSocket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(socketError(QAbstractSocket::SocketError)));
+    connect(pSocket, SIGNAL(errorOccurred(QAbstractSocket::SocketError)), this, SLOT(socketError(QAbstractSocket::SocketError)));
     connect(ui->buttonRefresh, SIGNAL(clicked()), this, SLOT(updateCurrentList()));
 }
 

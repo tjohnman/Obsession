@@ -16,7 +16,7 @@ ConnectionController::ConnectionController()
 {
     pSocket.open(QIODevice::ReadWrite);
     connect(&pSocket, SIGNAL(connected()), this, SLOT(onSocketConnected()));
-    connect(&pSocket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(onSocketError(QAbstractSocket::SocketError)));
+    connect(&pSocket, SIGNAL(errorOccurred(QAbstractSocket::SocketError)), this, SLOT(onSocketError(QAbstractSocket::SocketError)));
     connect(&pTimeoutTimer, SIGNAL(timeout()), this, SLOT(onConnectionTimedOut()));
 
     pServerAgreement = QString();
