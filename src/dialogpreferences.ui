@@ -109,6 +109,63 @@
        </item>
       </widget>
      </item>
+     </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_theme">
+     <property name="spacing">
+      <number>6</number>
+     </property>
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <property name="bottomMargin">
+      <number>0</number>
+     </property>
+     <item>
+      <widget class="QLabel" name="label_theme">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>75</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>Theme:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="themeCombo">
+       <item>
+        <property name="text">
+         <string>Auto (Follow System)</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Light</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Dark</string>
+        </property>
+       </item>
+      </widget>
+     </item>
     </layout>
    </item>
    <item>

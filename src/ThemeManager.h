@@ -49,7 +49,7 @@ public:
     // Apply dark theme from QSS file
     static void applyDarkTheme()
     {
-        QFile styleFile(":/resources/dark-theme.qss");
+        QFile styleFile(QString::fromUtf8(":/resources/dark-theme.qss"));
         if (!styleFile.open(QFile::ReadOnly | QFile::Text)) {
             qWarning("Could not load dark theme stylesheet");
             return;
@@ -64,21 +64,21 @@ public:
     // Apply light theme (default Qt style)
     static void applyLightTheme()
     {
-        qApp->setStyleSheet("");  // Clear any custom stylesheet
+        qApp->setStyleSheet(QString::fromUtf8(""));  // Clear any custom stylesheet
     }
     
     // Save theme preference to settings
     static void saveThemePreference(AppTheme theme)
     {
-        QSettings settings("mir", "Contra");
-        settings.setValue("appTheme", static_cast<int>(theme));
+        QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
+        settings.setValue(QString::fromUtf8("appTheme"), static_cast<int>(theme));
     }
     
     // Load theme preference from settings
     static AppTheme loadThemePreference()
     {
-        QSettings settings("mir", "Contra");
-        int themeValue = settings.value("appTheme", static_cast<int>(AppTheme::Auto)).toInt();
+        QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
+        int themeValue = settings.value(QString::fromUtf8("appTheme"), static_cast<int>(AppTheme::Auto)).toInt();
         return static_cast<AppTheme>(themeValue);
     }
     
@@ -92,18 +92,18 @@ public:
     static QString themeToString(AppTheme theme)
     {
         switch (theme) {
-            case AppTheme::Light: return "Light";
-            case AppTheme::Dark: return "Dark";
-            case AppTheme::Auto: return "Auto (Follow System)";
-            default: return "Auto (Follow System)";
+            case AppTheme::Light: return QString::fromUtf8("Light");
+            case AppTheme::Dark: return QString::fromUtf8("Dark");
+            case AppTheme::Auto: return QString::fromUtf8("Auto (Follow System)");
+            default: return QString::fromUtf8("Auto (Follow System)");
         }
     }
     
     // Convert string to theme enum
     static AppTheme stringToTheme(const QString& str)
     {
-        if (str == "Light") return AppTheme::Light;
-        if (str == "Dark") return AppTheme::Dark;
+        if (str == QString::fromUtf8("Light")) return AppTheme::Light;
+        if (str == QString::fromUtf8("Dark")) return AppTheme::Dark;
         return AppTheme::Auto;
     }
 };

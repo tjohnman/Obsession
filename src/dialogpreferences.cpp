@@ -1,5 +1,6 @@
 #include "dialogpreferences.h"
 #include "ui_dialogpreferences.h"
+#include "ThemeManager.h"
 #include <QSettings>
 #include <QStringConverter>
 
@@ -17,6 +18,20 @@ DialogPreferences::DialogPreferences(QWidget *parent) :
     if(encoding == "Shift_JIS") ui->encodingCombo->setCurrentIndex(1);
     if(encoding == "ISO-8859-1") ui->encodingCombo->setCurrentIndex(2);
     if(encoding == "UTF-8") ui->encodingCombo->setCurrentIndex(3);
+
+    // Load theme preference
+    AppTheme currentTheme = ThemeManager::loadThemePreference();
+    switch(currentTheme) {
+        case AppTheme::Auto:
+            ui->themeCombo->setCurrentIndex(0);
+            break;
+        case AppTheme::Light:
+            ui->themeCombo->setCurrentIndex(1);
+            break;
+        case AppTheme::Dark:
+            ui->themeCombo->setCurrentIndex(2);
+            break;
+    }
 
     QFont font;
     font.setFamily(settings.value("fontFamily", "Consolas").toString());
@@ -115,6 +130,25 @@ void DialogPreferences::acceptSettings() {
         break;
     }
     settings.setValue("EncodingName", ui->encodingCombo->currentText());
+
+    // Save and apply theme preference
+    AppTheme selectedTheme;
+    switch(ui->themeCombo->currentIndex()) {
+        case 0:
+            selectedTheme = AppTheme::Auto;
+            break;
+        case 1:
+            selectedTheme = AppTheme::Light;
+            break;
+        case 2:
+            selectedTheme = AppTheme::Dark;
+            break;
+        default:
+            selectedTheme = AppTheme::Auto;
+            break;
+    }
+    ThemeManager::saveThemePreference(selectedTheme);
+    ThemeManager::applyTheme(selectedTheme);
 
     settings.setValue("dlqueue", ui->dlQueueEdit->text().toInt());
     settings.setValue("soundsEnabled", ui->soundCheckBox->isChecked());
