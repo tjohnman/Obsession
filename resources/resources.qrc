@@ -60,6 +60,7 @@
     </qresource>
     <qresource prefix="/resources">
         <file>dark-theme.qss</file>
+        <file>light-theme.qss</file>
     </qresource>
     <qresource prefix="/bookmarks">
         <file>interfaceIcons/bookmarksAdd.png</file>

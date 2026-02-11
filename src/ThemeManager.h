@@ -63,10 +63,23 @@ public:
         styleFile.close();
     }
     
-    // Apply light theme (default Qt style)
+    // Apply light theme from QSS file
     static void applyLightTheme()
     {
-        qApp->setStyleSheet(QString::fromUtf8(""));  // Clear any custom stylesheet
+        QFile styleFile(QString::fromUtf8(":/resources/light-theme.qss"));
+        if (!styleFile.open(QFile::ReadOnly | QFile::Text)) {
+            qWarning("Could not load light theme stylesheet from: :/resources/light-theme.qss");
+            qWarning("Error: %s", qPrintable(styleFile.errorString()));
+            // Fallback to clearing stylesheet (default Qt style)
+            qApp->setStyleSheet(QString::fromUtf8(""));
+            return;
+        }
+        
+        QTextStream stream(&styleFile);
+        QString stylesheet = stream.readAll();
+        qDebug("Light theme loaded successfully, %d bytes", stylesheet.length());
+        qApp->setStyleSheet(stylesheet);
+        styleFile.close();
     }
     
     // Save theme preference to settings
