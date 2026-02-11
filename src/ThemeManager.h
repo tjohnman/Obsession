@@ -40,8 +40,13 @@ public:
         auto colorScheme = QGuiApplication::styleHints()->colorScheme();
         
         if (colorScheme == Qt::ColorScheme::Dark) {
+            qDebug("System theme detected: Dark");
             applyDarkTheme();
+        } else if (colorScheme == Qt::ColorScheme::Light) {
+            qDebug("System theme detected: Light");
+            applyLightTheme();
         } else {
+            qDebug("System theme detected: Unknown, defaulting to Light");
             applyLightTheme();
         }
     }
