@@ -8,6 +8,9 @@
 ListWidgetUsers::ListWidgetUsers(QWidget *parent) :
     QListWidget(parent)
 {
+    // Disable stylesheet for this widget to preserve custom icon backgrounds
+    this->setStyleSheet(QString::fromUtf8(""));
+    
     PMAction = new QAction(QString::fromUtf8("Send PM to user"), this);
     PMAction->setIcon(QIcon(QString::fromUtf8(":/main/interfaceIcons/mainNew.png")));
     infoAction = new QAction(QString::fromUtf8("Get user info"), this);

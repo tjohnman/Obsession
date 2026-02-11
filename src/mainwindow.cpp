@@ -441,9 +441,14 @@ void MainWindow::onUserListChanged() {
         QImage image = QImage(path);
         bool use_light_color = false;
 
+        qDebug() << "User" << i << "icon path:" << path;
+        qDebug() << "Image loaded:" << !image.isNull() << "Size:" << image.size();
+
         if(!image.isNull()) {
             item->setBackground(QBrush(image));
             item->setSizeHint(QSize(232, image.size().height()));
+            qDebug() << "Background brush set for item, size hint:" << QSize(232, image.size().height());
+            qDebug() << "Item background:" << item->background();
 
             if(settings.value("useLightColorNames", true).toBool()) {
                 qreal average = 0;
