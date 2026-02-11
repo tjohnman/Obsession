@@ -22,8 +22,8 @@ ConnectionController::ConnectionController()
     pServerAgreement = QString();
 
     // TODO: Preferences
-    QSettings settings("mir", "Contra");
-    pNickname = settings.value("nick", "unnamed").toString();
+    QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
+    pNickname = settings.value(QString::fromUtf8("nick"), QString::fromUtf8("unnamed")).toString();
     pIconID = (quint16) settings.value("icon", 25096).toString().toShort();
 
     pAFK = false;
@@ -61,7 +61,7 @@ qint32 ConnectionController::connectToServer(QString address, QString login, QSt
     pServerAddress = address;
     pPlainLogin = login;
     pPlainPassword = password;
-    qint32 semicolonIndex = address.lastIndexOf(":");
+    qint32 semicolonIndex = address.lastIndexOf(QString::fromUtf8(":"));
     QString addr;
     quint16 port;
 
@@ -139,15 +139,15 @@ void ConnectionController::sendEmote(QString text) {
 
 void ConnectionController::toggleAFK() {
     if(pAFK) {
-        QSettings settings("mir", "Contra");
-        pNickname = settings.value(QString("nick"), "unnamed").toString();
+        QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
+        pNickname = settings.value(QString::fromUtf8("nick"), QString::fromUtf8("unnamed")).toString();
         sendUserInfo();
-        sendEmote(QString("is back"));
+        sendEmote(QString::fromUtf8("is back"));
         pAFK = false;
     } else {
-        sendEmote(QString("is AFK"));
-        QSettings settings("mir", "Contra");
-        pNickname = settings.value(QString("nick"), "unnamed").toString() + QString(" (AFK)");
+        sendEmote(QString::fromUtf8("is AFK"));
+        QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
+        pNickname = settings.value(QString::fromUtf8("nick"), QString::fromUtf8("unnamed")).toString() + QString::fromUtf8(" (AFK)");
         pAFK = true;
         sendUserInfo();
     }
@@ -158,8 +158,8 @@ bool ConnectionController::isAFK() {
 }
 
 void ConnectionController::sendUserInfo() {
-    QSettings settings("mir", "Contra");
-    pNickname = settings.value(QString("nick"), "unnamed").toString();
+    QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
+    pNickname = settings.value(QString::fromUtf8("nick"), QString::fromUtf8("unnamed")).toString();
     pIconID = settings.value("icon", 25096).toString().toShort();
     CTransaction * uinfoTransaction = new CTransaction(304, pTaskIDCounter++);
     uinfoTransaction->addParameter(102, TextHelper::EncodeText(pNickname).size(), TextHelper::EncodeText(pNickname).data());
@@ -178,7 +178,7 @@ s_user * ConnectionController::getUserByUid(qint16 uid) {
 
 s_user * ConnectionController::getUserByName(QString name) {
     for(quint32 i=0; i<pUsers.size(); i++) {
-        if(name.contains(QString(pUsers[i]->name))) {
+        if(name.contains(QString::fromUtf8(pUsers[i]->name))) {
             return pUsers[i];
         }
     }
@@ -215,9 +215,9 @@ void ConnectionController::sendPMToUser(quint16 uid, QString message, bool autom
 }
 
 void ConnectionController::closeConnection(bool silent) {
-    if(!silent && pServerAddress != "" && !pServerAddress.isEmpty())
+    if(!silent && pServerAddress != QString::fromUtf8("") && !pServerAddress.isEmpty())
     {
-        emit gotChatMessage(QString("                <b>Disconnected from %1</b>").arg(pServerAddress));
+        emit gotChatMessage(QString::fromUtf8("                <b>Disconnected from %1</b>").arg(pServerAddress));
     }
     pSocket.close();
     if(pSocket.state() != QAbstractSocket::UnconnectedState) {
@@ -285,7 +285,7 @@ void ConnectionController::onSocketConnected() {
         loginTransaction->addParameter(164, VERSION_MAJOR*10 + VERSION_MINOR);
     }
 
-    pServerAgreement = "";
+    pServerAgreement = QString::fromUtf8("");
 
     sendTransaction(loginTransaction, true);
 }
@@ -305,7 +305,7 @@ ConnectionController::t_protocolExtensions ConnectionController::checkForProtoco
     sock->waitForReadyRead();
     QByteArray response = sock->readAll().left(4);
 
-    pServerProtocolExtensions.pitbull = response == "YES.";
+    pServerProtocolExtensions.pitbull = response == QString::fromUtf8("YES.");
 
     sock->disconnect();*/
 
@@ -319,71 +319,71 @@ void ConnectionController::onSocketError(QAbstractSocket::SocketError e) {
     QString string;
     switch(e) {
     case 0:
-        string = "Connection was refused.";
+        string = QString::fromUtf8("Connection was refused.");
         break;
     case 1:
-        string = "The server closed the connection.";
+        string = QString::fromUtf8("The server closed the connection.");
         break;
     case 2:
-        string = "Host not found.";
+        string = QString::fromUtf8("Host not found.");
         break;
     case 3:
-        string = "Socket access denied.";
+        string = QString::fromUtf8("Socket access denied.");
         break;
     case 4:
-        string = "Not enough memory.";
+        string = QString::fromUtf8("Not enough memory.");
         break;
     case 5:
-        string = "Connection timed out.";
+        string = QString::fromUtf8("Connection timed out.");
         break;
     case 6:
-        string = "System datagram limit reached.";
+        string = QString::fromUtf8("System datagram limit reached.");
         break;
     case 7:
-        string = "Network connection lost.";
+        string = QString::fromUtf8("Network connection lost.");
         break;
     case 8:
-        string = "Address already in use.";
+        string = QString::fromUtf8("Address already in use.");
         break;
     case 9:
-        string = "Specified address not available.";
+        string = QString::fromUtf8("Specified address not available.");
         break;
     case 10:
-        string = "Network operation not supported.";
+        string = QString::fromUtf8("Network operation not supported.");
         break;
     case 12:
-        string = "Proxy requires authentication.";
+        string = QString::fromUtf8("Proxy requires authentication.");
         break;
     case 13:
-        string = "SSL/TSL handshake failed.";
+        string = QString::fromUtf8("SSL/TSL handshake failed.");
         break;
     case 11:
-        string = "Socket operation still in progress.";
+        string = QString::fromUtf8("Socket operation still in progress.");
         break;
     case 14:
-        string = "Connection to proxy denied.";
+        string = QString::fromUtf8("Connection to proxy denied.");
         break;
     case 15:
-        string = "Proxy disconnected unexpectedly.";
+        string = QString::fromUtf8("Proxy disconnected unexpectedly.");
         break;
     case 16:
-        string = "Connection to proxy timed out.";
+        string = QString::fromUtf8("Connection to proxy timed out.");
         break;
     case 17:
-        string = "Proxy address not found.";
+        string = QString::fromUtf8("Proxy address not found.");
         break;
     case 18:
-        string = "Could not identify proxy protocol.";
+        string = QString::fromUtf8("Could not identify proxy protocol.");
         break;
     default:
-        string = "Unknown socket error.";
+        string = QString::fromUtf8("Unknown socket error.");
     }
 
 
-    QSettings settings("mir", "Contra");
+    QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
     if(e == 1 && settings.value("autoReconnect", false).toBool() && pReconnectionAttempts < 3)
     {
-        emit socketError(string+"<br>Reconnecting...");
+        emit socketError(string+ QString::fromUtf8("<br>Reconnecting..."));
         closeConnection();
         QTimer::singleShot(2000, this, SLOT(reconnect()));
     } else
@@ -395,15 +395,15 @@ void ConnectionController::onSocketError(QAbstractSocket::SocketError e) {
 
 void ConnectionController::onConnectionTimedOut()
 {
-    QSettings settings("mir", "Contra");
+    QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
     if(settings.value("autoReconnect", false).toBool() && pReconnectionAttempts < 3)
     {
-        emit socketError("Connection timed out.<br>Reconnecting...");
+        emit socketError(QString::fromUtf8("Connection timed out.<br>Reconnecting..."));
         closeConnection();
         QTimer::singleShot(2000, this, SLOT(reconnect()));
     } else
     {
-        emit socketError("Connection timed out.");
+        emit socketError(QString::fromUtf8("Connection timed out."));
         closeConnection();
     }
 }
@@ -457,8 +457,8 @@ void ConnectionController::onSocketData() {
                     break;
                 case 107:
                     {
-                    QSettings settings("mir", "Contra");
-                    pNickname = settings.value(QString("nick"), "unnamed").toString();
+                    QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
+                    pNickname = settings.value(QString::fromUtf8("nick"), QString::fromUtf8("unnamed")).toString();
 
                     sendUserInfo();
 
@@ -467,27 +467,27 @@ void ConnectionController::onSocketData() {
                         if(parameterBuffer) {
                             if(parameterBuffer->type() == TYPE_STRING) {
                                 pServerName = parameterBuffer->toString();
-                                if(!pServerName.isEmpty() && pServerName != " ")
+                                if(!pServerName.isEmpty() && pServerName != QString::fromUtf8(" "))
                                 {
                                     emit gotServerName();
-                                    emit gotChatMessage(QString("                <b>Connected to %1</b>").arg(pServerName));
+                                    emit gotChatMessage(QString::fromUtf8("                <b>Connected to %1</b>").arg(pServerName));
                                 }
                                 else
                                 {
-                                    pServerName = "";
-                                    emit gotChatMessage(QString("                <b>Connected to %1</b>").arg(pServerAddress));
+                                    pServerName = QString::fromUtf8("");
+                                    emit gotChatMessage(QString::fromUtf8("                <b>Connected to %1</b>").arg(pServerAddress));
                                 }
                             }
                             else
                             {
-                                pServerName = "";
-                                emit gotChatMessage("                <b>Connection established</b>");
+                                pServerName = QString::fromUtf8("");
+                                emit gotChatMessage(QString::fromUtf8("                <b>Connection established</b>"));
                             }
                         }
                         else
                         {
-                            pServerName = "";
-                            emit gotChatMessage("                <b>Connection established</b>");
+                            pServerName = QString::fromUtf8("");
+                            emit gotChatMessage(QString::fromUtf8("                <b>Connection established</b>"));
                         }
 
                         requestUserList();
@@ -638,7 +638,7 @@ void ConnectionController::onSocketData() {
 
                                 newUser->doesCET = false;
 
-                                newUser->iconPath = new QString(QString(":/icons/") + QString::number(newUser->icon) + QString(".png"));
+                                newUser->iconPath = new QString(QString::fromUtf8(":/icons/") + QString::number(newUser->icon) + QString::fromUtf8(".png"));
 
                                 memcpy(&newUser->flags, parameterBuffer->data() + 4, 2);
                                 newUser->flags = qFromBigEndian(newUser->flags);
@@ -719,8 +719,8 @@ void ConnectionController::onSocketData() {
                                     qDebug() << "Warning: Ignoring old-style threaded news!";
                                 }
                                 if(parameterBuffer->id() == 321) { // Got news items
-                                    QString _name = "";
-                                    QString _poster = "";
+                                    QString _name = QString::fromUtf8("");
+                                    QString _poster = QString::fromUtf8("");
 
                                     quint32 count;
                                     memcpy(&count, parameterBuffer->data()+4, 4);
@@ -751,7 +751,7 @@ void ConnectionController::onSocketData() {
                                         char * atitle = (char *) malloc(tsize+1);
                                         memcpy(atitle, parameterBuffer->data()+offset+23, tsize);
                                         atitle[(quint16)tsize] = '\0';
-                                        _name = QString(atitle);
+                                        _name = QString::fromUtf8(atitle);
                                         free(atitle);
 
                                         char psize;
@@ -759,7 +759,7 @@ void ConnectionController::onSocketData() {
                                         char * aposter = (char *) malloc(psize+1);
                                         memcpy(aposter, parameterBuffer->data()+offset+24+tsize, psize);
                                         aposter[(quint16)psize] = '\0';
-                                        _poster = QString(aposter);
+                                        _poster = QString::fromUtf8(aposter);
                                         free(aposter);
 
                                         qint32 offset2 = offset+24+tsize+psize;
@@ -788,7 +788,7 @@ void ConnectionController::onSocketData() {
                                 }
                                 if(parameterBuffer->id() == 323) { // Got news categories/bundles
                                     unsigned char _type = 0;
-                                    QString _name = "";
+                                    QString _name = QString::fromUtf8("");
 
                                     quint16 _typeshort;
                                     memcpy(&_typeshort, parameterBuffer->data(), 2);
@@ -803,7 +803,7 @@ void ConnectionController::onSocketData() {
                                         buffer = (char *) malloc(ns+1);
                                         memcpy(buffer, parameterBuffer->data()+5, ns);
                                         buffer[ns] = '\0';
-                                        _name = QString(buffer);
+                                        _name = QString::fromUtf8(buffer);
                                         free(buffer);
                                     }
 
@@ -813,7 +813,7 @@ void ConnectionController::onSocketData() {
                                         buffer = (char *) malloc(ns+1);
                                         memcpy(buffer, parameterBuffer->data()+29, ns);
                                         buffer[ns] = '\0';
-                                        _name = QString(buffer);
+                                        _name = QString::fromUtf8(buffer);
                                         free(buffer);
                                     }
 
@@ -833,7 +833,7 @@ void ConnectionController::onSocketData() {
                             t = (char *) malloc(parameterBuffer->length()+1);
                             memcpy(t, parameterBuffer->data(), parameterBuffer->length());
                             t[parameterBuffer->length()] = '\0';
-                            text = QString(t);
+                            text = QString::fromUtf8(t);
                             free(t);
                         }
                         parameterBuffer = receivedTransaction->getParameterById(329);
@@ -841,7 +841,7 @@ void ConnectionController::onSocketData() {
                             t = (char *) malloc(parameterBuffer->length()+1);
                             memcpy(t, parameterBuffer->data(), parameterBuffer->length());
                             t[parameterBuffer->length()] = '\0';
-                            poster = QString(t);
+                            poster = QString::fromUtf8(t);
                             free(t);
                         }
                         parameterBuffer = receivedTransaction->getParameterById(330);
@@ -903,49 +903,49 @@ void ConnectionController::onSocketData() {
                                 }
                             }
 
-                            timestamp = QString::number(d)+" ";
+                            timestamp = QString::number(d)+ QString::fromUtf8(" ");
 
                             switch(M) {
                             case 1:
-                                timestamp += "January ";
+                                timestamp += QString::fromUtf8("January ");
                                 break;
                             case 2:
-                                timestamp += "February ";
+                                timestamp += QString::fromUtf8("February ");
                                 break;
                             case 3:
-                                timestamp += "March ";
+                                timestamp += QString::fromUtf8("March ");
                                 break;
                             case 4:
-                                timestamp += "April ";
+                                timestamp += QString::fromUtf8("April ");
                                 break;
                             case 5:
-                                timestamp += "May ";
+                                timestamp += QString::fromUtf8("May ");
                                 break;
                             case 6:
-                                timestamp += "June ";
+                                timestamp += QString::fromUtf8("June ");
                                 break;
                             case 7:
-                                timestamp += "July ";
+                                timestamp += QString::fromUtf8("July ");
                                 break;
                             case 8:
-                                timestamp += "August ";
+                                timestamp += QString::fromUtf8("August ");
                                 break;
                             case 9:
-                                timestamp += "September ";
+                                timestamp += QString::fromUtf8("September ");
                                 break;
                             case 10:
-                                timestamp += "October ";
+                                timestamp += QString::fromUtf8("October ");
                                 break;
                             case 11:
-                                timestamp += "November ";
+                                timestamp += QString::fromUtf8("November ");
                                 break;
                             case 12:
-                                timestamp += "December ";
+                                timestamp += QString::fromUtf8("December ");
                                 break;
                             }
 
                             timestamp += QString::number(year);
-                            timestamp += " at ";
+                            timestamp += QString::fromUtf8(" at ");
 
                             while(s > 3600) {
                                 h++;
@@ -957,23 +957,23 @@ void ConnectionController::onSocketData() {
                             }
 
                             if(h < 10) {
-                                timestamp += "0"+QString::number(h)+":";
+                                timestamp += QString::fromUtf8("0")+QString::number(h)+ QString::fromUtf8(":");
                             } else {
-                                timestamp += QString::number(h)+":";
+                                timestamp += QString::number(h)+ QString::fromUtf8(":");
                             }
                             if(m < 10) {
-                                timestamp += "0"+QString::number(m)+":";
+                                timestamp += QString::fromUtf8("0")+QString::number(m)+ QString::fromUtf8(":");
                             } else {
-                                timestamp += QString::number(m)+":";
+                                timestamp += QString::number(m)+ QString::fromUtf8(":");
                             }
                             if(s < 10) {
-                                timestamp += "0"+QString::number(s);
+                                timestamp += QString::fromUtf8("0")+QString::number(s);
                             } else {
                                 timestamp += QString::number(s);
                             }
 
                             if(d > 31) {
-                                timestamp = "Unknown";
+                                timestamp = QString::fromUtf8("Unknown");
                             }
                         }
 
@@ -1027,7 +1027,7 @@ void ConnectionController::onSocketData() {
                 quint16 uid = parameterBuffer->toShort();
 
                 if(uid) {
-                    sendPMToUser(uid, QString("I'm sorry, this client does not support private chats yet. Please use private messages\0"), true);
+                    sendPMToUser(uid, QString::fromUtf8("I'm sorry, this client does not support private chats yet. Please use private messages\0"), true);
                 }
             }
             break;
@@ -1099,7 +1099,7 @@ void ConnectionController::onSocketData() {
                         }
 
                         user->icon = newIcon;
-                        user->iconPath = new QString(QString(":/icons/") + QString::number(user->icon) + QString(".png"));
+                        user->iconPath = new QString(QString::fromUtf8(":/icons/") + QString::number(user->icon) + QString::fromUtf8(".png"));
                     }
 
                     parameterBuffer = receivedTransaction->getParameterById(112);
@@ -1117,7 +1117,7 @@ void ConnectionController::onSocketData() {
                         user->nameLength = parameterBuffer->length();
 
                         QString newName = TextHelper::DecodeText(user->name, parameterBuffer->length());
-                        QString message = QString("                <b>%1 is now known as %2</b>").arg(oldName, newName);
+                        QString message = QString::fromUtf8("                <b>%1 is now known as %2</b>").arg(oldName, newName);
 
                         if(oldName != newName)
                         {
@@ -1133,7 +1133,7 @@ void ConnectionController::onSocketData() {
                     parameterBuffer = receivedTransaction->getParameterById(104);
                     if(parameterBuffer) {
                         newUser->icon = parameterBuffer->toShort();
-                        newUser->iconPath = new QString(QString("icons/") + QString::number(newUser->icon) + QString(".png"));
+                        newUser->iconPath = new QString(QString::fromUtf8("icons/") + QString::number(newUser->icon) + QString::fromUtf8(".png"));
                     }
 
                     parameterBuffer = receivedTransaction->getParameterById(112);
@@ -1149,7 +1149,7 @@ void ConnectionController::onSocketData() {
                     }
 
                     pUsers.push_back(newUser);
-                    QString message = QString("                <b>%1 has joined</b>").arg(TextHelper::DecodeText(newUser->name, newUser->nameLength));
+                    QString message = QString::fromUtf8("                <b>%1 has joined</b>").arg(TextHelper::DecodeText(newUser->name, newUser->nameLength));
                     emit gotChatMessage(message);
                 }
                 emit userListChanged();
@@ -1168,7 +1168,7 @@ void ConnectionController::onSocketData() {
 
                 emit userLeft(user);
 
-                QString message = QString("                <b>%1 has left</b>").arg(TextHelper::DecodeText(user->name, user->nameLength));
+                QString message = QString::fromUtf8("                <b>%1 has left</b>").arg(TextHelper::DecodeText(user->name, user->nameLength));
                 emit gotChatMessage(message);
                 for(quint32 i=0; i<pUsers.size(); i++) {
                     if(pUsers[i]->id == uid) {
@@ -1197,6 +1197,6 @@ void ConnectionController::onSocketData() {
 
 std::string ConnectionController::getUserHash(s_user * user) {
     QString string;
-    string.append(user->name);
+    string.append(QString::fromUtf8(user->name));
     return string.toStdString();
 }

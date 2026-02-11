@@ -10,7 +10,7 @@ CUpload::CUpload()
     uploadInProgress = false;
     referenceNumber = -1;
     fileSize = 0;
-    currentName = "Waiting for name...";
+    currentName = QString::fromUtf8("Waiting for name...");
     bytesSent = 0;
     dataSize = 0;
     bytesWritten = 0;
@@ -36,9 +36,9 @@ void CUpload::stopUpload() {
         file->close();
         uploadTimer->stop();
         if(uploadInProgress) {
-            widget->infoLabel()->setText("Stopped");
+            widget->infoLabel()->setText(QString::fromUtf8("Stopped"));
         } else {
-            widget->infoLabel()->setText("Cancelled");
+            widget->infoLabel()->setText(QString::fromUtf8("Cancelled"));
         }
         uploadInProgress = false;
         finished = true;
@@ -84,7 +84,7 @@ void CUpload::updateSpeed() {
         speedString = QString::asprintf("%.0f bytes/s", speed);
     }
 
-    widget->infoLabel()->setText(readString+" of "+sizeString+" ("+speedString+")");
+    widget->infoLabel()->setText(readString+QString::fromUtf8(" of ")+sizeString+QString::fromUtf8(" (")+speedString+ QString::fromUtf8(")"));
     widget->progressBar()->setValue(bytesSent);
 }
 
@@ -176,7 +176,7 @@ void CUpload::threadFinished(int code)
         dataSize = 0;
         widget->progressBar()->setValue(10);
         widget->progressBar()->setMaximum(10);
-        widget->infoLabel()->setText("Completed");
+        widget->infoLabel()->setText(QString::fromUtf8("Completed"));
         uploadInProgress = false;
         file->close();
         uploadTimer->stop();
@@ -186,25 +186,25 @@ void CUpload::threadFinished(int code)
     default:
     case 1:
         qDebug() << "Data sending failed.";
-        widget->infoLabel()->setText("Upload interrupted.");
+        widget->infoLabel()->setText(QString::fromUtf8("Upload interrupted."));
         uploadTimer->stop();
         finished = true;
         uploadInProgress = false;
         break;
     case 2:
-        widget->infoLabel()->setText("Server rejected the operation. Check encoding settings.");
+        widget->infoLabel()->setText(QString::fromUtf8("Server rejected the operation. Check encoding settings."));
         uploadTimer->stop();
         finished = true;
         uploadInProgress = false;
         break;
     case 3:
-        widget->infoLabel()->setText("Error reading file.");
+        widget->infoLabel()->setText(QString::fromUtf8("Error reading file."));
         uploadTimer->stop();
         finished = true;
         uploadInProgress = false;
         break;
     case 4:
-        widget->infoLabel()->setText("Could not connect for transfer. Check encoding settings.");
+        widget->infoLabel()->setText(QString::fromUtf8("Could not connect for transfer. Check encoding settings."));
         uploadTimer->stop();
         finished = true;
         uploadInProgress = false;

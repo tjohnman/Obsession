@@ -63,7 +63,7 @@ void DownloadManager::onDownloadFinished() {
         }
     }
 
-    QSettings settings("mir", "Contra");
+    QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
     qint32 dlqueue = settings.value("dlqueue", 1).toInt();
 
     qint32 free;
@@ -71,7 +71,7 @@ void DownloadManager::onDownloadFinished() {
         for(quint32 i=0; i<downloads.size(); i++) {
             CDownload * download;
             download = downloads[i];
-            if(download->widget->infoLabel()->text() == "Queued") {
+            if(download->widget->infoLabel()->text() == QString::fromUtf8("Queued")) {
                 sendDownloadRequestToServer(download);
             }
         }
@@ -81,7 +81,7 @@ void DownloadManager::onDownloadFinished() {
             for(quint32 i=0; i<downloads.size(); i++) {
                 CDownload * download;
                 download = downloads[i];
-                if(download->widget->infoLabel()->text() == "Queued") {
+                if(download->widget->infoLabel()->text() == QString::fromUtf8("Queued")) {
                     sendDownloadRequestToServer(download);
                     break;
                 }
@@ -97,15 +97,15 @@ void DownloadManager::onForcedDownload(CDownload * download) {
 void DownloadManager::sendDownloadRequestToServer(CDownload * download) {
     QString path = download->pathOnServer;
     download->matched = false;
-    download->widget->infoLabel()->setText("Waiting for server...");
+    download->widget->infoLabel()->setText(QString::fromUtf8("Waiting for server..."));
     CTransaction * fileRequest = connection->createTransaction(202);
     fileRequest->addParameter(201, TextHelper::EncodeText(download->currentName).size(), TextHelper::EncodeText(download->currentName).data());
 
-    if(!path.endsWith("/")) {
-        path.append("/");
+    if(!path.endsWith(QString::fromUtf8("/"))) {
+        path.append(QString::fromUtf8("/"));
     }
 
-    QStringList levels = path.split("/", Qt::SkipEmptyParts);
+    QStringList levels = path.split(QString::fromUtf8("/"), Qt::SkipEmptyParts);
     quint16 directorylevels = levels.count();
     quint16 pathlen = 2 + directorylevels * 3;
     for(qint32 i=0; i<levels.count(); i++) {
@@ -132,7 +132,7 @@ void DownloadManager::sendDownloadRequestToServer(CDownload * download) {
     // Look for existing data
 
     QFile preFile;
-    preFile.setFileName(DownloadManager::GetDownloadsDirectoryPath()+"/"+QString(download->currentName));
+    preFile.setFileName(DownloadManager::GetDownloadsDirectoryPath()+ QString::fromUtf8("/") +QString(download->currentName));
     if(preFile.exists()) {
         quint32 preSize = preFile.size();
 
@@ -164,7 +164,7 @@ void DownloadManager::onQueueUpdate(quint32 ref, quint32 pos) {
 
 void DownloadManager::onRequestedFile(QString name, qint32 size, QString path) {
     if(size < 0) {
-        DialogError error("The Hotline protocol does not support files over 2GB in size.", 0);
+        DialogError error(QString::fromUtf8("The Hotline protocol does not support files over 2GB in size."), 0);
         error.show();
         return;
     }
@@ -175,7 +175,7 @@ void DownloadManager::onRequestedFile(QString name, qint32 size, QString path) {
     newDownload->fileSize = size;
 
     QFile preFile;
-    preFile.setFileName(DownloadManager::GetDownloadsDirectoryPath()+"/"+QString(newDownload->currentName));
+    preFile.setFileName(DownloadManager::GetDownloadsDirectoryPath()+ QString::fromUtf8("/") +QString(newDownload->currentName));
     if(preFile.exists()) {
         quint32 preSize = preFile.size();
         newDownload->bytesRead = preSize;
@@ -189,7 +189,7 @@ void DownloadManager::onRequestedFile(QString name, qint32 size, QString path) {
     item->setSizeHint(customItem->sizeHint());
     listWidget->addItem(item);
     listWidget->setItemWidget(item, customItem);
-    customItem->infoLabel()->setText("Queued");
+    customItem->infoLabel()->setText(QString::fromUtf8("Queued"));
     newDownload->widget = customItem;
     newDownload->itemPlaceholder = item;
 

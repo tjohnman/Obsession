@@ -22,7 +22,7 @@ WidgetChat::WidgetChat(QWidget *parent) :
 void WidgetChat::printChat(QString str) {
     ui->textEdit->moveCursor(QTextCursor::End);
     QString formatted = TextHelper::FormatMessageToHTML(str);
-    ui->textEdit->insertHtml(formatted+"<br>");
+    ui->textEdit->insertHtml(formatted+ QString::fromUtf8("<br>"));
     ui->textEdit->moveCursor(QTextCursor::End);
     ui->textEdit->ensureCursorVisible();
     ui->lineEdit->setFocus();
@@ -47,7 +47,7 @@ WidgetChat::~WidgetChat()
 
 void WidgetChat::setEncodingLabel(QString enc)
 {
-    ui->encodingLabel->setText("Using encoding <b>"+enc+"</b>");
+    ui->encodingLabel->setText(QString::fromUtf8("Using encoding <b>")+enc+ QString::fromUtf8("</b>"));
 }
 
 void WidgetChat::changeEvent(QEvent *e)

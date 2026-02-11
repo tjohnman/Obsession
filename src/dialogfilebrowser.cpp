@@ -13,7 +13,7 @@ DialogFileBrowser::DialogFileBrowser(ConnectionController * c, QWidget *parent) 
 {
     ui->setupUi(this);
     connection = c;
-    path = _m_RawPath = "/";
+    path = _m_RawPath = QString::fromUtf8("/");
     connect(connection, SIGNAL(gotFileList(std::vector<s_hotlineFile *>)), this, SLOT(onGotFileList(std::vector<s_hotlineFile *>)));
     connect(ui->treeWidget, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(onDoubleClick(QModelIndex)));
     connect(ui->treeWidget, SIGNAL(clicked(QModelIndex)), this, SLOT(selectionChange()));
@@ -66,31 +66,31 @@ void DialogFileBrowser::dropEvent(QDropEvent *event) {
 }
 
 QString DialogFileBrowser::getExtension(QString name) {
-    qint32 last = name.lastIndexOf(".");
+    qint32 last = name.lastIndexOf(QString::fromUtf8("."));
     if(last == -1) {
-        return "";
+        return QString::fromUtf8("");
     }
     return name.right(name.length()-last-1).toLower();
 }
 
 void DialogFileBrowser::resetPath() {
-    path = "/";
+    path = QString::fromUtf8("/");
     ui->treeWidget->setEnabled(true);
 }
 
 void DialogFileBrowser::load() {
-    if(!path.endsWith("/")) {
-        path.append("/");
+    if(!path.endsWith(QString::fromUtf8("/"))) {
+        path.append(QString::fromUtf8("/"));
     }
-    if(!_m_RawPath.endsWith("/"))
+    if(!_m_RawPath.endsWith(QString::fromUtf8("/")))
     {
-        _m_RawPath.append("/");
+        _m_RawPath.append(QString::fromUtf8("/"));
     }
     ui->labelPath->setText(path);
     CTransaction * fileListTransaction = connection->createTransaction(200);
 
     if(path.length() > 1) {
-        QStringList levels = path.split("/", Qt::SkipEmptyParts);
+        QStringList levels = path.split(QString::fromUtf8("/"), Qt::SkipEmptyParts);
         quint16 directorylevels = levels.count();
         quint16 pathlen = 2 + directorylevels * 3;
         for(qint32 i=0; i<levels.count(); i++) {
@@ -116,15 +116,15 @@ void DialogFileBrowser::load() {
         fileListTransaction->addParameter(202, pathlen, pathdata);
     }
     connection->sendTransaction(fileListTransaction, true);
-    ui->label->setText("loading...");
+    ui->label->setText(QString::fromUtf8("loading..."));
     ui->treeWidget->setEnabled(false);
 }
 
 void DialogFileBrowser::onDoubleClick(QModelIndex model) {
     QTreeWidgetItem * item = ui->treeWidget->currentItem();
-    if(item->data(2, 0).toString() == "fldr") {
-        path = QString(path + item->data(0, 0).toString() + "/");
-        _m_RawPath = QString(_m_RawPath + _m_RawNames[item->data(0,0).toString()] + "/");
+    if(item->data(2, 0).toString() == QString::fromUtf8("fldr")) {
+        path = QString(path + item->data(0, 0).toString() + QString::fromUtf8("/"));
+        _m_RawPath = QString(_m_RawPath + _m_RawNames[item->data(0,0).toString()] + QString::fromUtf8("/"));
         load();
     } else {
         requestFile();
@@ -142,26 +142,26 @@ void DialogFileBrowser::onGotFileList(std::vector<s_hotlineFile *> list) {
         item->setData(0, 0, _n);
         qint32 size = list[i]->size;
         if(!strncmp(list[i]->type, "fldr", 4)) {
-            item->setData(1, 0, QString::number(size) + (size == 1 ? " item" : " items"));
+            item->setData(1, 0, QString::number(size) + (size == 1 ? QString::fromUtf8(" item") : QString::fromUtf8(" items")));
         } else {
             if(size > 1024) {
                 if(size > 1024*1024*1024) {
-                    item->setData(1, 0, QString::number(size/1024/1024/1024) + " GB");
+                    item->setData(1, 0, QString::number(size/1024/1024/1024) + QString::fromUtf8(" GB"));
                 } else {
                     if(size > 1024*1024) {
-                        item->setData(1, 0, QString::number(size/1024/1024) + " MB");
+                        item->setData(1, 0, QString::number(size/1024/1024) + QString::fromUtf8(" MB"));
                     } else {
-                        item->setData(1, 0, QString::number(size/1024) + " KB");
+                        item->setData(1, 0, QString::number(size/1024) + QString::fromUtf8(" KB"));
                     }
                 }
             } else {
                 if(size < 0) {
-                    item->setData(1, 0, "more than 2GB");
+                    item->setData(1, 0, QVariant(QString::fromUtf8("more than 2GB")));
                 } else {
                     if(list[i]->size <= 0) {
-                        item->setData(1, 0, "0 bytes");
+                        item->setData(1, 0, QVariant(QString::fromUtf8("0 bytes")));
                     } else {
-                        item->setData(1, 0, QString::number(size) + " bytes");
+                        item->setData(1, 0, QString::number(size) + QString::fromUtf8(" bytes"));
                     }
                 }
             }
@@ -170,154 +170,154 @@ void DialogFileBrowser::onGotFileList(std::vector<s_hotlineFile *> list) {
         item->setTextAlignment(1, Qt::AlignRight);
 
         if(!strncmp(list[i]->type, "fldr", 4)) {
-            item->setIcon(0, QIcon(":/files/interfaceIcons/filesFolder.png"));
+            item->setIcon(0, QIcon(QString::fromUtf8(":/files/interfaceIcons/filesFolder.png")));
         } else {
-            item->setIcon(0, QIcon(":/files/interfaceIcons/filesUnknown.png"));
+            item->setIcon(0, QIcon(QString::fromUtf8(":/files/interfaceIcons/filesUnknown.png")));
 
-            if(getExtension(_n) == "sitx") {
-                item->setIcon(0, QIcon(":/files/interfaceIcons/filesArchive.png"));
+            if(getExtension(_n) == QString::fromUtf8("sitx")) {
+                item->setIcon(0, QIcon(QString::fromUtf8(":/files/interfaceIcons/filesArchive.png")));
             }
-            if(getExtension(_n) == "sit") {
-                item->setIcon(0, QIcon(":/files/interfaceIcons/filesArchive.png"));
+            if(getExtension(_n) == QString::fromUtf8("sit")) {
+                item->setIcon(0, QIcon(QString::fromUtf8(":/files/interfaceIcons/filesArchive.png")));
             }
-            if(getExtension(_n) == "zip") {
-                item->setIcon(0, QIcon(":/files/interfaceIcons/filesArchive.png"));
+            if(getExtension(_n) == QString::fromUtf8("zip")) {
+                item->setIcon(0, QIcon(QString::fromUtf8(":/files/interfaceIcons/filesArchive.png")));
             }
-            if(getExtension(_n) == "dmg") {
-                item->setIcon(0, QIcon(":/files/interfaceIcons/filesArchive.png"));
+            if(getExtension(_n) == QString::fromUtf8("dmg")) {
+                item->setIcon(0, QIcon(QString::fromUtf8(":/files/interfaceIcons/filesArchive.png")));
             }
-            if(getExtension(_n) == "rar") {
-                item->setIcon(0, QIcon(":/files/interfaceIcons/filesArchive.png"));
+            if(getExtension(_n) == QString::fromUtf8("rar")) {
+                item->setIcon(0, QIcon(QString::fromUtf8(":/files/interfaceIcons/filesArchive.png")));
             }
-            if(getExtension(_n) == "7zip") {
-                item->setIcon(0, QIcon(":/files/interfaceIcons/filesArchive.png"));
+            if(getExtension(_n) == QString::fromUtf8("7zip")) {
+                item->setIcon(0, QIcon(QString::fromUtf8(":/files/interfaceIcons/filesArchive.png")));
             }
-            if(getExtension(_n) == "7z") {
-                item->setIcon(0, QIcon(":/files/interfaceIcons/filesArchive.png"));
+            if(getExtension(_n) == QString::fromUtf8("7z")) {
+                item->setIcon(0, QIcon(QString::fromUtf8(":/files/interfaceIcons/filesArchive.png")));
             }
-            if(getExtension(_n) == "z") {
-                item->setIcon(0, QIcon(":/files/interfaceIcons/filesArchive.png"));
+            if(getExtension(_n) == QString::fromUtf8("z")) {
+                item->setIcon(0, QIcon(QString::fromUtf8(":/files/interfaceIcons/filesArchive.png")));
             }
-            if(getExtension(_n) == "tar") {
-                item->setIcon(0, QIcon(":/files/interfaceIcons/filesArchive.png"));
+            if(getExtension(_n) == QString::fromUtf8("tar")) {
+                item->setIcon(0, QIcon(QString::fromUtf8(":/files/interfaceIcons/filesArchive.png")));
             }
-            if(getExtension(_n) == "hqx") {
-                item->setIcon(0, QIcon(":/files/interfaceIcons/filesArchive.png"));
+            if(getExtension(_n) == QString::fromUtf8("hqx")) {
+                item->setIcon(0, QIcon(QString::fromUtf8(":/files/interfaceIcons/filesArchive.png")));
             }
-            if(getExtension(_n) == "gzip") {
-                item->setIcon(0, QIcon(":/files/interfaceIcons/filesArchive.png"));
+            if(getExtension(_n) == QString::fromUtf8("gzip")) {
+                item->setIcon(0, QIcon(QString::fromUtf8(":/files/interfaceIcons/filesArchive.png")));
             }
-            if(getExtension(_n) == "gz") {
-                item->setIcon(0, QIcon(":/files/interfaceIcons/filesArchive.png"));
+            if(getExtension(_n) == QString::fromUtf8("gz")) {
+                item->setIcon(0, QIcon(QString::fromUtf8(":/files/interfaceIcons/filesArchive.png")));
             }
-            if(getExtension(_n) == "exe") {
-                item->setIcon(0, QIcon(":/files/interfaceIcons/filesExe.png"));
+            if(getExtension(_n) == QString::fromUtf8("exe")) {
+                item->setIcon(0, QIcon(QString::fromUtf8(":/files/interfaceIcons/filesExe.png")));
             }
-            if(getExtension(_n) == "jpg") {
-                item->setIcon(0, QIcon(":/files/interfaceIcons/filesImage.png"));
+            if(getExtension(_n) == QString::fromUtf8("jpg")) {
+                item->setIcon(0, QIcon(QString::fromUtf8(":/files/interfaceIcons/filesImage.png")));
             }
-            if(getExtension(_n) == "jpeg") {
-                item->setIcon(0, QIcon(":/files/interfaceIcons/filesImage.png"));
+            if(getExtension(_n) == QString::fromUtf8("jpeg")) {
+                item->setIcon(0, QIcon(QString::fromUtf8(":/files/interfaceIcons/filesImage.png")));
             }
-            if(getExtension(_n) == "bmp") {
-                item->setIcon(0, QIcon(":/files/interfaceIcons/filesImage.png"));
+            if(getExtension(_n) == QString::fromUtf8("bmp")) {
+                item->setIcon(0, QIcon(QString::fromUtf8(":/files/interfaceIcons/filesImage.png")));
             }
-            if(getExtension(_n) == "txt") {
-                item->setIcon(0, QIcon(":/files/interfaceIcons/filesText.png"));
+            if(getExtension(_n) == QString::fromUtf8("txt")) {
+                item->setIcon(0, QIcon(QString::fromUtf8(":/files/interfaceIcons/filesText.png")));
             }
-            if(getExtension(_n) == "srt") {
-                item->setIcon(0, QIcon(":/files/interfaceIcons/filesText.png"));
+            if(getExtension(_n) == QString::fromUtf8("srt")) {
+                item->setIcon(0, QIcon(QString::fromUtf8(":/files/interfaceIcons/filesText.png")));
             }
-            if(getExtension(_n) == "lit") {
-                item->setIcon(0, QIcon(":/files/interfaceIcons/filesText.png"));
+            if(getExtension(_n) == QString::fromUtf8("lit")) {
+                item->setIcon(0, QIcon(QString::fromUtf8(":/files/interfaceIcons/filesText.png")));
             }
-            if(getExtension(_n) == "doc") {
-                item->setIcon(0, QIcon(":/files/interfaceIcons/filesDocument.png"));
+            if(getExtension(_n) == QString::fromUtf8("doc")) {
+                item->setIcon(0, QIcon(QString::fromUtf8(":/files/interfaceIcons/filesDocument.png")));
             }
-            if(getExtension(_n) == "pdf") {
-                item->setIcon(0, QIcon(":/files/interfaceIcons/filesDocument.png"));
+            if(getExtension(_n) == QString::fromUtf8("pdf")) {
+                item->setIcon(0, QIcon(QString::fromUtf8(":/files/interfaceIcons/filesDocument.png")));
             }
-            if(getExtension(_n) == "rtf") {
-                item->setIcon(0, QIcon(":/files/interfaceIcons/filesDocument.png"));
+            if(getExtension(_n) == QString::fromUtf8("rtf")) {
+                item->setIcon(0, QIcon(QString::fromUtf8(":/files/interfaceIcons/filesDocument.png")));
             }
-            if(getExtension(_n) == "mov") {
-                item->setIcon(0, QIcon(":/files/interfaceIcons/filesVideo.png"));
+            if(getExtension(_n) == QString::fromUtf8("mov")) {
+                item->setIcon(0, QIcon(QString::fromUtf8(":/files/interfaceIcons/filesVideo.png")));
             }
-            if(getExtension(_n) == "avi") {
-                item->setIcon(0, QIcon(":/files/interfaceIcons/filesVideo.png"));
+            if(getExtension(_n) == QString::fromUtf8("avi")) {
+                item->setIcon(0, QIcon(QString::fromUtf8(":/files/interfaceIcons/filesVideo.png")));
             }
-            if(getExtension(_n) == "wmv") {
-                item->setIcon(0, QIcon(":/files/interfaceIcons/filesVideo.png"));
+            if(getExtension(_n) == QString::fromUtf8("wmv")) {
+                item->setIcon(0, QIcon(QString::fromUtf8(":/files/interfaceIcons/filesVideo.png")));
             }
-            if(getExtension(_n) == "mp4") {
-                item->setIcon(0, QIcon(":/files/interfaceIcons/filesVideo.png"));
+            if(getExtension(_n) == QString::fromUtf8("mp4")) {
+                item->setIcon(0, QIcon(QString::fromUtf8(":/files/interfaceIcons/filesVideo.png")));
             }
-            if(getExtension(_n) == "mkv") {
-                item->setIcon(0, QIcon(":/files/interfaceIcons/filesVideo.png"));
+            if(getExtension(_n) == QString::fromUtf8("mkv")) {
+                item->setIcon(0, QIcon(QString::fromUtf8(":/files/interfaceIcons/filesVideo.png")));
             }
-            if(getExtension(_n) == "mpg") {
-                item->setIcon(0, QIcon(":/files/interfaceIcons/filesVideo.png"));
+            if(getExtension(_n) == QString::fromUtf8("mpg")) {
+                item->setIcon(0, QIcon(QString::fromUtf8(":/files/interfaceIcons/filesVideo.png")));
             }
-            if(getExtension(_n) == "mpeg") {
-                item->setIcon(0, QIcon(":/files/interfaceIcons/filesVideo.png"));
+            if(getExtension(_n) == QString::fromUtf8("mpeg")) {
+                item->setIcon(0, QIcon(QString::fromUtf8(":/files/interfaceIcons/filesVideo.png")));
             }
-            if(getExtension(_n) == "ogm") {
-                item->setIcon(0, QIcon(":/files/interfaceIcons/filesVideo.png"));
+            if(getExtension(_n) == QString::fromUtf8("ogm")) {
+                item->setIcon(0, QIcon(QString::fromUtf8(":/files/interfaceIcons/filesVideo.png")));
             }
-            if(getExtension(_n) == "mp3") {
-                item->setIcon(0, QIcon(":/files/interfaceIcons/filesAudio.png"));
+            if(getExtension(_n) == QString::fromUtf8("mp3")) {
+                item->setIcon(0, QIcon(QString::fromUtf8(":/files/interfaceIcons/filesAudio.png")));
             }
-            if(getExtension(_n) == "wav") {
-                item->setIcon(0, QIcon(":/files/interfaceIcons/filesAudio.png"));
+            if(getExtension(_n) == QString::fromUtf8("wav")) {
+                item->setIcon(0, QIcon(QString::fromUtf8(":/files/interfaceIcons/filesAudio.png")));
             }
-            if(getExtension(_n) == "aif") {
-                item->setIcon(0, QIcon(":/files/interfaceIcons/filesAudio.png"));
+            if(getExtension(_n) == QString::fromUtf8("aif")) {
+                item->setIcon(0, QIcon(QString::fromUtf8(":/files/interfaceIcons/filesAudio.png")));
             }
-            if(getExtension(_n) == "aiff") {
-                item->setIcon(0, QIcon(":/files/interfaceIcons/filesAudio.png"));
+            if(getExtension(_n) == QString::fromUtf8("aiff")) {
+                item->setIcon(0, QIcon(QString::fromUtf8(":/files/interfaceIcons/filesAudio.png")));
             }
-            if(getExtension(_n) == "wma") {
-                item->setIcon(0, QIcon(":/files/interfaceIcons/filesAudio.png"));
+            if(getExtension(_n) == QString::fromUtf8("wma")) {
+                item->setIcon(0, QIcon(QString::fromUtf8(":/files/interfaceIcons/filesAudio.png")));
             }
-            if(getExtension(_n) == "ogg") {
-                item->setIcon(0, QIcon(":/files/interfaceIcons/filesAudio.png"));
+            if(getExtension(_n) == QString::fromUtf8("ogg")) {
+                item->setIcon(0, QIcon(QString::fromUtf8(":/files/interfaceIcons/filesAudio.png")));
             }
-            if(getExtension(_n) == "iso") {
-                item->setIcon(0, QIcon(":/files/interfaceIcons/filesIso.png"));
+            if(getExtension(_n) == QString::fromUtf8("iso")) {
+                item->setIcon(0, QIcon(QString::fromUtf8(":/files/interfaceIcons/filesIso.png")));
             }
-            if(getExtension(_n) == "nrg") {
-                item->setIcon(0, QIcon(":/files/interfaceIcons/filesIso.png"));
+            if(getExtension(_n) == QString::fromUtf8("nrg")) {
+                item->setIcon(0, QIcon(QString::fromUtf8(":/files/interfaceIcons/filesIso.png")));
             }
 
             if(!strncmp(list[i]->type, "JPEG", 4)) {
-                item->setIcon(0, QIcon(":/files/interfaceIcons/filesImage.png"));
+                item->setIcon(0, QIcon(QString::fromUtf8(":/files/interfaceIcons/filesImage.png")));
             }
             if(!strncmp(list[i]->type, "PNGf", 4)) {
-                item->setIcon(0, QIcon(":/files/interfaceIcons/filesImage.png"));
+                item->setIcon(0, QIcon(QString::fromUtf8(":/files/interfaceIcons/filesImage.png")));
             }
             if(!strncmp(list[i]->type, "BMP ", 4)) {
-                item->setIcon(0, QIcon(":/files/interfaceIcons/filesImage.png"));
+                item->setIcon(0, QIcon(QString::fromUtf8(":/files/interfaceIcons/filesImage.png")));
             }
             if(!strncmp(list[i]->type, "ZIP ", 4)) {
-                item->setIcon(0, QIcon(":/files/interfaceIcons/filesArchive.png"));
+                item->setIcon(0, QIcon(QString::fromUtf8(":/files/interfaceIcons/filesArchive.png")));
             }
             if(!strncmp(list[i]->type, "SITD", 4)) {
-                item->setIcon(0, QIcon(":/files/interfaceIcons/filesArchive.png"));
+                item->setIcon(0, QIcon(QString::fromUtf8(":/files/interfaceIcons/filesArchive.png")));
             }
             if(!strncmp(list[i]->type, "DEXE", 4)) {
-                item->setIcon(0, QIcon(":/files/interfaceIcons/filesExe.png"));
+                item->setIcon(0, QIcon(QString::fromUtf8(":/files/interfaceIcons/filesExe.png")));
             }
 
-            if(getExtension(_n) == "hpf") {
-                item->setIcon(0, QIcon(":/files/interfaceIcons/filesPartial.png"));
+            if(getExtension(_n) == QString::fromUtf8("hpf")) {
+                item->setIcon(0, QIcon(QString::fromUtf8(":/files/interfaceIcons/filesPartial.png")));
             }
         }
 
-        item->setData(2, 0, QString(list[i]->type));
+        item->setData(2, 0, QString::fromUtf8(list[i]->type));
 
         ui->treeWidget->addTopLevelItem(item);
     }
-    ui->label->setText(QString::number(list.size())+" items");
+    ui->label->setText(QString::number(list.size())+ QString::fromUtf8(" items"));
     ui->treeWidget->setEnabled(true);
     for(qint32 i=0; i<ui->treeWidget->columnCount(); ++i)
     {
@@ -328,13 +328,13 @@ void DialogFileBrowser::onGotFileList(std::vector<s_hotlineFile *> list) {
 }
 
 void DialogFileBrowser::goDirectoryUp() {
-    if(path.isEmpty() || path == "/") {
-        path = "/";
+    if(path.isEmpty() || path == QString::fromUtf8("/")) {
+        path = QString::fromUtf8("/");
         return;
     }
-    QStringList levels = path.split("/", Qt::SkipEmptyParts);
+    QStringList levels = path.split(QString::fromUtf8("/"), Qt::SkipEmptyParts);
     levels.pop_back();
-    path = levels.join("/");
+    path = levels.join(QString::fromUtf8("/"));
     load();
 }
 
@@ -365,7 +365,7 @@ void DialogFileBrowser::requestFileDelete()
     CTransaction * transaction = connection->createTransaction(204);
     transaction->addParameter(201, TextHelper::EncodeText(ui->treeWidget->currentItem()->data(0, 0).toString()).size(), TextHelper::EncodeText(ui->treeWidget->currentItem()->data(0, 0).toString()).data());
 
-    QStringList levels = path.split("/", Qt::SkipEmptyParts);
+    QStringList levels = path.split(QString::fromUtf8("/"), Qt::SkipEmptyParts);
     quint16 directorylevels = levels.count();
     quint16 pathlen = 2 + directorylevels * 3;
     for(qint32 i=0; i<levels.count(); i++) {
@@ -417,13 +417,13 @@ void DialogFileBrowser::selectFileToUpload() {
 
 void DialogFileBrowser::requestUpload() {
     CTransaction * uploadRequest = connection->createTransaction(203);
-    uploadRequest->addParameter(201, TextHelper::EncodeText(uploadedFile.fileName().split("/").last()).size(), TextHelper::EncodeText(uploadedFile.fileName().split("/").last()).data());
+    uploadRequest->addParameter(201, TextHelper::EncodeText(uploadedFile.fileName().split(QString::fromUtf8("/")).last()).size(), TextHelper::EncodeText(uploadedFile.fileName().split(QString::fromUtf8("/")).last()).data());
 
-    if(!path.endsWith("/")) {
-        path.append("/");
+    if(!path.endsWith(QString::fromUtf8("/"))) {
+        path.append(QString::fromUtf8("/"));
     }
 
-    QStringList levels = path.split("/", Qt::SkipEmptyParts);
+    QStringList levels = path.split(QString::fromUtf8("/"), Qt::SkipEmptyParts);
     quint16 directorylevels = levels.count();
     quint16 pathlen = 2 + directorylevels * 3;
     for(qint32 i=0; i<levels.count(); i++) {

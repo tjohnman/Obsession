@@ -29,7 +29,7 @@ MainWindow::MainWindow(QWidget *parent, bool checkForUpdates) :
     connection = new ConnectionController();
 
     chatWidget = new WidgetChat(this);
-    ui->tabWidget->addTab(chatWidget, "Public Chat");
+    ui->tabWidget->addTab(chatWidget, QString::fromUtf8("Public Chat"));
 
     threadedNewsWidget = new WidgetNews(connection);
     downloadManager = new DownloadManager(connection);
@@ -104,17 +104,17 @@ MainWindow::MainWindow(QWidget *parent, bool checkForUpdates) :
     QFont font = ui->statusLabel->font();
     font.setPointSize(font.pointSize() - 1);
     ui->statusLabel->setFont(font);
-    setStatus(QString("Not connected"));
+    setStatus(QString::fromUtf8("Not connected"));
 
     chatSound = new QSoundEffect(this);
     pmSound = new QSoundEffect(this);
     
     #ifdef Q_OS_WIN32
-    chatSound->setSource(QUrl::fromLocalFile("./sounds/chat.wav"));
-    pmSound->setSource(QUrl::fromLocalFile("./sounds/pm.wav"));
+    chatSound->setSource(QUrl::fromLocalFile(QString::fromUtf8("./sounds/chat.wav")));
+    pmSound->setSource(QUrl::fromLocalFile(QString::fromUtf8("./sounds/pm.wav")));
     #else
-    chatSound->setSource(QUrl("qrc:/sounds/chat.wav"));
-    pmSound->setSource(QUrl("qrc:/sounds/pm.wav"));
+    chatSound->setSource(QUrl(QString::fromUtf8("qrc:/sounds/chat.wav")));
+    pmSound->setSource(QUrl(QString::fromUtf8("qrc:/sounds/pm.wav")));
     #endif
 
     chatWidget->chatSound = chatSound;
@@ -151,22 +151,22 @@ void MainWindow::setStatus(QString s) {
 }
 
 void MainWindow::log(QString t) {
-    debugConsole->addText(t+"\n");
+    debugConsole->addText(t+ QString::fromUtf8("\n"));
 }
 
 void MainWindow::autoConnect() {
     bool auto_connected = false;
-    QSettings settings("mir", "Contra");
+    QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
 
-    QString auto_bookmark = settings.value("autoBookmark", "").toString();
+    QString auto_bookmark = settings.value(QString::fromUtf8("autoBookmark"), QString::fromUtf8("")).toString();
     int bookmark_count = settings.value("bookmarkCount", 0).toInt();
 
-    if(auto_bookmark != "") for(int i=0; i<bookmark_count; ++i) {
-        if(settings.value("bookmarkaddress"+QString::number(i)) == auto_bookmark) {
+    if(auto_bookmark != QString::fromUtf8("")) for(int i=0; i<bookmark_count; ++i) {
+        if(settings.value(QString::fromUtf8("bookmarkaddress")+QString::number(i)) == auto_bookmark) {
             auto_connected = true;
-            this->connection->connectToServer(settings.value("bookmarkaddress"+QString::number(i), "localhost").toString(),
-                                          settings.value("bookmarklogin"+QString::number(i), "").toString(),
-                                          settings.value("bookmarkpassword"+QString::number(i), "").toString());
+            this->connection->connectToServer(settings.value(QString::fromUtf8("bookmarkaddress")+QString::number(i), QString::fromUtf8("localhost")).toString(),
+                                          settings.value(QString::fromUtf8("bookmarklogin")+QString::number(i),  QString::fromUtf8("")).toString(),
+                                          settings.value(QString::fromUtf8("bookmarkpassword")+QString::number(i),  QString::fromUtf8("")).toString());
         }
     }
 
@@ -176,9 +176,9 @@ void MainWindow::autoConnect() {
 }
 
 void MainWindow::onConnected() {
-    setStatus("Connected");
+    setStatus(QString::fromUtf8("Connected"));
 
-    QSettings settings("mir", "Contra");
+    QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
     if(settings.value("connectionKeepAlive", true).toBool())
     {
         connect(&keepAliveTimer, SIGNAL(timeout()), connection, SLOT(requestUserList()));
@@ -189,27 +189,27 @@ void MainWindow::onConnected() {
 }
 
 void MainWindow::playChatSound() {
-    QSettings settings("mir", "Contra");
+    QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
     if(settings.value("soundsEnabled", true).toBool()) {
         chatSound->play();
     }
 }
 
 void MainWindow::playPMSound() {
-    QSettings settings("mir", "Contra");
+    QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
     if(settings.value("soundsEnabled", true).toBool()) {
         pmSound->play();
     }
 }
 
 void MainWindow::changedTab() {
-    if(ui->tabWidget->currentIndex() == 0 && ui->tabWidget->tabText(0) != "Public Chat") {
-        ui->tabWidget->setTabText(0, "Public Chat");
+    if(ui->tabWidget->currentIndex() == 0 && ui->tabWidget->tabText(0) != QString::fromUtf8("Public Chat")) {
+        ui->tabWidget->setTabText(0, QString::fromUtf8("Public Chat"));
     }
 }
 
 void MainWindow::openThreadedNews() {
-    ui->tabWidget->addTab(threadedNewsWidget, "News");
+    ui->tabWidget->addTab(threadedNewsWidget, QString::fromUtf8("News"));
     ui->tabWidget->setCurrentIndex(ui->tabWidget->count()-1);
     threadedNewsWidget->getNews();
 }
@@ -234,7 +234,7 @@ void MainWindow::openDownloads() {
         }
     }
     if(!isThere) {
-        ui->tabWidget->addTab(downloadsDialog, "Downloads");
+        ui->tabWidget->addTab(downloadsDialog, QString::fromUtf8("Downloads"));
         ui->tabWidget->setCurrentIndex(ui->tabWidget->count()-1);
     }
 }
@@ -247,14 +247,14 @@ void MainWindow::openUploads() {
         }
     }
     if(!isThere) {
-        ui->tabWidget->addTab(uploadsDialog, "Uploads");
+        ui->tabWidget->addTab(uploadsDialog, QString::fromUtf8("Uploads"));
         ui->tabWidget->setCurrentIndex(ui->tabWidget->count()-1);
     }
 }
 
 void MainWindow::onConnecting() {
     connection->closeConnection(true);
-    setStatus("Connecting...");
+    setStatus(QString::fromUtf8("Connecting..."));
     ui->tabWidget->clear();
     threadedNewsWidget->clear();
     fileBrowserDialog->resetPath();
@@ -263,18 +263,18 @@ void MainWindow::onConnecting() {
 
 void MainWindow::openChat()
 {
-    ui->tabWidget->addTab(chatWidget, "Public Chat");
+    ui->tabWidget->addTab(chatWidget, QString::fromUtf8("Public Chat"));
     ui->tabWidget->setCurrentIndex(ui->tabWidget->count()-1);
 }
 
 void MainWindow::openLinearNews() {
-    ui->tabWidget->addTab(linearNews, "Message Board");
+    ui->tabWidget->addTab(linearNews, QString::fromUtf8("Message Board"));
     ui->tabWidget->setCurrentIndex(ui->tabWidget->count()-1);
     linearNews->requestNews();
 }
 
 void MainWindow::openConsole() {
-    ui->tabWidget->addTab(debugConsole, "Debug console");
+    ui->tabWidget->addTab(debugConsole, QString::fromUtf8("Debug console"));
     ui->tabWidget->setCurrentIndex(ui->tabWidget->count()-1);
 }
 
@@ -297,7 +297,7 @@ void MainWindow::onError(QString errorString) {
 }
 
 void MainWindow::openFileBrowser() {
-    ui->tabWidget->addTab(fileBrowserDialog, "Files");
+    ui->tabWidget->addTab(fileBrowserDialog, QString::fromUtf8("Files"));
     fileBrowserDialog->load();
     ui->tabWidget->setCurrentIndex(ui->tabWidget->count()-1);
 }
@@ -361,31 +361,31 @@ void MainWindow::slotCloseWindow() {
 void MainWindow::disconnect() {
     connection->closeConnection();
     clearUserList();
-    setWindowTitle("Obsession Hotline Client");
-    setStatus("Disconnected");
+    setWindowTitle(QString::fromUtf8("Obsession Hotline Client"));
+    setStatus(QString::fromUtf8("Disconnected"));
 }
 
 void MainWindow::showServerAgreement() {
     agreementDialog->setAgreement(connection->serverAgreement());
-    ui->tabWidget->addTab(agreementDialog, "Agreement");
+    ui->tabWidget->addTab(agreementDialog, QString::fromUtf8("Agreement"));
     ui->tabWidget->setCurrentIndex(ui->tabWidget->count()-1);
 }
 
 void MainWindow::onGotServerName() {
-    setStatus(QString("Connected to ") + connection->serverName());
-    setWindowTitle(connection->serverName() + " | Obsession Hotline Client");
+    setStatus(QString::fromUtf8("Connected to ") + connection->serverName());
+    setWindowTitle(connection->serverName() + QString::fromUtf8(" | Obsession Hotline Client"));
 }
 
 void MainWindow::onGotBroadcast(QString message)
 {
-    onError("Server-wide broadcast: "+message);
+    onError(QString::fromUtf8("Server-wide broadcast: ")+message);
 }
 
 void MainWindow::onGotChatMessage(QString message) {
     playChatSound();
     chatWidget->printChat(message);
     if(ui->tabWidget->currentWidget() != chatWidget) {
-        ui->tabWidget->setTabText(0, "*Public Chat*");
+        ui->tabWidget->setTabText(0, QString::fromUtf8("*Public Chat*"));
     }
 }
 
@@ -419,7 +419,7 @@ void MainWindow::onClickCreateAccount()
 }
 
 void MainWindow::onUserListChanged() {
-    QSettings settings("mir", "Contra");
+    QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
 
     std::vector<s_user*> * users = connection->getUserList();
     clearUserList();
@@ -430,7 +430,7 @@ void MainWindow::onUserListChanged() {
         DialogPrivateMessaging * private_messages = this->getUserPrivateChat(user);
         private_messages->user = user;
 
-        QListWidgetItem * item = new QListWidgetItem("           "+TextHelper::DecodeText(user->name, user->nameLength));
+        QListWidgetItem * item = new QListWidgetItem(QString::fromUtf8("           ")+TextHelper::DecodeText(user->name, user->nameLength));
         QFont f = QFont();
 
         f.setBold(true);
@@ -492,8 +492,8 @@ void MainWindow::openBookmarksDialog()
 
 void MainWindow::onPreferencesSaved() {
     QFont font;
-    QSettings settings("mir", "Contra");
-    font.setFamily(settings.value("fontFamily", "MS Shell Dlg2").toString());
+    QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
+    font.setFamily(settings.value(QString::fromUtf8("fontFamily"), QString::fromUtf8("MS Shell Dlg2")).toString());
     qint32 style = settings.value("fontStyle", 0).toInt();
     switch(style) {
     case 0:
@@ -510,7 +510,7 @@ void MainWindow::onPreferencesSaved() {
     font.setPointSize(settings.value("fontSize", 8).toInt());
     font.setBold(settings.value("fontBold", false).toBool());
     chatWidget->setChatFont(font);
-    chatWidget->setEncodingLabel(settings.value("EncodingName", "Mac OS Roman").toString());
+    chatWidget->setEncodingLabel(settings.value(QString::fromUtf8("EncodingName"), QString::fromUtf8("Mac OS Roman")).toString());
 
     if(settings.value("connectionKeepAlive", true).toBool())
     {
@@ -614,19 +614,21 @@ void MainWindow::onVersionReady()
     }
 
     QByteArray versionArray = pUpdateCheckReply->readAll();
-    qDebug() << "Current version: " << QString("%1.%2").arg(VERSION_MAJOR).arg(VERSION_MINOR);
+    qDebug() << "Current version: " << QString::fromUtf8("%1.%2").arg(VERSION_MAJOR).arg(VERSION_MINOR);
     qDebug() << "Latest version: " << versionArray;
 
     QList<QByteArray> splitArray = versionArray.split('.');
     if(splitArray[0].toInt() > VERSION_MAJOR || splitArray[1].toInt() > VERSION_MINOR)
     {
         qDebug() << "Update needed.";
-        switch(QMessageBox::information(this, "Update available",
-                                        "There is a new version of Obsession ready for download."
-                                        " Do you want to launch your web browser to download it?", "Yes", "No"))
+        switch(QMessageBox::information(this, QString::fromUtf8("Update available"),
+                                        QString::fromUtf8("There is a new version of Obsession ready for download."
+                                        " Do you want to launch your web browser to download it?"), 
+                                        QString::fromUtf8("Yes"), 
+                                        QString::fromUtf8("No")))
         {
             case 0:
-            QDesktopServices::openUrl(QUrl(""));
+            QDesktopServices::openUrl(QUrl(QString::fromUtf8("")));
             break;
         }
     }

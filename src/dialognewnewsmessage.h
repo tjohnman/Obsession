@@ -12,7 +12,7 @@ class DialogNewNewsMessage : public QDialog
     Q_OBJECT
 
 public:
-    explicit DialogNewNewsMessage(QWidget *parent, const QString path = "", const quint32 parentId = 0);
+    explicit DialogNewNewsMessage(QWidget *parent, const QString path = QString::fromUtf8(""), const quint32 parentId = 0);
     ~DialogNewNewsMessage();
 
 public slots:

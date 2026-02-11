@@ -56,9 +56,9 @@ void DialogOpenConnection::clear() {
 void DialogOpenConnection::_clearFields() {
     ui->autoConnectCheckbox->setDisabled(true);
     ui->autoConnectCheckbox->setChecked(false);
-    ui->lineEdit->setText("");
-    ui->lineEdit_2->setText("");
-    ui->lineEdit_3->setText("");
+    ui->lineEdit->setText(QString::fromUtf8(""));
+    ui->lineEdit_2->setText(QString::fromUtf8(""));
+    ui->lineEdit_3->setText(QString::fromUtf8(""));
     ui->lineEdit->setFocus();
 }
 
@@ -71,16 +71,16 @@ void DialogOpenConnection::setFocusOnLogin() {
 void DialogOpenConnection::bookmarkCurrent() {
 
     if (ui->lineEdit->text().trimmed().length() == 0) {
-        QMessageBox::information(this, "Missing server address", "Please provide an address.");
+        QMessageBox::information(this, QString::fromUtf8("Missing server address"), QString::fromUtf8("Please provide an address."));
         return;
     }
 
-    QSettings settings("mir", "Contra");
+    QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
     qint32 bookmarkCount = settings.value("bookmarkCount", 0).toInt();
-    settings.setValue("bookmarkname"+QString::number(bookmarkCount), ui->lineEdit->text().trimmed());
-    settings.setValue("bookmarkaddress"+QString::number(bookmarkCount), ui->lineEdit->text().trimmed());
-    settings.setValue("bookmarklogin"+QString::number(bookmarkCount), ui->lineEdit_2->text().trimmed());
-    settings.setValue("bookmarkpassword"+QString::number(bookmarkCount), ui->lineEdit_3->text().trimmed());
+    settings.setValue(QString::fromUtf8("bookmarkname")+QString::number(bookmarkCount), ui->lineEdit->text().trimmed());
+    settings.setValue(QString::fromUtf8("bookmarkaddress")+QString::number(bookmarkCount), ui->lineEdit->text().trimmed());
+    settings.setValue(QString::fromUtf8("bookmarklogin")+QString::number(bookmarkCount), ui->lineEdit_2->text().trimmed());
+    settings.setValue(QString::fromUtf8("bookmarkpassword")+QString::number(bookmarkCount), ui->lineEdit_3->text().trimmed());
     bookmarkCount++;
     settings.setValue("bookmarkCount", bookmarkCount);
     updateBookmarkList();
@@ -88,7 +88,7 @@ void DialogOpenConnection::bookmarkCurrent() {
 }
 
 void DialogOpenConnection::choseBookmark(int selectedIndex) {
-    QSettings settings("mir", "Contra");
+    QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
 
     if (selectedIndex == 0) {
         this->_clearFields();
@@ -97,12 +97,12 @@ void DialogOpenConnection::choseBookmark(int selectedIndex) {
     }
 
     ui->autoConnectCheckbox->setDisabled(false);
-    ui->lineEdit->setText(settings.value("bookmarkaddress"+QString::number(selectedIndex-1)).toString());
-    ui->lineEdit_2->setText(settings.value("bookmarklogin"+QString::number(selectedIndex-1)).toString());
-    ui->lineEdit_3->setText(settings.value("bookmarkpassword"+QString::number(selectedIndex-1)).toString());
+    ui->lineEdit->setText(settings.value(QString::fromUtf8("bookmarkaddress")+QString::number(selectedIndex-1)).toString());
+    ui->lineEdit_2->setText(settings.value(QString::fromUtf8("bookmarklogin")+QString::number(selectedIndex-1)).toString());
+    ui->lineEdit_3->setText(settings.value(QString::fromUtf8("bookmarkpassword")+QString::number(selectedIndex-1)).toString());
 
-    QString auto_bookmark = settings.value("autoBookmark", "").toString();
-    if(auto_bookmark != "" && auto_bookmark == settings.value("bookmarkaddress"+QString::number(selectedIndex-1)).toString()) {
+    QString auto_bookmark = settings.value(QString::fromUtf8("autoBookmark"), QString::fromUtf8("")).toString();
+    if(auto_bookmark != QString::fromUtf8("") && auto_bookmark == settings.value(QString::fromUtf8("bookmarkaddress")+QString::number(selectedIndex-1)).toString()) {
         ui->autoConnectCheckbox->setChecked(true);
     } else {
         ui->autoConnectCheckbox->setChecked(false);
@@ -113,23 +113,23 @@ void DialogOpenConnection::choseBookmark(int selectedIndex) {
 
 void DialogOpenConnection::updateAutoConnectStatus()
 {
-    QSettings settings("mir", "Contra");
+    QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
     if(ui->autoConnectCheckbox->isChecked()) {
         settings.setValue("autoBookmark", ui->lineEdit->text());
     } else {
-        settings.setValue("autoBookmark", "");
+        settings.setValue(QString::fromUtf8("autoBookmark"), QString::fromUtf8(""));
     }
 }
 
 void DialogOpenConnection::updateBookmarkList() {
-    QSettings settings("mir", "Contra");
+    QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
 
     ui->comboBox->clear();
-    ui->comboBox->addItem("");
+    ui->comboBox->addItem(QString::fromUtf8(""));
 
     qint32 bookmarkCount = settings.value("bookmarkCount", 0).toInt();
     for(qint32 i=0; i<bookmarkCount; i++) {
-        ui->comboBox->addItem(settings.value("bookmarkname"+QString::number(i)).toString());
+        ui->comboBox->addItem(settings.value(QString::fromUtf8("bookmarkname")+QString::number(i)).toString());
     }
 }
 

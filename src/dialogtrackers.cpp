@@ -46,7 +46,7 @@ void DialogTrackers::connectToServer(QModelIndex model) {
 
     connection->closeConnection();
 
-    if(!connection->connectToServer(address+":"+port, "", "")) {
+    if(!connection->connectToServer(address+ QString::fromUtf8(":") +port,  QString::fromUtf8(""),  QString::fromUtf8(""))) {
         close();
     }
 }
@@ -72,7 +72,7 @@ void DialogTrackers::onServerSelectionChanged() {
 }
 
 void DialogTrackers::deleteTracker() {
-    if (QMessageBox::question(this, "Delete tracker", "Are you sure you want to permanently remove this tracker from the list of saved trackers?", QMessageBox::Yes | QMessageBox::No, QMessageBox::No) != QMessageBox::Yes) {
+    if (QMessageBox::question(this, QString::fromUtf8("Delete tracker"), QString::fromUtf8("Are you sure you want to permanently remove this tracker from the list of saved trackers?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::No) != QMessageBox::Yes) {
         return;
     }
 
@@ -100,33 +100,33 @@ void DialogTrackers::deleteTracker() {
 }
 
 void DialogTrackers::saveTrackerList() {
-    QSettings settings("mir", "Contra");
+    QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
     settings.setValue("numtrackers", (qint32)pTrackerAddresses.size());
     qint32 numTrackers = settings.value("numtrackers").toInt();
 
     for(qint32 i=0; i<numTrackers; i++) {
-        settings.setValue(QString("tracker")+QString::number(i), pTrackerNames[i]);
-        settings.setValue(QString("trackeradd")+QString::number(i), pTrackerAddresses[i]);
+        settings.setValue(QString::fromUtf8("tracker")+QString::number(i), pTrackerNames[i]);
+        settings.setValue(QString::fromUtf8("trackeradd")+QString::number(i), pTrackerAddresses[i]);
     }
 }
 
 void DialogTrackers::updateTrackerList() {
-    QSettings settings("mir", "Contra");
+    QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
     qint32 numTrackers = settings.value("numtrackers").toInt();
 
     pTrackerNames.clear();
     pTrackerAddresses.clear();
     ui->comboBox->clear();
     for(qint32 i=0; i<numTrackers; i++) {
-        pTrackerNames.push_back(settings.value(QString("tracker")+QString::number(i)).toString());
-        pTrackerAddresses.push_back(settings.value(QString("trackeradd")+QString::number(i)).toString());
+        pTrackerNames.push_back(settings.value(QString::fromUtf8("tracker")+QString::number(i)).toString());
+        pTrackerAddresses.push_back(settings.value(QString::fromUtf8("trackeradd")+QString::number(i)).toString());
         ui->comboBox->addItem(pTrackerNames.back());
     }
 
-    if (numTrackers == 0 && QMessageBox::question(this, "No trackers found", "Your trackers list is empty. Do you want to add hltracker.com to the list?", QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
-        pTrackerNames.push_back("hltracker.com");
-        pTrackerAddresses.push_back("hltracker.com");
-        ui->comboBox->addItem("hltracker.com");
+    if (numTrackers == 0 && QMessageBox::question(this, QString::fromUtf8("No trackers found"), QString::fromUtf8("Your trackers list is empty. Do you want to add hltracker.com to the list?"), QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
+        pTrackerNames.push_back(QString::fromUtf8("hltracker.com"));
+        pTrackerAddresses.push_back(QString::fromUtf8("hltracker.com"));
+        ui->comboBox->addItem(QString::fromUtf8("hltracker.com"));
 
         saveTrackerList();
     }
@@ -141,10 +141,10 @@ void DialogTrackers::updateServerList(QString tracker) {
     ui->pushButton_3->setEnabled(false);
 
     if(ui->comboBox->count() == 0) {
-        ui->label->setText("");
+        ui->label->setText(QString::fromUtf8(""));
         ui->pushButton_2->setEnabled(false);
         ui->treeWidget->clear();
-        ui->pushButton_2->setText("Remove");
+        ui->pushButton_2->setText(QString::fromUtf8("Remove"));
         return;
     }
 
@@ -156,7 +156,7 @@ void DialogTrackers::updateServerList(QString tracker) {
     for(quint32 i=0; i<pTrackerNames.size(); i++) {
         if(pTrackerNames[i] == tracker) {
             address = pTrackerAddresses[i];
-            ui->pushButton_2->setText("Remove " + pTrackerNames[i]);
+            ui->pushButton_2->setText(QString::fromUtf8("Remove ") + pTrackerNames[i]);
         }
     }
 
@@ -167,7 +167,7 @@ void DialogTrackers::updateServerList(QString tracker) {
 
     connect(pSocket, SIGNAL(connected()), this, SLOT(sendRequest()));
     
-    ui->label->setText("loading...");
+    ui->label->setText(QString::fromUtf8("loading..."));
     pSocket->connectToHost(address, 5498, QIODevice::ReadWrite);
 }
 
@@ -183,7 +183,7 @@ void DialogTrackers::sendRequest() {
 
     if(readBytes != 6 || strncmp(magic, response, 6) != 0) {
         qDebug() << (quint8) response[0] << " " << (quint8) response[1] << " " << (quint8) response[2] << " " << (quint8) response[3] << " " << (quint8) response[4] << " " << (quint8) response[5];
-        ui->label->setText("Connecting to tracker failed.");
+        ui->label->setText(QString::fromUtf8("Connecting to tracker failed."));
         return;
     }
 
@@ -196,7 +196,7 @@ void DialogTrackers::onSocketData() {
     quint16 confirm;
 
     if(!gotHeader) {
-        ui->label->setText("0 servers");
+        ui->label->setText(QString::fromUtf8("0 servers"));
         numServers = 0;
 
         pSocket->read((char*)&confirm, 2);
@@ -237,9 +237,9 @@ void DialogTrackers::onSocketData() {
         b = (unsigned char) ipbuffer[1];
         c = (unsigned char) ipbuffer[2];
         d = (unsigned char) ipbuffer[3];
-        address = QString::number(a) + QString(".") +
-                  QString::number(b) + QString(".") +
-                  QString::number(c) + QString(".") +
+        address = QString::number(a) + QString::fromUtf8(".") +
+                  QString::number(b) + QString::fromUtf8(".") +
+                  QString::number(c) + QString::fromUtf8(".") +
                   QString::number(d);
 
         pSocket->read((char*)&port, 2);
@@ -271,7 +271,7 @@ void DialogTrackers::onSocketData() {
         item->setToolTip(2, description);
         item->setTextAlignment(1, Qt::AlignHCenter);
         ui->treeWidget->addTopLevelItem(item);
-        ui->label->setText(QString::number(ui->treeWidget->topLevelItemCount())+" servers");
+        ui->label->setText(QString::number(ui->treeWidget->topLevelItemCount())+ QString::fromUtf8(" servers"));
         ui->buttonRefresh->setEnabled(true);
     }
     numServers = ui->treeWidget->topLevelItemCount();
@@ -304,8 +304,8 @@ void DialogTrackers::openConnectionWindow() {
         QString port = ui->treeWidget->topLevelItem(model.row())->data(4, 0).toString();
         DialogOpenConnection * dialog = new DialogOpenConnection(0, connection);
 
-        if(port != "5500") {
-            dialog->setAddress(address+":"+port);
+        if(port != QString::fromUtf8("5500")) {
+            dialog->setAddress(address+ QString::fromUtf8(":") +port);
         } else {
             dialog->setAddress(address);
         }

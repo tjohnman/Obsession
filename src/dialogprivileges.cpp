@@ -21,7 +21,7 @@ DialogPrivileges::DialogPrivileges(ConnectionController * c, QString user, QStri
     pPrivileges7 = p7;
     pPrivileges8 = p8;
     ui->editLogin->setText(user);
-    if(password.data()[0].toLatin1() == 0) password = "";
+    if(password.data()[0].toLatin1() == 0) password = QString::fromUtf8("");
     ui->editPassword->setText(password);
 
     connect(this, SIGNAL(accepted()), this, SLOT(onAccepted()));

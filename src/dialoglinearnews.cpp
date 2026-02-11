@@ -16,7 +16,7 @@ DialogLinearNews::DialogLinearNews(ConnectionController * c, QWidget *parent) :
 }
 
 void DialogLinearNews::requestNews() {
-    ui->plainTextEdit->setPlainText("");
+    ui->plainTextEdit->setPlainText(QString::fromUtf8(""));
     connect(connection, SIGNAL(gotLinearNews(QString)), this, SLOT(updateNews(QString)));
     CTransaction * newsRequest = connection->createTransaction(101);
     connection->sendTransaction(newsRequest, true);

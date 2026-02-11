@@ -42,7 +42,7 @@ void UploadManager::onRequestedFile(QString name, qint32 size) {
     upload->fileSize = size;
 
     upload->file->setFileName(name);
-    upload->currentName = name.split("/").last();
+    upload->currentName = name.split(QString::fromUtf8("/")).last();
 
     QListWidgetItem * item = new QListWidgetItem();
     WidgetDownloadItem * customItem = new WidgetDownloadItem();

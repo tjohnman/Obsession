@@ -10,14 +10,14 @@ DialogPreferences::DialogPreferences(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    QSettings settings("mir", "Contra");
-    ui->lineEdit->setText(settings.value(QString("nick"), "unnamed").toString());
+    QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
+    ui->lineEdit->setText(settings.value(QString::fromUtf8("nick"), QString::fromUtf8("unnamed")).toString());
 
-    QString encoding = settings.value(QString::fromUtf8("Encoding"), "Apple Roman").toString();
-    if(encoding == "Apple Roman") ui->encodingCombo->setCurrentIndex(0);
-    if(encoding == "Shift_JIS") ui->encodingCombo->setCurrentIndex(1);
-    if(encoding == "ISO-8859-1") ui->encodingCombo->setCurrentIndex(2);
-    if(encoding == "UTF-8") ui->encodingCombo->setCurrentIndex(3);
+    QString encoding = settings.value(QString::fromUtf8("Encoding"), QString::fromUtf8("Apple Roman")).toString();
+    if(encoding == QString::fromUtf8("Apple Roman")) ui->encodingCombo->setCurrentIndex(0);
+    if(encoding == QString::fromUtf8("Shift_JIS")) ui->encodingCombo->setCurrentIndex(1);
+    if(encoding == QString::fromUtf8("ISO-8859-1")) ui->encodingCombo->setCurrentIndex(2);
+    if(encoding == QString::fromUtf8("UTF-8")) ui->encodingCombo->setCurrentIndex(3);
 
     // Load theme preference
     AppTheme currentTheme = ThemeManager::loadThemePreference();
@@ -34,7 +34,7 @@ DialogPreferences::DialogPreferences(QWidget *parent) :
     }
 
     QFont font;
-    font.setFamily(settings.value("fontFamily", "Consolas").toString());
+    font.setFamily(settings.value(QString::fromUtf8("fontFamily"), QString::fromUtf8("Consolas")).toString());
     qint32 style = settings.value("fontStyle", 9).toInt();
     switch(style) {
     case 0:
@@ -81,7 +81,7 @@ void DialogPreferences::openBookmarks() {
 
 void DialogPreferences::changeFont() {
     bool ok;
-    QSettings settings("mir", "Contra");
+    QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
     QFont font = QFontDialog::getFont(
                     &ok, ui->sampleEdit->font(), this );
     if ( ok ) {
@@ -131,23 +131,23 @@ QString DialogPreferences::selectedEncoding()
 }
 
 void DialogPreferences::acceptSettings() {
-    QSettings settings("mir", "Contra");
-    settings.setValue(QString("nick"), ui->lineEdit->text());
+    QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
+    settings.setValue(QString::fromUtf8("nick"), ui->lineEdit->text());
 
     switch(ui->encodingCombo->currentIndex())
     {
         default:
         case 0:
-            settings.setValue("Encoding", "Apple Roman");
+            settings.setValue(QString::fromUtf8("Encoding"), QString::fromUtf8("Apple Roman"));
         break;
         case 1:
-            settings.setValue("Encoding", "Shift_JIS");
+            settings.setValue(QString::fromUtf8("Encoding"), QString::fromUtf8("Shift_JIS"));
         break;
         case 2:
-            settings.setValue("Encoding", "ISO-8859-1");
+            settings.setValue(QString::fromUtf8("Encoding"), QString::fromUtf8("ISO-8859-1"));
         break;
         case 3:
-            settings.setValue("Encoding", "UTF-8");
+            settings.setValue(QString::fromUtf8("Encoding"), QString::fromUtf8("UTF-8"));
         break;
     }
     settings.setValue("EncodingName", ui->encodingCombo->currentText());
@@ -180,6 +180,6 @@ void DialogPreferences::acceptSettings() {
     settings.sync();
     emit saved();
 
-    ui->sampleEdit->setText("Sample text");
+    ui->sampleEdit->setText(QString::fromUtf8("Sample text"));
     close();
 }

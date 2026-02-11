@@ -11,7 +11,7 @@ DialogIconViewer::DialogIconViewer(QWidget *parent) :
 
     connect(ui->listWidget, SIGNAL(clicked(QModelIndex)), this, SLOT(onClicked(QModelIndex)));
 
-    QDir iconsFolder = QDir(":/icons");
+    QDir iconsFolder = QDir(QString::fromUtf8(":/icons"));
     QFileInfoList fileList = iconsFolder.entryInfoList();
 
     for(quint32 i=2; i<iconsFolder.count(); i++) {
@@ -24,9 +24,9 @@ DialogIconViewer::DialogIconViewer(QWidget *parent) :
 }
 
 void DialogIconViewer::onClicked(QModelIndex model) {
-    QSettings settings("mir", "Contra");
+    QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
     QString name = model.data(0).toString();
-    if(name.endsWith(".png")) {
+    if(name.endsWith(QString::fromUtf8(".png"))) {
         name = name.left(name.length()-4);
     }
     settings.setValue("icon", name);

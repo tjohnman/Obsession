@@ -25,11 +25,11 @@ DialogNewNewsMessage::~DialogNewNewsMessage()
 }
 
 void DialogNewNewsMessage::onTitleChanged() {
-    ui->pushButtonSend->setEnabled(ui->lineEditTitle->text().trimmed() != "" && ui->plainTextEditMessage->toPlainText().trimmed() != "");
+    ui->pushButtonSend->setEnabled(ui->lineEditTitle->text().trimmed() != QString::fromUtf8("") && ui->plainTextEditMessage->toPlainText().trimmed() != QString::fromUtf8(""));
 }
 
 void DialogNewNewsMessage::onMessageChanged() {
-    ui->pushButtonSend->setEnabled(ui->lineEditTitle->text().trimmed() != "" && ui->plainTextEditMessage->toPlainText().trimmed() != "");
+    ui->pushButtonSend->setEnabled(ui->lineEditTitle->text().trimmed() != QString::fromUtf8("") && ui->plainTextEditMessage->toPlainText().trimmed() != QString::fromUtf8(""));
 }
 
 void DialogNewNewsMessage::onSendPressed() {

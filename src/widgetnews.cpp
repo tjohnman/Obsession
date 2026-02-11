@@ -65,7 +65,7 @@ void WidgetNews::getNews() {
         }
 
         if(path.length() > 1) {
-            QStringList levels = path.split(":", Qt::SkipEmptyParts);
+            QStringList levels = path.split(QString::fromUtf8(":"), Qt::SkipEmptyParts);
             quint16 directorylevels = levels.count();
             quint16 pathlen = 2 + directorylevels * 3;
             for(qint32 i=0; i<levels.count(); i++) {
@@ -119,7 +119,7 @@ QString WidgetNews::getItemPath(QTreeWidgetItem * item) {
 
     QTreeWidgetItem * c = item;
     while(c->parent()) {
-        _path = c->parent()->data(0, 0).toString() + ":" + _path;
+        _path = c->parent()->data(0, 0).toString() + QString::fromUtf8(":") + _path;
         c = c->parent();
     }
 
@@ -127,13 +127,13 @@ QString WidgetNews::getItemPath(QTreeWidgetItem * item) {
 }
 
 void WidgetNews::setRead(QTreeWidgetItem * item, bool set) {
-    QSettings settings("mir", "Contra");
+    QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
     QString key = item->data(0, 0).toString()+item->data(1, 0).toString()+item->data(2, 0).toString()+item->data(3, 0).toString();
     settings.setValue(key, set);
 }
 
 bool WidgetNews::checkIfRead(QTreeWidgetItem * item) {
-    QSettings settings("mir", "Contra");
+    QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
     QString key = item->data(0, 0).toString()+item->data(1, 0).toString()+item->data(2, 0).toString()+item->data(3, 0).toString();
     return settings.value(key, false).toBool();
 }
@@ -159,7 +159,7 @@ void WidgetNews::onNewsItems(QString _name, quint32 id, quint32 pid) {
     newItem->setData(1, 0, 0);
     newItem->setData(2, 0, id);
     newItem->setData(3, 0, pid);
-    newItem->setIcon(0, QIcon(":/news/interfaceIcons/newsItem.png"));
+    newItem->setIcon(0, QIcon(QString::fromUtf8(":/news/interfaceIcons/newsItem.png")));
 
     if(!checkIfRead(newItem)) {
         QFont font;
@@ -192,10 +192,10 @@ void WidgetNews::onNewsCategory(unsigned char _type, QString _name) {
 
     switch(_type) {
     case 2:
-        newItem->setIcon(0, QIcon(":/files/interfaceIcons/filesFolder.png"));
+        newItem->setIcon(0, QIcon(QString::fromUtf8(":/files/interfaceIcons/filesFolder.png")));
         break;
     case 3:
-        newItem->setIcon(0, QIcon(":/news/interfaceIcons/newsCategory.png"));
+        newItem->setIcon(0, QIcon(QString::fromUtf8(":/news/interfaceIcons/newsCategory.png")));
         break;
     default:
         break;
@@ -250,7 +250,7 @@ void WidgetNews::onMessageSubmitted(const QString title, const QString message, 
 
     if (parentId) transaction->addParameter(326, parentId);
 
-    const QByteArray flavorData = TextHelper::EncodeText("text/plain");
+    const QByteArray flavorData = TextHelper::EncodeText(QString::fromUtf8("text/plain"));
     transaction->addParameter(327, flavorData.length(), flavorData.constData());
 
     const QByteArray titleData = TextHelper::EncodeText(title);

@@ -13,7 +13,7 @@ CDownload::CDownload()
     downloadInProgress = false;
     referenceNumber = -1;
     fileSize = 0;
-    currentName = "Waiting for name...";
+    currentName = QString::fromUtf8("Waiting for name...");
     bytesRead = 0;
     dataSize = 0;
     bytesWritten = 0;
@@ -22,7 +22,7 @@ CDownload::CDownload()
     connect(downloadTimer, SIGNAL(timeout()), this, SLOT(updateSpeed()));
     downloadSpeed = 0;
     queuePosition = -1;
-    pathOnServer = "/";
+    pathOnServer = QString::fromUtf8("/");
     connection = NULL;
     file = new QFile();
     inited = false;
@@ -40,15 +40,15 @@ void CDownload::stopDownload() {
             file->close();
             downloadTimer->stop();
             if(downloadInProgress) {
-                widget->infoLabel()->setText("Stopped");
+                widget->infoLabel()->setText(QString::fromUtf8("Stopped"));
             } else {
-                widget->infoLabel()->setText("Cancelled");
+                widget->infoLabel()->setText(QString::fromUtf8("Cancelled"));
             }
             finished = true;
             emit downloadFinished();
         }
     } else {
-        widget->infoLabel()->setText("Cancelled");
+        widget->infoLabel()->setText(QString::fromUtf8("Cancelled"));
         finished = true;
     }
     widget->goButton()->setEnabled(true);
@@ -119,38 +119,38 @@ void CDownload::updateSpeed() {
                     hoursRemaining -= 24;
                 }
                 if(daysRemaining > 0) {
-                    timeString = QString::number(daysRemaining)+(daysRemaining == 1 ? " day " : " days ") +
-                                 QString::number(hoursRemaining)+(hoursRemaining == 1 ? " hour " : " hours ") +
-                                 QString::number(minutesRemaining)+(minutesRemaining == 1 ? " minute " : " minutes ") +
-                                 QString::number(secondsRemaining)+(secondsRemaining == 1 ? " second " : " seconds ")+"remaining";
+                    timeString = QString::number(daysRemaining)+(daysRemaining == 1 ? QString::fromUtf8(" day ") : QString::fromUtf8(" days ")) +
+                                 QString::number(hoursRemaining)+(hoursRemaining == 1 ? QString::fromUtf8(" hour ") : QString::fromUtf8(" hours ")) +
+                                 QString::number(minutesRemaining)+(minutesRemaining == 1 ? QString::fromUtf8(" minute ") : QString::fromUtf8(" minutes ")) +
+                                 QString::number(secondsRemaining)+(secondsRemaining == 1 ? QString::fromUtf8(" second ") : QString::fromUtf8(" seconds "))+QString::fromUtf8("remaining");
                 } else {
-                    timeString = QString::number(hoursRemaining)+(hoursRemaining == 1 ? " hour " : " hours ") +
-                                 QString::number(minutesRemaining)+(minutesRemaining == 1 ? " minute " : " minutes ") +
-                                 QString::number(secondsRemaining)+(secondsRemaining == 1 ? " second " : " seconds ")+"remaining";
+                    timeString = QString::number(hoursRemaining)+(hoursRemaining == 1 ? QString::fromUtf8(" hour ") : QString::fromUtf8(" hours ")) +
+                                 QString::number(minutesRemaining)+(minutesRemaining == 1 ? QString::fromUtf8(" minute ") : QString::fromUtf8(" minutes ")) +
+                                 QString::number(secondsRemaining)+(secondsRemaining == 1 ? QString::fromUtf8(" second ") : QString::fromUtf8(" seconds "))+QString::fromUtf8("remaining");
                 }
             } else {
                 if(hoursRemaining > 0) {
-                    timeString = QString::number(hoursRemaining)+(hoursRemaining == 1 ? " hour " : " hours ") +
-                                 QString::number(minutesRemaining)+(minutesRemaining == 1 ? " minute " : " minutes ") +
-                                 QString::number(secondsRemaining)+(secondsRemaining == 1 ? " second " : " seconds ")+"remaining";
+                    timeString = QString::number(hoursRemaining)+(hoursRemaining == 1 ? QString::fromUtf8(" hour ") : QString::fromUtf8(" hours ")) +
+                                 QString::number(minutesRemaining)+(minutesRemaining == 1 ? QString::fromUtf8(" minute ") : QString::fromUtf8(" minutes ")) +
+                                 QString::number(secondsRemaining)+(secondsRemaining == 1 ? QString::fromUtf8(" second ") : QString::fromUtf8(" seconds "))+QString::fromUtf8("remaining");
                 } else {
-                    timeString = QString::number(minutesRemaining)+(minutesRemaining == 1 ? " minute " : " minutes ") +
-                                 QString::number(secondsRemaining)+(secondsRemaining == 1 ? " second " : " seconds ")+"remaining";
+                    timeString = QString::number(minutesRemaining)+(minutesRemaining == 1 ? QString::fromUtf8(" minute ") : QString::fromUtf8(" minutes ")) +
+                                 QString::number(secondsRemaining)+(secondsRemaining == 1 ? QString::fromUtf8(" second ") : QString::fromUtf8(" seconds "))+QString::fromUtf8("remaining");
                 }
             }
         } else {
             if(minutesRemaining > 0) {
-                timeString = QString::number(minutesRemaining)+(minutesRemaining == 1 ? " minute " : " minutes ") +
-                             QString::number(secondsRemaining)+(secondsRemaining == 1 ? " second " : " seconds ")+"remaining";
+                timeString = QString::number(minutesRemaining)+(minutesRemaining == 1 ? QString::fromUtf8(" minute ") : QString::fromUtf8(" minutes ")) +
+                             QString::number(secondsRemaining)+(secondsRemaining == 1 ? QString::fromUtf8(" second ") : QString::fromUtf8(" seconds "))+ QString::fromUtf8("remaining");
             } else {
-                timeString = QString::number(secondsRemaining)+(secondsRemaining == 1 ? " second " : " seconds ")+"remaining";
+                timeString = QString::number(secondsRemaining)+(secondsRemaining == 1 ? QString::fromUtf8(" second ") : QString::fromUtf8(" seconds "))+ QString::fromUtf8("remaining");
             }
         }
     } else {
-        timeString = QString::number(secondsRemaining)+(secondsRemaining == 1 ? " second " : " seconds ")+"remaining";
+        timeString = QString::number(secondsRemaining)+(secondsRemaining == 1 ? QString::fromUtf8(" second ") : QString::fromUtf8(" seconds "))+ QString::fromUtf8("remaining");
     }
 
-    widget->infoLabel()->setText(timeString+" - "+readString+" of "+sizeString+" ("+speedString+")");
+    widget->infoLabel()->setText(timeString+QString::fromUtf8(" - ")+readString+QString::fromUtf8(" of ")+sizeString+QString::fromUtf8(" (")+speedString+ QString::fromUtf8(")"));
 }
 
 void CDownload::updateName() {
@@ -176,11 +176,11 @@ qint32 CDownload::init() {
     widget->goButton()->setEnabled(false);
     widget->stopButton()->setEnabled(true);
     widget->queueButton()->setEnabled(true);
-    widget->infoLabel()->setText("Preparing...");
+    widget->infoLabel()->setText(QString::fromUtf8("Preparing..."));
     forced = false;
 
     if(queuePosition > 0) {
-        widget->infoLabel()->setText("Queued by server at position "+QString::number(queuePosition));
+        widget->infoLabel()->setText(QString::fromUtf8("Queued by server at position ")+QString::number(queuePosition));
         return 0;
     }
 
@@ -205,7 +205,7 @@ void CDownload::queueDownload() {
     downloadInProgress = false;
     inited = false;
     forced = false;
-    widget->infoLabel()->setText("Queued");
+    widget->infoLabel()->setText(QString::fromUtf8("Queued"));
 }
 
 void CDownload::startDownloading() {
@@ -248,7 +248,7 @@ void CDownload::serverReady() {
         {
             socket.close();
             downloadInProgress = false;
-            emit gotError("Read error receiving flat header from server.");
+            emit gotError(QString::fromUtf8("Read error receiving flat header from server."));
             return;
         }
 
@@ -256,7 +256,7 @@ void CDownload::serverReady() {
             socket.close();
             downloadInProgress = false;
             qDebug("Got flat header: %s\n", flatHeader);
-            emit gotError("Received incorrect flat header from server.");
+            emit gotError(QString::fromUtf8("Received incorrect flat header from server."));
             return;
         }
 
@@ -267,14 +267,14 @@ void CDownload::serverReady() {
         {
             socket.close();
             downloadInProgress = false;
-            emit gotError("Read error receiving fork header from server.");
+            emit gotError(QString::fromUtf8("Read error receiving fork header from server."));
             return;
         }
 
         if(strncmp(forkHeader, "INFO", 4)) {
             socket.close();
             downloadInProgress = false;
-            emit gotError("Received incorrect fork header from server.");
+            emit gotError(QString::fromUtf8("Received incorrect fork header from server."));
             return;
         }
 
@@ -299,7 +299,7 @@ void CDownload::serverReady() {
     {
         socket.close();
         downloadInProgress = false;
-        emit gotError("Read error receiving data header from server.");
+        emit gotError(QString::fromUtf8("Read error receiving data header from server."));
         return;
     }
 
@@ -307,7 +307,7 @@ void CDownload::serverReady() {
         qDebug() << "DATA header was expected, but got something else (" << dataHeader << ").";
         socket.close();
         downloadInProgress = false;
-        emit gotError("Received incorrect data header from server.");
+        emit gotError(QString::fromUtf8("Received incorrect data header from server."));
         return;
     }
 
@@ -321,17 +321,17 @@ void CDownload::serverReady() {
     widget->progressBar()->setValue(bytesRead);
 
     const QString downloadsFolder = DownloadManager::GetDownloadsDirectoryPath();
-    file->setFileName(downloadsFolder + "/" + currentName);
+    file->setFileName(downloadsFolder + QString::fromUtf8("/") + currentName);
     if(file->exists()) {
         if(!file->open(QIODevice::Append)) {
             qDebug() << "Could not open file for writing!";
-            emit gotError("Could not open file for writting.");
+            emit gotError(QString::fromUtf8("Could not open file for writting."));
             return;
         }
     } else {
         if(!file->open(QIODevice::WriteOnly)) {
             qDebug() << "Could not open file for writing!";
-            emit gotError("Could not open file for writting.");
+            emit gotError(QString::fromUtf8("Could not open file for writting."));
             return;
         }
     }
@@ -358,56 +358,56 @@ void CDownload::gotData() {
 
     if (error != QFile::NoError)
     {
-        QString errorString = "";
+        QString errorString = QString::fromUtf8("");
         switch (error)
         {
             default:
-                errorString = "No error.";
+                errorString = QString::fromUtf8("No error.");
                 break;
             case QFile::NoError:
-                errorString = "No error occurred.";
+                errorString = QString::fromUtf8("No error occurred.");
                 break;
             case QFile::ReadError:
-                errorString = "An error occurred when reading from the file.";
+                errorString = QString::fromUtf8("An error occurred when reading from the file.");
                 break;
             case QFile::WriteError:
-                errorString = "An error occurred when writing to the file.";
+                errorString = QString::fromUtf8("An error occurred when writing to the file.");
                 break;
             case QFile::FatalError:
-                errorString = "A fatal error occurred.";
+                errorString = QString::fromUtf8("A fatal error occurred.");
                 break;
             case QFile::ResourceError:
-                errorString = "Resource error. ";
+                errorString = QString::fromUtf8("Resource error. ");
                 break;
             case QFile::OpenError:
-                errorString = "The file could not be opened.";
+                errorString = QString::fromUtf8("The file could not be opened.");
                 break;
             case QFile::AbortError:
-                errorString = "The operation was aborted.";
+                errorString = QString::fromUtf8("The operation was aborted.");
                 break;
             case QFile::TimeOutError:
-                errorString = "A timeout occurred.";
+                errorString = QString::fromUtf8("A timeout occurred.");
                 break;
             case QFile::UnspecifiedError:
-                errorString = "An unspecified error occurred.";
+                errorString = QString::fromUtf8("An unspecified error occurred.");
                 break;
             case QFile::RemoveError:
-                errorString = "The file could not be removed.";
+                errorString = QString::fromUtf8("The file could not be removed.");
                 break;
             case QFile::RenameError:
-                errorString = "The file could not be renamed.";
+                errorString = QString::fromUtf8("The file could not be renamed.");
                 break;
             case QFile::PositionError:
-                errorString = "The position in the file could not be changed.";
+                errorString = QString::fromUtf8("The position in the file could not be changed.");
                 break;
             case QFile::ResizeError:
-                errorString = "The file could not be resized.";
+                errorString = QString::fromUtf8("The file could not be resized.");
                 break;
             case QFile::PermissionsError:
-                errorString = "The file could not be accessed.";
+                errorString = QString::fromUtf8("The file could not be accessed.");
                 break;
             case QFile::CopyError:
-                errorString = "The file could not be copied.";
+                errorString = QString::fromUtf8("The file could not be copied.");
                 break;
         }
 
@@ -428,7 +428,7 @@ void CDownload::gotData() {
         dataSize = 0;
         widget->progressBar()->setValue(10);
         widget->progressBar()->setMaximum(10);
-        widget->infoLabel()->setText("Completed");
+        widget->infoLabel()->setText(QString::fromUtf8("Completed"));
         downloadInProgress = false;
         file->flush();
         file->close();
