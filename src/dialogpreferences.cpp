@@ -65,6 +65,7 @@ DialogPreferences::DialogPreferences(QWidget *parent) :
     connect(ui->buttonBox, SIGNAL(rejected()), this, SLOT(close()));
     connect(ui->buttonBookmarks, SIGNAL(clicked()), this, SLOT(openBookmarks()));
     connect(ui->butonChangeFont, SIGNAL(clicked()), this, SLOT(changeFont()));
+    connect(ui->themeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(onThemeChanged(int)));
 }
 
 DialogPreferences::~DialogPreferences()
@@ -90,6 +91,26 @@ void DialogPreferences::changeFont() {
         settings.setValue("fontBold", font.bold());
     }
     ui->sampleEdit->setFont(font);
+}
+
+void DialogPreferences::onThemeChanged(int index) {
+    // Apply theme immediately when combo box changes
+    AppTheme selectedTheme;
+    switch(index) {
+        case 0:
+            selectedTheme = AppTheme::Auto;
+            break;
+        case 1:
+            selectedTheme = AppTheme::Light;
+            break;
+        case 2:
+            selectedTheme = AppTheme::Dark;
+            break;
+        default:
+            selectedTheme = AppTheme::Auto;
+            break;
+    }
+    ThemeManager::applyTheme(selectedTheme);
 }
 
 void DialogPreferences::changeEvent(QEvent *e)
@@ -131,7 +152,7 @@ void DialogPreferences::acceptSettings() {
     }
     settings.setValue("EncodingName", ui->encodingCombo->currentText());
 
-    // Save and apply theme preference
+    // Save theme preference (already applied in real-time via onThemeChanged)
     AppTheme selectedTheme;
     switch(ui->themeCombo->currentIndex()) {
         case 0:
@@ -148,7 +169,6 @@ void DialogPreferences::acceptSettings() {
             break;
     }
     ThemeManager::saveThemePreference(selectedTheme);
-    ThemeManager::applyTheme(selectedTheme);
 
     settings.setValue("dlqueue", ui->dlQueueEdit->text().toInt());
     settings.setValue("soundsEnabled", ui->soundCheckBox->isChecked());

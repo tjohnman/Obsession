@@ -28,6 +28,7 @@ private slots:
     void acceptSettings();
     void openBookmarks();
     void changeFont();
+    void onThemeChanged(int index);
 
 signals:
     void saved();
