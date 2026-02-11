@@ -147,15 +147,18 @@ set(FORMS
 set(RESOURCES
     resources/resources.qrc
     resources/icons1.qrc
-    resources/icons2.qrc
+    # resources/icons2.qrc  # Temporarily disabled - missing icons/27184.png
 )
+
+# Compile resources
+qt_add_resources(RESOURCE_FILES ${RESOURCES})
 
 # Create executable
 qt_add_executable(Obsession
     ${SOURCES}
     ${HEADERS}
     ${FORMS}
-    ${RESOURCES}
+    ${RESOURCE_FILES}
 )
 
 # Include directories
