@@ -140,7 +140,8 @@ QListWidget, QListView {
 
 QListWidget::item, QListView::item {
     padding: 4px 8px;
-    /* Note: background-color intentionally not set here to allow custom backgrounds (e.g., user icons) */
+    background: transparent;  /* Explicitly transparent to show custom backgrounds */
+    /* Note: Individual items can override this with custom backgrounds (e.g., user icons) */
 }
 
 QListWidget::item:hover, QListView::item:hover {
