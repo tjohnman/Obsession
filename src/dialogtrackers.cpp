@@ -25,11 +25,15 @@ DialogTrackers::DialogTrackers(ConnectionController * c, QWidget *parent) :
 
     addTrackerDialog = new DialogAddTracker(this);
 
-    ui->treeWidget->header()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
-    ui->treeWidget->header()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
+    ui->treeWidget->header()->setSectionResizeMode(0, QHeaderView::Interactive);
+    ui->treeWidget->header()->setSectionResizeMode(1, QHeaderView::Interactive);
     ui->treeWidget->header()->setSectionResizeMode(2, QHeaderView::Stretch);
+    
+    // Set reasonable default column widths
+    ui->treeWidget->setColumnWidth(0, 200);  // Name column
+    ui->treeWidget->setColumnWidth(1, 60);   // Users column
 
-    connect(ui->comboBox, SIGNAL(currentIndexChanged(QString)), this, SLOT(updateServerList(QString)));
+    connect(ui->comboBox, SIGNAL(currentTextChanged(QString)), this, SLOT(updateServerList(QString)));
     connect(ui->pushButton, SIGNAL(clicked()), addTrackerDialog, SLOT(show()));
     connect(ui->pushButton_2, SIGNAL(clicked()), this, SLOT(deleteTracker()));
     connect(ui->pushButton_3, SIGNAL(clicked()), this, SLOT(openConnectionWindow()));
