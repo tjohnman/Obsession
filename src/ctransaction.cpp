@@ -168,13 +168,25 @@ void CTransaction::addData(const char * data) {
         case 323:
             newParameter.type = TYPE_STRING;
             break;
+        case 327:  // Unknown news parameter - handle as string
+        case 328:  // Unknown news parameter - handle as string
+            newParameter.type = TYPE_STRING;
+            break;
         case 329:
             newParameter.type = TYPE_STRING;
             break;
         case 330:
             newParameter.type = TYPE_STRING;
             break;
+        case 331:  // Unknown news parameter - handle as string
+        case 332:  // Unknown news parameter - handle as string
+            newParameter.type = TYPE_STRING;
+            break;
         case 333:
+            newParameter.type = TYPE_STRING;
+            break;
+        case 335:  // Unknown news parameter - handle as string
+        case 336:  // Unknown news parameter - handle as string
             newParameter.type = TYPE_STRING;
             break;
         default:
