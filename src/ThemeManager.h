@@ -58,7 +58,6 @@ public:
         
         QTextStream stream(&styleFile);
         QString stylesheet = stream.readAll();
-        qDebug("Dark theme loaded successfully, %d bytes", stylesheet.length());
         qApp->setStyleSheet(stylesheet);
         styleFile.close();
     }
@@ -77,7 +76,6 @@ public:
         
         QTextStream stream(&styleFile);
         QString stylesheet = stream.readAll();
-        qDebug("Light theme loaded successfully, %d bytes", stylesheet.length());
         qApp->setStyleSheet(stylesheet);
         styleFile.close();
     }

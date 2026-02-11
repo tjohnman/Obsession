@@ -65,9 +65,7 @@ DialogPreferences::DialogPreferences(QWidget *parent) :
     connect(ui->buttonBox, SIGNAL(rejected()), this, SLOT(close()));
     connect(ui->buttonBookmarks, SIGNAL(clicked()), this, SLOT(openBookmarks()));
     connect(ui->butonChangeFont, SIGNAL(clicked()), this, SLOT(changeFont()));
-    
-    bool connected = connect(ui->themeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(onThemeChanged(int)));
-    qWarning(">>> Theme combo signal connected: %s <<<", connected ? "SUCCESS" : "FAILED");
+    connect(ui->themeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(onThemeChanged(int)));
 }
 
 DialogPreferences::~DialogPreferences()
@@ -97,29 +95,22 @@ void DialogPreferences::changeFont() {
 
 void DialogPreferences::onThemeChanged(int index) {
     // Apply theme immediately when combo box changes
-    qWarning(">>> THEME CHANGED TO INDEX: %d <<<", index);
-    
     AppTheme selectedTheme;
     switch(index) {
         case 0:
             selectedTheme = AppTheme::Auto;
-            qWarning(">>> Applying AUTO theme <<<");
             break;
         case 1:
             selectedTheme = AppTheme::Light;
-            qWarning(">>> Applying LIGHT theme <<<");
             break;
         case 2:
             selectedTheme = AppTheme::Dark;
-            qWarning(">>> Applying DARK theme <<<");
             break;
         default:
             selectedTheme = AppTheme::Auto;
-            qWarning(">>> Applying AUTO theme (default) <<<");
             break;
     }
     ThemeManager::applyTheme(selectedTheme);
-    qWarning(">>> Theme application complete <<<");
 }
 
 void DialogPreferences::changeEvent(QEvent *e)
