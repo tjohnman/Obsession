@@ -460,32 +460,34 @@ void MainWindow::onUserListChanged() {
             }
         }
 
+        // Determine base color strategy: In dark theme, use light colors; in light theme, check icon brightness
+        bool useLightColors = ThemeManager::isDarkThemeActive() || use_light_color;
+        
         switch(user->flags%4) {
         default:
         case 0:
-            // In dark theme, always use light colors; in light theme, check icon brightness
-            if(ThemeManager::isDarkThemeActive() || use_light_color)
-                item->setForeground(QColor(255, 255, 255));
+            if(useLightColors)
+                item->setForeground(QColor(255, 255, 255));  // White
             else
-                item->setForeground(QColor(0, 0, 0));
+                item->setForeground(QColor(0, 0, 0));  // Black
             break;
         case 1:
-            if(ThemeManager::isDarkThemeActive() || use_light_color)
-                item->setForeground(QColor(200, 200, 200));
+            if(useLightColors)
+                item->setForeground(QColor(180, 180, 180));  // Light gray (darker than white for contrast)
             else
-                item->setForeground(QColor(100, 100, 100));
+                item->setForeground(QColor(100, 100, 100));  // Dark gray
             break;
         case 2:
-            if(ThemeManager::isDarkThemeActive() || use_light_color)
-                item->setForeground(QColor(255, 127, 127));
+            if(useLightColors)
+                item->setForeground(QColor(255, 100, 100));  // Light red (brighter for visibility)
             else
-                item->setForeground(QColor(127, 0, 0));
+                item->setForeground(QColor(180, 0, 0));  // Dark red (brighter than original)
             break;
         case 3:
-            if(ThemeManager::isDarkThemeActive() || use_light_color)
-                item->setForeground(QColor(255, 127, 255));
+            if(useLightColors)
+                item->setForeground(QColor(255, 150, 255));  // Light magenta (brighter for visibility)
             else
-                item->setForeground(QColor(127, 0, 127));
+                item->setForeground(QColor(180, 0, 180));  // Dark magenta (brighter than original)
             break;
         }
 
