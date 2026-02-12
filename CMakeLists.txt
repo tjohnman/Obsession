@@ -113,6 +113,7 @@ set(HEADERS
     src/HotlineTypes.h
     src/DateTimeParser.h
     src/UserManager.h
+    src/ServerInfo.h
     src/dialogprivileges.h
     src/dialogrequestaccount.h
     src/dialogcreateaccount.h

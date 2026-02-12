@@ -6,6 +6,7 @@
 #include <vector>
 #include "ctransaction.h"
 #include "UserManager.h"
+#include "ServerInfo.h"
 #include <QtEndian>
 #include <QDate>
 #include <QTimer>
@@ -63,12 +64,7 @@ private:
     QString pNickname;
     qint16 pClientVersion;
 
-    QString pServerAddress;
-    quint16 pServerPort;
-    QString pServerName;
-    qint16 pServerVersion;
-    QString pServerAgreement;
-    QString pServerBannerURL;
+    ServerInfo m_serverInfo;
 
     QString pPlainLogin, pPlainPassword;
     QTimer pTimeoutTimer;

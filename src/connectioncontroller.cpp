@@ -27,7 +27,7 @@ ConnectionController::ConnectionController()
     // Connect UserManager signals
     connect(&m_userManager, &UserManager::userListChanged, this, &ConnectionController::userListChanged);
 
-    pServerAgreement = QString();
+    m_serverInfo.agreement() = QString();
 
     // TODO: Preferences
     auto& settings = SettingsManager::instance();
@@ -66,7 +66,7 @@ qint32 ConnectionController::connectToServer(QString address, QString login, QSt
     }
 
     emit connecting();
-    pServerAddress = address;
+    m_serverInfo.address() = address;
     pPlainLogin = login;
     pPlainPassword = password;
     qint32 semicolonIndex = address.lastIndexOf(QString::fromUtf8(":"));
@@ -129,7 +129,7 @@ void ConnectionController::sendTransaction(CTransaction * t, bool expectReply) {
 }
 
 QString ConnectionController::serverName() {
-    return QString(pServerName.data());
+    return QString(m_serverInfo.name().data());
 }
 
 void ConnectionController::sendChatText(QString text) {
@@ -188,7 +188,7 @@ std::vector<HotlineUser *> * ConnectionController::getUserList() {
 }
 
 QString ConnectionController::serverAgreement() {
-    return pServerAgreement;
+    return m_serverInfo.agreement();
 }
 
 void ConnectionController::requestUserInfo(quint16 id)
@@ -213,9 +213,9 @@ void ConnectionController::sendPMToUser(quint16 uid, QString message, bool autom
 }
 
 void ConnectionController::closeConnection(bool silent) {
-    if(!silent && pServerAddress != QString::fromUtf8("") && !pServerAddress.isEmpty())
+    if(!silent && m_serverInfo.address() != QString::fromUtf8("") && !m_serverInfo.address().isEmpty())
     {
-        emit gotChatMessage(QString::fromUtf8("                <b>Disconnected from %1</b>").arg(pServerAddress));
+        emit gotChatMessage(QString::fromUtf8("                <b>Disconnected from %1</b>").arg(m_serverInfo.address()));
     }
     pSocket.close();
     if(pSocket.state() != QAbstractSocket::UnconnectedState) {
@@ -283,7 +283,7 @@ void ConnectionController::onSocketConnected() {
         loginTransaction->addParameter(164, VERSION_MAJOR*10 + VERSION_MINOR);
     }
 
-    pServerAgreement = QString::fromUtf8("");
+    m_serverInfo.agreement() = QString::fromUtf8("");
 
     sendTransaction(loginTransaction, true);
 }
@@ -408,7 +408,7 @@ void ConnectionController::onConnectionTimedOut()
 
 void ConnectionController::reconnect()
 {
-    connectToServer(pServerAddress,pPlainLogin,pPlainPassword, false);
+    connectToServer(m_serverInfo.address(),pPlainLogin,pPlainPassword, false);
 }
 
 void ConnectionController::onNameChanged() {
@@ -464,27 +464,27 @@ void ConnectionController::onSocketData() {
                         parameterBuffer = receivedTransaction->getParameterById(toInt(Parameter::ServerBanner));
                         if(parameterBuffer) {
                             if(parameterBuffer->type() == TYPE_STRING) {
-                                pServerName = parameterBuffer->toString();
-                                if(!pServerName.isEmpty() && pServerName != QString::fromUtf8(" "))
+                                m_serverInfo.name() = parameterBuffer->toString();
+                                if(!m_serverInfo.name().isEmpty() && m_serverInfo.name() != QString::fromUtf8(" "))
                                 {
                                     emit gotServerName();
-                                    emit gotChatMessage(QString::fromUtf8("                <b>Connected to %1</b>").arg(pServerName));
+                                    emit gotChatMessage(QString::fromUtf8("                <b>Connected to %1</b>").arg(m_serverInfo.name()));
                                 }
                                 else
                                 {
-                                    pServerName = QString::fromUtf8("");
-                                    emit gotChatMessage(QString::fromUtf8("                <b>Connected to %1</b>").arg(pServerAddress));
+                                    m_serverInfo.name() = QString::fromUtf8("");
+                                    emit gotChatMessage(QString::fromUtf8("                <b>Connected to %1</b>").arg(m_serverInfo.address()));
                                 }
                             }
                             else
                             {
-                                pServerName = QString::fromUtf8("");
+                                m_serverInfo.name() = QString::fromUtf8("");
                                 emit gotChatMessage(QString::fromUtf8("                <b>Connection established</b>"));
                             }
                         }
                         else
                         {
-                            pServerName = QString::fromUtf8("");
+                            m_serverInfo.name() = QString::fromUtf8("");
                             emit gotChatMessage(QString::fromUtf8("                <b>Connection established</b>"));
                         }
 
@@ -879,7 +879,7 @@ void ConnectionController::onSocketData() {
         case 109:
             parameterBuffer = receivedTransaction->getParameterById(toInt(Parameter::ChatMessage));
             if(parameterBuffer) {
-                pServerAgreement = parameterBuffer->toString();
+                m_serverInfo.agreement() = parameterBuffer->toString();
             }
             break;
 
@@ -901,8 +901,8 @@ void ConnectionController::onSocketData() {
 
                 if (bannerType == 1) {
                     parameterBuffer = receivedTransaction->getParameterById(toInt(Parameter::ServerBannerUrl));
-                    pServerBannerURL = parameterBuffer->toString();
-                    emit gotServerBannerURL(pServerBannerURL);
+                    m_serverInfo.bannerURL() = parameterBuffer->toString();
+                    emit gotServerBannerURL(m_serverInfo.bannerURL());
                 }
             }
             break;
