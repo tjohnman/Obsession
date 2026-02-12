@@ -44,7 +44,7 @@ ConnectionController::ConnectionController()
     m_receivedTransaction.reset();
 }
 
-bool ConnectionController::isConnected() {
+bool ConnectionController::isConnected() const {
     if(pSocket.state() == QAbstractSocket::ConnectedState) {
         return true;
     }
@@ -126,7 +126,7 @@ void ConnectionController::sendTransaction(CTransaction * t, bool expectReply) {
     }
 }
 
-QString ConnectionController::serverName() {
+QString ConnectionController::serverName() const {
     return QString(m_serverInfo.name().data());
 }
 
@@ -159,7 +159,7 @@ void ConnectionController::toggleAFK() {
     }
 }
 
-bool ConnectionController::isAFK() {
+bool ConnectionController::isAFK() const {
     return m_clientState.isAFK();
 }
 
@@ -173,19 +173,19 @@ void ConnectionController::sendUserInfo() {
     sendTransaction(uinfoTransaction);
 }
 
-HotlineUser * ConnectionController::getUserByUid(qint16 uid) {
+HotlineUser * ConnectionController::getUserByUid(qint16 uid) const {
     return m_userManager.getUserByUid(uid);
 }
 
-HotlineUser * ConnectionController::getUserByName(QString name) {
+HotlineUser * ConnectionController::getUserByName(QString name) const {
     return m_userManager.getUserByName(name);
 }
 
-std::vector<HotlineUser *> * ConnectionController::getUserList() {
+std::vector<HotlineUser *> * ConnectionController::getUserList() const {
     return m_userManager.getUserList();
 }
 
-QString ConnectionController::serverAgreement() {
+QString ConnectionController::serverAgreement() const {
     return m_serverInfo.agreement();
 }
 

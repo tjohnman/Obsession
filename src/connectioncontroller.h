@@ -24,7 +24,7 @@ class ConnectionController : public QObject
 public:
     ConnectionController();
 
-    QString serverName();
+    QString serverName() const;
     QString serverIdentifier() const { return m_serverInfo.identifier(); }
 
     qint32 connectToServer(QString address, QString login, QString password, bool resetAutoReconnect = true);
@@ -36,16 +36,16 @@ public:
     void requestAccount(QString login);
     void broadcast(QString text);
 
-    bool isConnected();
+    bool isConnected() const;
     void toggleAFK();
-    bool isAFK();
-    QString serverAgreement();
+    bool isAFK() const;
+    QString serverAgreement() const;
 
     void closeConnection(bool silent = false);
 
-    HotlineUser * getUserByUid(qint16 uid);
-    HotlineUser * getUserByName(QString name);
-    std::vector<HotlineUser *> * getUserList();
+    HotlineUser * getUserByUid(qint16 uid) const;
+    HotlineUser * getUserByName(QString name) const;
+    std::vector<HotlineUser *> * getUserList() const;
 
     UserManager* userManager() { return &m_userManager; }
 

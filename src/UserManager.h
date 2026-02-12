@@ -61,8 +61,8 @@ public:
      * @brief Get the complete user list
      * @return Pointer to user vector
      */
-    std::vector<HotlineUser*>* getUserList() {
-        return &m_users;
+    std::vector<HotlineUser*>* getUserList() const {
+        return const_cast<std::vector<HotlineUser*>*>(&m_users);
     }
 
     /**
