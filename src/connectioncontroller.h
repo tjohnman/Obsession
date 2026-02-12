@@ -84,6 +84,8 @@ private:
     void handleUserChangeReply(TransactionParameter*& parameterBuffer);
     void handleGetNewsCategoryListReply(TransactionParameter*& parameterBuffer);
     void handleUploadFileReply(TransactionParameter*& parameterBuffer);
+    void handleBroadcastReply(TransactionParameter*& parameterBuffer);
+    void handleNewsItemsReply(TransactionParameter*& parameterBuffer);
 
     // Non-reply transaction handlers
     void handlePrivateMessage(TransactionParameter*& parameterBuffer);

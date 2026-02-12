@@ -477,127 +477,12 @@ void ConnectionController::onSocketData() {
                     handleGetNewsCategoryListReply(parameterBuffer);
                     break;
                  case 355:
-                    {
-                        parameterBuffer = m_receivedTransaction->getParameterById(toInt(Parameter::ChatMessage));
-                        if(parameterBuffer) {
-                            emit gotBroadcast(parameterBuffer->toString());
-                        }
-                    }
+                    handleBroadcastReply(parameterBuffer);
                     break;
                  case 370:
                  case 371:
-                    {
-                        for(quint32 i=0; i<m_receivedTransaction->numberOfParameters(); i++) {
-                            parameterBuffer = m_receivedTransaction->getParameter(i);
-                            if(parameterBuffer) {
-                                if(parameterBuffer->id() == 320) {
-                                    qDebug() << "Warning: Ignoring old-style threaded news!";
-                                }
-                                if(parameterBuffer->id() == 321) { // Got news items
-                                    QString _name = QString::fromUtf8("");
-                                    QString _poster = QString::fromUtf8("");
-
-                                    quint32 count;
-                                    memcpy(&count, parameterBuffer->data()+4, 4);
-                                    count = qFromBigEndian(count);
-
-                                    char size;
-                                    memcpy(&size, parameterBuffer->data()+8, 1);
-
-                                    char size2;
-                                    memcpy(&size2, parameterBuffer->data()+9+size, 1);
-
-                                    qint32 offset = 10+size+size2;
-                                    for(quint32 j=0; j<count; j++) {
-                                        quint32 articleID;
-                                        memcpy(&articleID, parameterBuffer->data()+offset, 4);
-                                        articleID = qFromBigEndian(articleID);
-
-                                        quint32 parentArticleID;
-                                        memcpy(&parentArticleID, parameterBuffer->data()+offset+12, 4);
-                                        parentArticleID = qFromBigEndian(parentArticleID);
-
-                                        quint16 fcount;
-                                        memcpy(&fcount, parameterBuffer->data()+offset+20, 2);
-                                        fcount = qFromBigEndian(fcount);
-
-                                        char tsize;
-                                        memcpy(&tsize, parameterBuffer->data()+offset+22, 1);
-                                        char * atitle = (char *) malloc(tsize+1);
-                                        memcpy(atitle, parameterBuffer->data()+offset+23, tsize);
-                                        atitle[(quint16)tsize] = '\0';
-                                        _name = QString::fromUtf8(atitle);
-                                        free(atitle);
-
-                                        char psize;
-                                        memcpy(&psize, parameterBuffer->data()+offset+23+tsize, 1);
-                                        char * aposter = (char *) malloc(psize+1);
-                                        memcpy(aposter, parameterBuffer->data()+offset+24+tsize, psize);
-                                        aposter[(quint16)psize] = '\0';
-                                        _poster = QString::fromUtf8(aposter);
-                                        free(aposter);
-
-                                        qint32 offset2 = offset+24+tsize+psize;
-
-                                        for(quint32 f=0; f<fcount; f++) {
-                                            char fsize;
-                                            memcpy(&fsize, parameterBuffer->data()+offset2, 1);
-                                            offset2 += 1;
-                                            // char * mime = (char *) malloc(fsize+1);
-                                            // memcpy(mime, parameterBuffer->data()+offset2, fsize);
-                                            // mime[(quint16)fsize] = '\0';
-                                            // free(mime);
-
-                                            offset2+= fsize;
-                                            quint16 asize;
-                                            memcpy(&asize, parameterBuffer->data()+offset2, 2);
-                                            asize = qFromBigEndian(asize);
-
-                                            offset2 += 2;
-                                        }
-
-                                        offset = offset2;
-
-                                        emit gotNewsItem(_name, articleID, parentArticleID);
-                                    }
-                                }
-                                if(parameterBuffer->id() == 323) { // Got news categories/bundles
-                                    unsigned char _type = 0;
-                                    QString _name = QString::fromUtf8("");
-
-                                    quint16 _typeshort;
-                                    memcpy(&_typeshort, parameterBuffer->data(), 2);
-                                    _typeshort = qFromBigEndian(_typeshort);
-                                    _type = (unsigned char) _typeshort;
-
-                                    char * buffer;
-
-                                    if(_typeshort == 2) { // Bundle
-                                        unsigned char ns;
-                                        memcpy(&ns, parameterBuffer->data()+4, 1);
-                                        buffer = (char *) malloc(ns+1);
-                                        memcpy(buffer, parameterBuffer->data()+5, ns);
-                                        buffer[ns] = '\0';
-                                        _name = QString::fromUtf8(buffer);
-                                        free(buffer);
-                                    }
-
-                                    if(_typeshort == 3) { // Category
-                                        unsigned char ns;
-                                        memcpy(&ns, parameterBuffer->data()+28, 1);
-                                        buffer = (char *) malloc(ns+1);
-                                        memcpy(buffer, parameterBuffer->data()+29, ns);
-                                        buffer[ns] = '\0';
-                                        _name = QString::fromUtf8(buffer);
-                                        free(buffer);
-                                    }
-
-                                    emit gotNewsCategory(_type, _name);
-                                }
-                            }
-                        }
-                    }
-                break;
+                    handleNewsItemsReply(parameterBuffer);
+                    break;
                 case Transaction::UploadFileReply:
                     handleUploadFileReply(parameterBuffer);
                     break;
@@ -1096,5 +981,124 @@ void ConnectionController::handleUploadFileReply(TransactionParameter*& paramete
     }
 
     emit gotNewsArticleText(text, poster, timestamp);
+}
+
+void ConnectionController::handleBroadcastReply(TransactionParameter*& parameterBuffer) {
+    parameterBuffer = m_receivedTransaction->getParameterById(toInt(Parameter::ChatMessage));
+    if(parameterBuffer) {
+        emit gotBroadcast(parameterBuffer->toString());
+    }
+}
+
+void ConnectionController::handleNewsItemsReply(TransactionParameter*& parameterBuffer) {
+    for(quint32 i=0; i<m_receivedTransaction->numberOfParameters(); i++) {
+        parameterBuffer = m_receivedTransaction->getParameter(i);
+        if(parameterBuffer) {
+            if(parameterBuffer->id() == 320) {
+                qDebug() << "Warning: Ignoring old-style threaded news!";
+            }
+            if(parameterBuffer->id() == 321) { // Got news items
+                QString _name = QString::fromUtf8("");
+                QString _poster = QString::fromUtf8("");
+
+                quint32 count;
+                memcpy(&count, parameterBuffer->data()+4, 4);
+                count = qFromBigEndian(count);
+
+                char size;
+                memcpy(&size, parameterBuffer->data()+8, 1);
+
+                char size2;
+                memcpy(&size2, parameterBuffer->data()+9+size, 1);
+
+                qint32 offset = 10+size+size2;
+                for(quint32 j=0; j<count; j++) {
+                    quint32 articleID;
+                    memcpy(&articleID, parameterBuffer->data()+offset, 4);
+                    articleID = qFromBigEndian(articleID);
+
+                    quint32 parentArticleID;
+                    memcpy(&parentArticleID, parameterBuffer->data()+offset+12, 4);
+                    parentArticleID = qFromBigEndian(parentArticleID);
+
+                    quint16 fcount;
+                    memcpy(&fcount, parameterBuffer->data()+offset+20, 2);
+                    fcount = qFromBigEndian(fcount);
+
+                    char tsize;
+                    memcpy(&tsize, parameterBuffer->data()+offset+22, 1);
+                    char * atitle = (char *) malloc(tsize+1);
+                    memcpy(atitle, parameterBuffer->data()+offset+23, tsize);
+                    atitle[(quint16)tsize] = '\0';
+                    _name = QString::fromUtf8(atitle);
+                    free(atitle);
+
+                    char psize;
+                    memcpy(&psize, parameterBuffer->data()+offset+23+tsize, 1);
+                    char * aposter = (char *) malloc(psize+1);
+                    memcpy(aposter, parameterBuffer->data()+offset+24+tsize, psize);
+                    aposter[(quint16)psize] = '\0';
+                    _poster = QString::fromUtf8(aposter);
+                    free(aposter);
+
+                    qint32 offset2 = offset+24+tsize+psize;
+
+                    for(quint32 f=0; f<fcount; f++) {
+                        char fsize;
+                        memcpy(&fsize, parameterBuffer->data()+offset2, 1);
+                        offset2 += 1;
+                        // char * mime = (char *) malloc(fsize+1);
+                        // memcpy(mime, parameterBuffer->data()+offset2, fsize);
+                        // mime[(quint16)fsize] = '\0';
+                        // free(mime);
+
+                        offset2+= fsize;
+                        quint16 asize;
+                        memcpy(&asize, parameterBuffer->data()+offset2, 2);
+                        asize = qFromBigEndian(asize);
+
+                        offset2 += 2;
+                    }
+
+                    offset = offset2;
+
+                    emit gotNewsItem(_name, articleID, parentArticleID);
+                }
+            }
+            if(parameterBuffer->id() == 323) { // Got news categories/bundles
+                unsigned char _type = 0;
+                QString _name = QString::fromUtf8("");
+
+                quint16 _typeshort;
+                memcpy(&_typeshort, parameterBuffer->data(), 2);
+                _typeshort = qFromBigEndian(_typeshort);
+                _type = (unsigned char) _typeshort;
+
+                char * buffer;
+
+                if(_typeshort == 2) { // Bundle
+                    unsigned char ns;
+                    memcpy(&ns, parameterBuffer->data()+4, 1);
+                    buffer = (char *) malloc(ns+1);
+                    memcpy(buffer, parameterBuffer->data()+5, ns);
+                    buffer[ns] = '\0';
+                    _name = QString::fromUtf8(buffer);
+                    free(buffer);
+                }
+
+                if(_typeshort == 3) { // Category
+                    unsigned char ns;
+                    memcpy(&ns, parameterBuffer->data()+28, 1);
+                    buffer = (char *) malloc(ns+1);
+                    memcpy(buffer, parameterBuffer->data()+29, ns);
+                    buffer[ns] = '\0';
+                    _name = QString::fromUtf8(buffer);
+                    free(buffer);
+                }
+
+                emit gotNewsCategory(_type, _name);
+            }
+        }
+    }
 }
 
