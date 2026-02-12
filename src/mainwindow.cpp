@@ -79,7 +79,7 @@ MainWindow::MainWindow(QWidget *parent, bool checkForUpdates) :
     connect(connection, SIGNAL(gotUserInfo(QString,QString,quint16)), this, SLOT(onOpenUserInfo(QString,QString,quint16)));
     connect(connection, SIGNAL(gotPermissions(QString,QString,quint8,quint8,quint8,quint8,quint8,quint8,quint8,quint8)), this, SLOT(gotPermissions(QString,QString,quint8,quint8,quint8,quint8,quint8,quint8,quint8,quint8)));
 
-    connect(connection, SIGNAL(userLeft(s_user*)), this, SLOT(onUserLeft(s_user*)));
+    connect(connection, SIGNAL(userLeft(HotlineUser*)), this, SLOT(onUserLeft(HotlineUser*)));
     connect(connection, SIGNAL(userChangedName(QString,QString)), this, SLOT(onUserChangedName(QString,QString)));
 
     connect(connection, SIGNAL(serverError(QString)), this, SLOT(onError(QString)));
@@ -423,16 +423,17 @@ void MainWindow::onClickCreateAccount()
 void MainWindow::onUserListChanged() {
     auto& settings = SettingsManager::instance();
 
-    std::vector<s_user*> * users = connection->getUserList();
+    std::vector<HotlineUser*> * users = connection->getUserList();
     clearUserList();
     for(quint32 i=0; i<users->size(); i++) {
-        s_user * user = users->at(i);
+        HotlineUser * user = users->at(i);
         user->orderInList = i;
 
         DialogPrivateMessaging * private_messages = this->getUserPrivateChat(user);
         private_messages->user = user;
 
-        QListWidgetItem * item = new QListWidgetItem(QString::fromUtf8("           ")+TextHelper::DecodeText(user->name, user->nameLength));
+        QByteArray nameUtf8 = user->name.toUtf8();
+        QListWidgetItem * item = new QListWidgetItem(QString::fromUtf8("           ")+TextHelper::DecodeText(nameUtf8.constData(), nameUtf8.length()));
         QFont f = QFont();
 
         f.setBold(true);
@@ -543,7 +544,7 @@ void MainWindow::onUserChangedName(QString old_name, QString new_name) {
     this->pPrivateChats.erase(old_name.toStdString());
 }
 
-void MainWindow::onUserLeft(s_user * user) {
+void MainWindow::onUserLeft(HotlineUser * user) {
     std::string user_hash = connection->getUserHash(user);
     std::map<std::string, DialogPrivateMessaging *>::iterator it = this->pPrivateChats.find(user_hash);
     if(it != this->pPrivateChats.end()) {
@@ -561,7 +562,7 @@ void MainWindow::openPreferencesDialog() {
 }
 
 void MainWindow::onGotPM(QString message, qint16 uid) {
-    s_user * user = connection->getUserByUid(uid);
+    HotlineUser * user = connection->getUserByUid(uid);
 
     if(user) {
         DialogPrivateMessaging * private_chat = this->getUserPrivateChat(user);
@@ -583,7 +584,7 @@ void MainWindow::onOpenMessagingWindow(quint16 uid) {
         return;
     }
 
-    s_user * user = connection->getUserByUid(uid);
+    HotlineUser * user = connection->getUserByUid(uid);
     if(user) {
         this->getUserPrivateChat(user)->show();
     }
@@ -607,7 +608,7 @@ void MainWindow::onOpenUserInfo(QString username, QString info, quint16 uid) {
         return;
     }
 
-    s_user * user = connection->getUserByUid(uid);
+    HotlineUser * user = connection->getUserByUid(uid);
     if(user) {
         if(user->infoWindow == nullptr) {
             user->infoWindow = new DialogUserInfo(uid, connection, this);
@@ -650,7 +651,7 @@ void MainWindow::onVersionReady()
 }
 
 
-DialogPrivateMessaging * MainWindow::getUserPrivateChat(s_user * user) {
+DialogPrivateMessaging * MainWindow::getUserPrivateChat(HotlineUser * user) {
     std::string user_hash = connection->getUserHash(user);
     std::map<std::string, DialogPrivateMessaging *>::iterator it = this->pPrivateChats.find(user_hash);
 

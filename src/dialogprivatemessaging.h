@@ -17,7 +17,7 @@ public:
 
     qint16 uid;
     ConnectionController * connection;
-    s_user * user;
+    HotlineUser * user;
 
     void gotMessage(QString m);
 

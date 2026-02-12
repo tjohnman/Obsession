@@ -90,7 +90,7 @@ public slots:
     void onClickCreateAccount();
     void onClickBroadcast();
     void onUserChangedName(QString old_name, QString new_name);
-    void onUserLeft(s_user * user);
+    void onUserLeft(HotlineUser * user);
 
 protected:
     void changeEvent(QEvent *e);
@@ -100,7 +100,7 @@ private:
     bool altPressed;
 
     void setStatus(QString s);
-    DialogPrivateMessaging * getUserPrivateChat(s_user * user);
+    DialogPrivateMessaging * getUserPrivateChat(HotlineUser * user);
 
     QNetworkReply * pUpdateCheckReply;
     QNetworkAccessManager * pNetworkAccessManager;

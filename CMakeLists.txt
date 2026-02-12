@@ -110,6 +110,7 @@ set(HEADERS
     src/SettingsManager.h
     src/FileTypeMapper.h
     src/HotlineProtocol.h
+    src/HotlineTypes.h
     src/DateTimeParser.h
     src/UserManager.h
     src/dialogprivileges.h

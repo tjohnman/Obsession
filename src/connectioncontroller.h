@@ -36,15 +36,15 @@ public:
 
     void closeConnection(bool silent = false);
 
-    s_user * getUserByUid(qint16 uid);
-    s_user * getUserByName(QString name);
-    std::vector<s_user *> * getUserList();
+    HotlineUser * getUserByUid(qint16 uid);
+    HotlineUser * getUserByName(QString name);
+    std::vector<HotlineUser *> * getUserList();
 
     UserManager* userManager() { return &m_userManager; }
 
     CTransaction * createTransaction(qint16 id);
 
-    std::string getUserHash(s_user *);
+    std::string getUserHash(HotlineUser *);
 
     QString serverIdent;
 
@@ -125,7 +125,7 @@ signals:
     void receivedFileDeleteResponse(qint32 code);
     void gotPermissions(QString login, QString password, quint8 p1, quint8 p2, quint8 p3, quint8 p4, quint8, quint8, quint8, quint8);
     void userChangedName(QString old_name, QString new_name);
-    void userLeft(s_user * user);
+    void userLeft(HotlineUser * user);
     void gotServerBannerURL(const QString url);
 };
 

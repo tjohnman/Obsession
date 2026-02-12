@@ -15,8 +15,8 @@ DialogPrivateMessaging::DialogPrivateMessaging(qint16 id, ConnectionController *
 
     user = connection->getUserByUid(uid);
 
-    ui->label->setText(QString::fromUtf8("Private chat with ") + QString::fromUtf8(user->name).left(user->nameLength));
-    this->setWindowTitle(QString::fromUtf8("Private chat with ") + QString::fromUtf8(user->name).left(user->nameLength));
+    ui->label->setText(QString::fromUtf8("Private chat with ") + user->name);
+    this->setWindowTitle(QString::fromUtf8("Private chat with ") + user->name);
 
     connect(ui->lineEdit, SIGNAL(returnPressed()), this, SLOT(sendMessage()));
 
@@ -64,7 +64,7 @@ void DialogPrivateMessaging::gotMessage(QString m) {
     ui->textEdit->moveCursor(QTextCursor::End);
     ui->textEdit->ensureCursorVisible();
     ui->lineEdit->setFocus();
-    ui->textEdit->insertHtml(QString::fromUtf8("<b>") + QString::fromUtf8(user->name)+QString::fromUtf8("</b>: ")+formatted+QString::fromUtf8("<p />"));
+    ui->textEdit->insertHtml(QString::fromUtf8("<b>") + user->name + QString::fromUtf8("</b>: ") + formatted + QString::fromUtf8("<p />"));
     ui->textEdit->moveCursor(QTextCursor::End);
     ui->textEdit->ensureCursorVisible();
 }

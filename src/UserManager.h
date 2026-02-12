@@ -34,8 +34,8 @@ public:
      * @param uid User ID
      * @return Pointer to user or nullptr if not found
      */
-    s_user* getUserByUid(qint16 uid) const {
-        for (s_user* user : m_users) {
+    HotlineUser* getUserByUid(qint16 uid) const {
+        for (HotlineUser* user : m_users) {
             if (user->id == uid) {
                 return user;
             }
@@ -48,9 +48,9 @@ public:
      * @param name Username to search for
      * @return Pointer to user or nullptr if not found
      */
-    s_user* getUserByName(const QString& name) const {
-        for (s_user* user : m_users) {
-            if (name.contains(QString::fromUtf8(user->name))) {
+    HotlineUser* getUserByName(const QString& name) const {
+        for (HotlineUser* user : m_users) {
+            if (name.contains(user->name)) {
                 return user;
             }
         }
@@ -61,7 +61,7 @@ public:
      * @brief Get the complete user list
      * @return Pointer to user vector
      */
-    std::vector<s_user*>* getUserList() {
+    std::vector<HotlineUser*>* getUserList() {
         return &m_users;
     }
 
@@ -77,7 +77,7 @@ public:
      * @brief Add a user to the list
      * @param user User to add (takes ownership)
      */
-    void addUser(s_user* user) {
+    void addUser(HotlineUser* user) {
         if (user) {
             m_users.push_back(user);
             emit userListChanged();
@@ -92,10 +92,9 @@ public:
     bool removeUser(qint16 uid) {
         for (auto it = m_users.begin(); it != m_users.end(); ++it) {
             if ((*it)->id == uid) {
-                s_user* user = *it;
+                HotlineUser* user = *it;
                 m_users.erase(it);
-                free(user->name);
-                free(user);
+                delete user;
                 emit userListChanged();
                 return true;
             }
@@ -111,17 +110,13 @@ public:
      * @return true if user was found and updated
      */
     bool updateUser(qint16 uid, const char* newName = nullptr, qint16 newIcon = -1) {
-        s_user* user = getUserByUid(uid);
+        HotlineUser* user = getUserByUid(uid);
         if (!user) {
             return false;
         }
 
         if (newName) {
-            free(user->name);
-            size_t nameLen = strlen(newName);
-            user->name = (char*)malloc(nameLen + 1);
-            memcpy(user->name, newName, nameLen);
-            user->name[nameLen] = '\0';
+            user->name = QString::fromUtf8(newName);
         }
 
         if (newIcon >= 0) {
@@ -136,9 +131,8 @@ public:
      * @brief Clear all users from the list
      */
     void clearAllUsers() {
-        for (s_user* user : m_users) {
-            free(user->name);
-            free(user);
+        for (HotlineUser* user : m_users) {
+            delete user;
         }
         m_users.clear();
         emit userListChanged();
@@ -149,15 +143,15 @@ public:
      * @param user User to hash
      * @return Hash string
      */
-    std::string getUserHash(s_user* user) const {
-        if (!user || !user->name) {
+    std::string getUserHash(HotlineUser* user) const {
+        if (!user) {
             return "";
         }
 
         std::string hash;
         hash += std::to_string(user->id);
         hash += "_";
-        hash += user->name;
+        hash += user->name.toStdString();
         hash += "_";
         hash += std::to_string(user->icon);
 
@@ -171,7 +165,7 @@ signals:
     void userListChanged();
 
 private:
-    std::vector<s_user*> m_users;
+    std::vector<HotlineUser*> m_users;
 };
 
 #endif // USERMANAGER_H

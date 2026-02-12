@@ -175,15 +175,15 @@ void ConnectionController::sendUserInfo() {
     sendTransaction(uinfoTransaction);
 }
 
-s_user * ConnectionController::getUserByUid(qint16 uid) {
+HotlineUser * ConnectionController::getUserByUid(qint16 uid) {
     return m_userManager.getUserByUid(uid);
 }
 
-s_user * ConnectionController::getUserByName(QString name) {
+HotlineUser * ConnectionController::getUserByName(QString name) {
     return m_userManager.getUserByName(name);
 }
 
-std::vector<s_user *> * ConnectionController::getUserList() {
+std::vector<HotlineUser *> * ConnectionController::getUserList() {
     return m_userManager.getUserList();
 }
 
@@ -622,7 +622,7 @@ void ConnectionController::onSocketData() {
                         parameterBuffer = receivedTransaction->getParameter(i);
                         if(parameterBuffer) {
                             if(parameterBuffer->id() == 300) {
-                                s_user * newUser = (s_user *) malloc(sizeof(s_user));
+                                HotlineUser * newUser = new HotlineUser();
 
                                 memcpy(&newUser->id, parameterBuffer->data(), 2);
                                 newUser->id = qFromBigEndian(newUser->id);
@@ -632,17 +632,16 @@ void ConnectionController::onSocketData() {
 
                                 newUser->doesCET = false;
 
-                                newUser->iconPath = new QString(QString::fromUtf8(":/icons/") + QString::number(newUser->icon) + QString::fromUtf8(".png"));
+                                newUser->iconPath = std::make_unique<QString>(QString::fromUtf8(":/icons/") + QString::number(newUser->icon) + QString::fromUtf8(".png"));
 
                                 memcpy(&newUser->flags, parameterBuffer->data() + 4, 2);
                                 newUser->flags = qFromBigEndian(newUser->flags);
 
-                                memcpy(&newUser->nameLength, parameterBuffer->data() + 6, 2);
-                                newUser->nameLength = qFromBigEndian(newUser->nameLength);
+                                quint16 nameLength;
+                                memcpy(&nameLength, parameterBuffer->data() + 6, 2);
+                                nameLength = qFromBigEndian(nameLength);
 
-                                newUser->name = (char *) malloc(sizeof(char)*newUser->nameLength+1);
-                                memcpy(newUser->name, parameterBuffer->data() + 8, newUser->nameLength);
-                                newUser->name[newUser->nameLength] = '\0';
+                                newUser->name = QString::fromUtf8(parameterBuffer->data() + 8, nameLength);
 
                                 newUser->infoWindow = nullptr;
 
@@ -949,7 +948,7 @@ void ConnectionController::onSocketData() {
 
                 quint16 uid = parameterBuffer->toShort();
 
-                s_user * user = getUserByUid(uid);
+                HotlineUser * user = getUserByUid(uid);
                 if(user) { // Update user
                     parameterBuffer = receivedTransaction->getParameterById(toInt(Parameter::UserIconId));
                     if(parameterBuffer) {
@@ -963,7 +962,7 @@ void ConnectionController::onSocketData() {
                         }
 
                         user->icon = newIcon;
-                        user->iconPath = new QString(QString::fromUtf8(":/icons/") + QString::number(user->icon) + QString::fromUtf8(".png"));
+                        user->iconPath = std::make_unique<QString>(QString::fromUtf8(":/icons/") + QString::number(user->icon) + QString::fromUtf8(".png"));
                     }
 
                     parameterBuffer = receivedTransaction->getParameterById(toInt(Parameter::UserFlags));
@@ -974,13 +973,13 @@ void ConnectionController::onSocketData() {
                     parameterBuffer = receivedTransaction->getParameterById(toInt(Parameter::UserLogin));
 
                     if(parameterBuffer) {
-                        QString oldName = TextHelper::DecodeText(user->name, user->nameLength);
+                        QByteArray oldNameUtf8 = user->name.toUtf8();
+                        QString oldName = TextHelper::DecodeText(oldNameUtf8.constData(), oldNameUtf8.length());
 
-                        user->name = (char *) malloc(sizeof(char)*parameterBuffer->length());
-                        memcpy(user->name, parameterBuffer->data(), parameterBuffer->length());
-                        user->nameLength = parameterBuffer->length();
+                        user->name = QString::fromUtf8(parameterBuffer->data(), parameterBuffer->length());
 
-                        QString newName = TextHelper::DecodeText(user->name, parameterBuffer->length());
+                        QByteArray newNameUtf8 = user->name.toUtf8();
+                        QString newName = TextHelper::DecodeText(newNameUtf8.constData(), newNameUtf8.length());
                         QString message = QString::fromUtf8("                <b>%1 is now known as %2</b>").arg(oldName, newName);
 
                         if(oldName != newName)
@@ -991,13 +990,13 @@ void ConnectionController::onSocketData() {
                     }
 
                 } else { // New user
-                    s_user * newUser = (s_user *) malloc(sizeof(s_user));
+                    HotlineUser * newUser = new HotlineUser();
                     newUser->id = uid;
 
                     parameterBuffer = receivedTransaction->getParameterById(toInt(Parameter::UserIconId));
                     if(parameterBuffer) {
                         newUser->icon = parameterBuffer->toShort();
-                        newUser->iconPath = new QString(QString::fromUtf8("icons/") + QString::number(newUser->icon) + QString::fromUtf8(".png"));
+                        newUser->iconPath = std::make_unique<QString>(QString::fromUtf8("icons/") + QString::number(newUser->icon) + QString::fromUtf8(".png"));
                     }
 
                     parameterBuffer = receivedTransaction->getParameterById(toInt(Parameter::UserFlags));
@@ -1007,13 +1006,12 @@ void ConnectionController::onSocketData() {
 
                     parameterBuffer = receivedTransaction->getParameterById(toInt(Parameter::UserLogin));
                     if(parameterBuffer) {
-                        newUser->name = (char *) malloc(sizeof(char)*parameterBuffer->length());
-                        memcpy(newUser->name, parameterBuffer->data(), parameterBuffer->length());
-                        newUser->nameLength = parameterBuffer->length();
+                        newUser->name = QString::fromUtf8(parameterBuffer->data(), parameterBuffer->length());
                     }
 
                     m_userManager.addUser(newUser);
-                    QString message = QString::fromUtf8("                <b>%1 has joined</b>").arg(TextHelper::DecodeText(newUser->name, newUser->nameLength));
+                    QByteArray nameUtf8 = newUser->name.toUtf8();
+                    QString message = QString::fromUtf8("                <b>%1 has joined</b>").arg(TextHelper::DecodeText(nameUtf8.constData(), nameUtf8.length()));
                     emit gotChatMessage(message);
                 }
             }
@@ -1022,7 +1020,7 @@ void ConnectionController::onSocketData() {
             parameterBuffer = receivedTransaction->getParameterById(toInt(Parameter::UserId));
             if(parameterBuffer) {
                 quint16 uid = parameterBuffer->toShort();
-                s_user * user = getUserByUid(uid);
+                HotlineUser * user = getUserByUid(uid);
 
                 if(!user) {
                     // Server reported user left, but it was never here to begin with.
@@ -1031,10 +1029,10 @@ void ConnectionController::onSocketData() {
 
                 emit userLeft(user);
 
-                QString message = QString::fromUtf8("                <b>%1 has left</b>").arg(TextHelper::DecodeText(user->name, user->nameLength));
+                QByteArray nameUtf8 = user->name.toUtf8();
+                QString message = QString::fromUtf8("                <b>%1 has left</b>").arg(TextHelper::DecodeText(nameUtf8.constData(), nameUtf8.length()));
                 emit gotChatMessage(message);
                 m_userManager.removeUser(uid);
-                delete user;
             }
             break;
         }
@@ -1049,6 +1047,6 @@ void ConnectionController::onSocketData() {
     }
 }
 
-std::string ConnectionController::getUserHash(s_user * user) {
+std::string ConnectionController::getUserHash(HotlineUser * user) {
     return m_userManager.getUserHash(user);
 }
