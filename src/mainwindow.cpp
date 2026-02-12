@@ -557,7 +557,7 @@ void MainWindow::openPreferencesDialog() {
     DialogPreferences * dialog = new DialogPreferences(this);
     connect(dialog, SIGNAL(saved()), connection, SLOT(onNameChanged()));
     connect(dialog, SIGNAL(saved()), this, SLOT(onPreferencesSaved()));
-    dialog->serverIdent = connection->serverIdent;
+    dialog->serverIdent = connection->serverIdentifier();
     dialog->open();
 }
 

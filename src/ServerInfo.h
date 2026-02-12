@@ -21,6 +21,7 @@ public:
     qint16 version() const { return m_version; }
     QString agreement() const { return m_agreement; }
     QString bannerURL() const { return m_bannerURL; }
+    QString identifier() const { return m_identifier; }
 
     // Setters
     void setAddress(const QString& addr) { m_address = addr; }
@@ -29,6 +30,7 @@ public:
     void setVersion(qint16 v) { m_version = v; }
     void setAgreement(const QString& a) { m_agreement = a; }
     void setBannerURL(const QString& url) { m_bannerURL = url; }
+    void setIdentifier(const QString& id) { m_identifier = id; }
 
     // Utility
     void clear() {
@@ -38,6 +40,7 @@ public:
         m_version = 0;
         m_agreement.clear();
         m_bannerURL.clear();
+        m_identifier.clear();
     }
 
 private:
@@ -47,6 +50,7 @@ private:
     qint16 m_version = 0;
     QString m_agreement;
     QString m_bannerURL;
+    QString m_identifier;  // Server display identifier
 };
 
 #endif // SERVERINFO_H

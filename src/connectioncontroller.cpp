@@ -93,7 +93,7 @@ qint32 ConnectionController::connectToServer(QString address, QString login, QSt
     m_connectionState.startTimeout();
     pSocket.connectToHost(addr, port);
 
-    serverIdent = addr;
+    m_serverInfo.setIdentifier(addr);
 
     return 0;
 }

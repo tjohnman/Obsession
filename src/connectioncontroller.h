@@ -24,6 +24,7 @@ public:
     ConnectionController();
 
     QString serverName();
+    QString serverIdentifier() const { return m_serverInfo.identifier(); }
 
     qint32 connectToServer(QString address, QString login, QString password, bool resetAutoReconnect = true);
     void sendTransaction(CTransaction *, bool expectReply = false);
@@ -50,8 +51,6 @@ public:
     CTransaction * createTransaction(qint16 id);
 
     std::string getUserHash(HotlineUser *);
-
-    QString serverIdent;
 
     QTcpSocket pSocket;
 
