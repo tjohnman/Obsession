@@ -958,23 +958,14 @@ void ConnectionController::handleGetNewsCategoryListReply(TransactionParameter*&
 
 void ConnectionController::handleUploadFileReply(TransactionParameter*& parameterBuffer) {
     QString text, poster, timestamp;
-    char * t;
 
     parameterBuffer = m_receivedTransaction->getParameterById(toInt(Parameter::NewsArticleData));
     if(parameterBuffer) {
-        t = (char *) malloc(parameterBuffer->length()+1);
-        memcpy(t, parameterBuffer->data(), parameterBuffer->length());
-        t[parameterBuffer->length()] = '\0';
-        text = QString::fromUtf8(t);
-        free(t);
+        text = QString::fromUtf8(parameterBuffer->data(), parameterBuffer->length());
     }
     parameterBuffer = m_receivedTransaction->getParameterById(toInt(Parameter::NewsArticleDate));
     if(parameterBuffer) {
-        t = (char *) malloc(parameterBuffer->length()+1);
-        memcpy(t, parameterBuffer->data(), parameterBuffer->length());
-        t[parameterBuffer->length()] = '\0';
-        poster = QString::fromUtf8(t);
-        free(t);
+        poster = QString::fromUtf8(parameterBuffer->data(), parameterBuffer->length());
     }
     parameterBuffer = m_receivedTransaction->getParameterById(toInt(Parameter::NewsArticleParent));
     if(parameterBuffer) {
@@ -1028,19 +1019,11 @@ void ConnectionController::handleNewsItemsReply(TransactionParameter*& parameter
 
                     char tsize;
                     memcpy(&tsize, parameterBuffer->data()+offset+22, 1);
-                    char * atitle = (char *) malloc(tsize+1);
-                    memcpy(atitle, parameterBuffer->data()+offset+23, tsize);
-                    atitle[(quint16)tsize] = '\0';
-                    _name = QString::fromUtf8(atitle);
-                    free(atitle);
+                    _name = QString::fromUtf8(parameterBuffer->data()+offset+23, tsize);
 
                     char psize;
                     memcpy(&psize, parameterBuffer->data()+offset+23+tsize, 1);
-                    char * aposter = (char *) malloc(psize+1);
-                    memcpy(aposter, parameterBuffer->data()+offset+24+tsize, psize);
-                    aposter[(quint16)psize] = '\0';
-                    _poster = QString::fromUtf8(aposter);
-                    free(aposter);
+                    _poster = QString::fromUtf8(parameterBuffer->data()+offset+24+tsize, psize);
 
                     qint32 offset2 = offset+24+tsize+psize;
 
@@ -1075,26 +1058,16 @@ void ConnectionController::handleNewsItemsReply(TransactionParameter*& parameter
                 _typeshort = qFromBigEndian(_typeshort);
                 _type = (unsigned char) _typeshort;
 
-                char * buffer;
-
                 if(_typeshort == 2) { // Bundle
                     unsigned char ns;
                     memcpy(&ns, parameterBuffer->data()+4, 1);
-                    buffer = (char *) malloc(ns+1);
-                    memcpy(buffer, parameterBuffer->data()+5, ns);
-                    buffer[ns] = '\0';
-                    _name = QString::fromUtf8(buffer);
-                    free(buffer);
+                    _name = QString::fromUtf8(parameterBuffer->data()+5, ns);
                 }
 
                 if(_typeshort == 3) { // Category
                     unsigned char ns;
                     memcpy(&ns, parameterBuffer->data()+28, 1);
-                    buffer = (char *) malloc(ns+1);
-                    memcpy(buffer, parameterBuffer->data()+29, ns);
-                    buffer[ns] = '\0';
-                    _name = QString::fromUtf8(buffer);
-                    free(buffer);
+                    _name = QString::fromUtf8(parameterBuffer->data()+29, ns);
                 }
 
                 emit gotNewsCategory(_type, _name);
