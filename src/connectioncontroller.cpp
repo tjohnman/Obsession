@@ -244,26 +244,30 @@ void ConnectionController::onSocketConnected() {
     pTimeoutTimer.stop();
     emit connected();
 
-    t_protocolExtensions protocol_extensions = this->checkForProtocolExtensions();
+    ProtocolExtensions protocol_extensions = this->checkForProtocolExtensions();
+    m_protocolExtensions = protocol_extensions;
 
     char clientMagicBytes[12] = {0x54, 0x52, 0x54, 0x50, 0x48, 0x4f, 0x54, 0x4c, 0x00, 0x01, 0x00, 0x02};
     char serverMagicBytes[8] = {0x54, 0x52, 0x54, 0x50, 0x00, 0x00, 0x00, 0x00};
 
-    pSocket.write(clientMagicBytes, 12);
-    pSocket.waitForReadyRead(30000);
-    QByteArray response = pSocket.readAll();
+    qint32 len = pSocket.read(serverMagicBytes, 8);
 
-    for(quint32 i=0; i<8; i++) {
-        if(response.data()[i] != serverMagicBytes[i]) {
-            qDebug() << "Handshake failed";
-            return;
-        }
+    if(len < 8 || memcmp(clientMagicBytes, serverMagicBytes, 4) != 0) {
+        pSocket.close();
+        // emit error
+        return;
     }
 
-    if(pSocket.bytesAvailable()) {
-        pSocket.readAll();
+    char errorCode[4];
+    qint32 errorCodeLen = pSocket.read(errorCode, 4);
+
+    if(errorCodeLen != 4 || errorCode[3] != 0) {
+        pSocket.close();
+        // emit error
+        return;
     }
-    connect(&pSocket, SIGNAL(readyRead()), this, SLOT(onSocketData()));
+
+    quint16 serverVersion = ((quint16)serverMagicBytes[6] << 8) | (quint16)serverMagicBytes[7];
 
     CTransaction * loginTransaction = new CTransaction(Transaction::Login, pTaskIDCounter++);
     loginTransaction->addParameter(toInt(Parameter::PrivateChat), m_clientState.encodedLogin().length(), m_clientState.encodedLogin().data());
@@ -271,14 +275,12 @@ void ConnectionController::onSocketConnected() {
         loginTransaction->addParameter(toInt(Parameter::UserPassword), m_clientState.encodedPassword().length(), m_clientState.encodedPassword().data());
     }
     loginTransaction->addParameter(toInt(Parameter::UserLogin), TextHelper::EncodeText(m_clientState.nickname()).size(), TextHelper::EncodeText(m_clientState.nickname()).data());
+    loginTransaction->addParameter(toInt(Parameter::UserIconId), m_clientState.iconID());
 
-    quint16 iconID = qToBigEndian((quint16)3520);
     quint16 ver = qToBigEndian(m_clientState.clientVersion());
+    loginTransaction->addParameter(151, ver);
 
-    loginTransaction->addParameter(toInt(Parameter::UserIconId), iconID);
-    loginTransaction->addParameter(toInt(Parameter::ProtocolVersion), ver);
-
-    if(protocol_extensions.pitbull) {
+    if(protocol_extensions.pitbull()) {
         loginTransaction->addParameter(163, 4, (char *)"OBSE");
         loginTransaction->addParameter(164, VERSION_MAJOR*10 + VERSION_MINOR);
     }
@@ -288,7 +290,7 @@ void ConnectionController::onSocketConnected() {
     sendTransaction(loginTransaction, true);
 }
 
-ConnectionController::t_protocolExtensions ConnectionController::checkForProtocolExtensions() {
+ProtocolExtensions ConnectionController::checkForProtocolExtensions() {
     QTcpSocket * sock = new QTcpSocket();
 
     // Pitbull extension is disabled because it broke file downloads and it is not properly documented.
@@ -303,12 +305,12 @@ ConnectionController::t_protocolExtensions ConnectionController::checkForProtoco
     sock->waitForReadyRead();
     QByteArray response = sock->readAll().left(4);
 
-    pServerProtocolExtensions.pitbull = response == QString::fromUtf8("YES.");
+    m_protocolExtensions.setPitbull(response == QString::fromUtf8("YES."));
 
     sock->disconnect();*/
 
     delete sock;
-    return pServerProtocolExtensions;
+    return m_protocolExtensions;
 }
 
 
@@ -493,7 +495,7 @@ void ConnectionController::onSocketData() {
                     break;
                     }
                 case Transaction::AgreementAccepted:
-                    if(pServerProtocolExtensions.pitbull) {
+                    if(m_protocolExtensions.pitbull()) {
                     /*
                     125 is sending an image
                     126 is recieving one

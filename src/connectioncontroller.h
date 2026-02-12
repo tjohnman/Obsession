@@ -9,6 +9,7 @@
 #include "ServerInfo.h"
 #include "TransactionQueue.h"
 #include "ClientState.h"
+#include "ProtocolExtensions.h"
 #include <QtEndian>
 #include <QDate>
 #include <QTimer>
@@ -57,6 +58,7 @@ private:
     UserManager m_userManager;
     ServerInfo m_serverInfo;
     ClientState m_clientState;
+    ProtocolExtensions m_protocolExtensions;
 
     QTimer pTimeoutTimer;
 
@@ -70,14 +72,7 @@ private:
 
     std::map<qint32,quint16> m_UserInfoTaskMap;
 
-    typedef struct {
-        bool pitbull = false;
-        bool encryption = false;
-    } t_protocolExtensions;
-
-    t_protocolExtensions pServerProtocolExtensions;
-
-    t_protocolExtensions checkForProtocolExtensions();
+    ProtocolExtensions checkForProtocolExtensions();
 
 public slots:
     void reconnect();
