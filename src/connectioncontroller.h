@@ -13,6 +13,7 @@
 #include "ProtocolExtensions.h"
 #include "ConnectionState.h"
 #include "TaskIdGenerator.h"
+#include "NewsProtocolParser.h"
 #include <QtEndian>
 #include <QDate>
 #include <QTimer>
