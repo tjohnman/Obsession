@@ -31,12 +31,12 @@ ConnectionController::ConnectionController()
 
     // TODO: Preferences
     auto& settings = SettingsManager::instance();
-    pNickname = settings.value(QString::fromUtf8("nick"), QString::fromUtf8("unnamed")).toString();
-    pIconID = (quint16) settings.value("icon", 25096).toString().toShort();
+    m_clientState.setNickname(settings.value(QString::fromUtf8("nick"), QString::fromUtf8("unnamed")).toString());
+    m_clientState.setIconID((quint16) settings.value("icon", 25096).toString().toShort());
 
-    pAFK = false;
+    m_clientState.setAFK(false);
 
-    pClientVersion = 190;
+    m_clientState.setClientVersion(190);
 
     pTaskIDCounter = 0;
 
@@ -67,8 +67,8 @@ qint32 ConnectionController::connectToServer(QString address, QString login, QSt
 
     emit connecting();
     m_serverInfo.address() = address;
-    pPlainLogin = login;
-    pPlainPassword = password;
+    m_clientState.setPlainLogin(login);
+    m_clientState.setPlainPassword(password);
     qint32 semicolonIndex = address.lastIndexOf(QString::fromUtf8(":"));
     QString addr;
     quint16 port;
@@ -81,17 +81,17 @@ qint32 ConnectionController::connectToServer(QString address, QString login, QSt
         port = 5500;
     }
 
-    pLogin = TextHelper::EncodeText(login);
-
-    for(qint32 i=0; i<pLogin.length(); i++) {
-        pLogin[i] = 255 - pLogin[i];
+    QByteArray encodedLogin = TextHelper::EncodeText(login);
+    for(qint32 i=0; i<encodedLogin.length(); i++) {
+        encodedLogin[i] = 255 - encodedLogin[i];
     }
+    m_clientState.setEncodedLogin(encodedLogin);
 
-    pPassword = TextHelper::EncodeText(password);
-
-    for(qint32 i=0; i<pPassword.length(); i++) {
-        pPassword[i] = 255 - pPassword[i];
+    QByteArray encodedPassword = TextHelper::EncodeText(password);
+    for(qint32 i=0; i<encodedPassword.length(); i++) {
+        encodedPassword[i] = 255 - encodedPassword[i];
     }
+    m_clientState.setEncodedPassword(encodedPassword);
 
     pTimeoutTimer.start();
     pSocket.connectToHost(addr, port);
@@ -146,32 +146,32 @@ void ConnectionController::sendEmote(QString text) {
 }
 
 void ConnectionController::toggleAFK() {
-    if(pAFK) {
+    if(m_clientState.isAFK()) {
         auto& settings = SettingsManager::instance();
-        pNickname = settings.value(QString::fromUtf8("nick"), QString::fromUtf8("unnamed")).toString();
+        m_clientState.setNickname(settings.value(QString::fromUtf8("nick"), QString::fromUtf8("unnamed")).toString());
         sendUserInfo();
         sendEmote(QString::fromUtf8("is back"));
-        pAFK = false;
+        m_clientState.setAFK(false);
     } else {
         sendEmote(QString::fromUtf8("is AFK"));
         auto& settings = SettingsManager::instance();
-        pNickname = settings.value(QString::fromUtf8("nick"), QString::fromUtf8("unnamed")).toString() + QString::fromUtf8(" (AFK)");
-        pAFK = true;
+        m_clientState.setNickname(settings.value(QString::fromUtf8("nick"), QString::fromUtf8("unnamed")).toString() + QString::fromUtf8(" (AFK)"));
+        m_clientState.setAFK(true);
         sendUserInfo();
     }
 }
 
 bool ConnectionController::isAFK() {
-    return pAFK;
+    return m_clientState.isAFK();
 }
 
 void ConnectionController::sendUserInfo() {
     auto& settings = SettingsManager::instance();
-    pNickname = settings.value(QString::fromUtf8("nick"), QString::fromUtf8("unnamed")).toString();
-    pIconID = settings.value("icon", 25096).toString().toShort();
+    m_clientState.setNickname(settings.value(QString::fromUtf8("nick"), QString::fromUtf8("unnamed")).toString());
+    m_clientState.setIconID(settings.value("icon", 25096).toString().toShort());
     CTransaction * uinfoTransaction = new CTransaction(Transaction::SetUserInfo, pTaskIDCounter++);
-    uinfoTransaction->addParameter(toInt(Parameter::UserLogin), TextHelper::EncodeText(pNickname).size(), TextHelper::EncodeText(pNickname).data());
-    uinfoTransaction->addParameter(toInt(Parameter::UserIconId), pIconID);
+    uinfoTransaction->addParameter(toInt(Parameter::UserLogin), TextHelper::EncodeText(m_clientState.nickname()).size(), TextHelper::EncodeText(m_clientState.nickname()).data());
+    uinfoTransaction->addParameter(toInt(Parameter::UserIconId), m_clientState.iconID());
     sendTransaction(uinfoTransaction);
 }
 
@@ -266,14 +266,14 @@ void ConnectionController::onSocketConnected() {
     connect(&pSocket, SIGNAL(readyRead()), this, SLOT(onSocketData()));
 
     CTransaction * loginTransaction = new CTransaction(Transaction::Login, pTaskIDCounter++);
-    loginTransaction->addParameter(toInt(Parameter::PrivateChat), pLogin.length(), pLogin.data());
-    if(pPassword.length() > 0) {
-        loginTransaction->addParameter(toInt(Parameter::UserPassword), pPassword.length(), pPassword.data());
+    loginTransaction->addParameter(toInt(Parameter::PrivateChat), m_clientState.encodedLogin().length(), m_clientState.encodedLogin().data());
+    if(m_clientState.encodedPassword().length() > 0) {
+        loginTransaction->addParameter(toInt(Parameter::UserPassword), m_clientState.encodedPassword().length(), m_clientState.encodedPassword().data());
     }
-    loginTransaction->addParameter(toInt(Parameter::UserLogin), TextHelper::EncodeText(pNickname).size(), TextHelper::EncodeText(pNickname).data());
+    loginTransaction->addParameter(toInt(Parameter::UserLogin), TextHelper::EncodeText(m_clientState.nickname()).size(), TextHelper::EncodeText(m_clientState.nickname()).data());
 
     quint16 iconID = qToBigEndian((quint16)3520);
-    quint16 ver = qToBigEndian(pClientVersion);
+    quint16 ver = qToBigEndian(m_clientState.clientVersion());
 
     loginTransaction->addParameter(toInt(Parameter::UserIconId), iconID);
     loginTransaction->addParameter(toInt(Parameter::ProtocolVersion), ver);
@@ -408,7 +408,7 @@ void ConnectionController::onConnectionTimedOut()
 
 void ConnectionController::reconnect()
 {
-    connectToServer(m_serverInfo.address(),pPlainLogin,pPlainPassword, false);
+    connectToServer(m_serverInfo.address(),m_clientState.plainLogin(),m_clientState.plainPassword(), false);
 }
 
 void ConnectionController::onNameChanged() {
@@ -456,7 +456,7 @@ void ConnectionController::onSocketData() {
                 case Transaction::Login:
                     {
                     auto& settings = SettingsManager::instance();
-                    pNickname = settings.value(QString::fromUtf8("nick"), QString::fromUtf8("unnamed")).toString();
+                    m_clientState.setNickname(settings.value(QString::fromUtf8("nick"), QString::fromUtf8("unnamed")).toString());
 
                     sendUserInfo();
 

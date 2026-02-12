@@ -115,6 +115,7 @@ set(HEADERS
     src/UserManager.h
     src/ServerInfo.h
     src/TransactionQueue.h
+    src/ClientState.h
     src/dialogprivileges.h
     src/dialogrequestaccount.h
     src/dialogcreateaccount.h

@@ -8,6 +8,7 @@
 #include "UserManager.h"
 #include "ServerInfo.h"
 #include "TransactionQueue.h"
+#include "ClientState.h"
 #include <QtEndian>
 #include <QDate>
 #include <QTimer>
@@ -19,7 +20,6 @@ class ConnectionController : public QObject
 public:
     ConnectionController();
 
-    bool pAFK;
     QString serverName();
 
     qint32 connectToServer(QString address, QString login, QString password, bool resetAutoReconnect = true);
@@ -52,22 +52,12 @@ public:
 
     QTcpSocket pSocket;
 
-    quint64 pPermissionBitmap;
-
-    QByteArray pLogin;
-
 private:
     TransactionQueue m_transactionQueue;
     UserManager m_userManager;
-
-    QByteArray pPassword;
-    quint16 pIconID;
-    QString pNickname;
-    qint16 pClientVersion;
-
     ServerInfo m_serverInfo;
+    ClientState m_clientState;
 
-    QString pPlainLogin, pPlainPassword;
     QTimer pTimeoutTimer;
 
     qint32 pTaskIDCounter;
