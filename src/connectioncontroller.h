@@ -72,6 +72,17 @@ private:
 
     ProtocolExtensions checkForProtocolExtensions();
 
+    // Transaction reply handlers
+    void handleServerMessageReply(TransactionParameter*& parameterBuffer);
+    void handleDeleteFileReply();
+    void handleDownloadFileReply(TransactionParameter*& parameterBuffer);
+
+    // Non-reply transaction handlers
+    void handleChatMessage(TransactionParameter*& parameterBuffer);
+    void handleServerAgreement(TransactionParameter*& parameterBuffer);
+    void handlePrivateChatRequest(TransactionParameter*& parameterBuffer);
+    void handleServerBanner(TransactionParameter*& parameterBuffer);
+
 public slots:
     void reconnect();
     void onSocketConnected();

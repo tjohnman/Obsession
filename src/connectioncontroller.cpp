@@ -447,10 +447,7 @@ void ConnectionController::onSocketData() {
         if(pendingTrans) {
             switch(pendingTrans->transactionID()) {
                 case Transaction::ServerMessage:
-                    parameterBuffer = m_receivedTransaction->getParameterById(toInt(Parameter::ChatMessage));
-                    if(parameterBuffer) {
-                        emit gotLinearNews(parameterBuffer->toString());
-                    }
+                    handleServerMessageReply(parameterBuffer);
                     break;
                 case Transaction::Login:
                     {
@@ -601,17 +598,10 @@ void ConnectionController::onSocketData() {
                     break;
                     }
                 case Transaction::DownloadFile:
-                    {
-                        parameterBuffer = m_receivedTransaction->getParameterById(toInt(Parameter::ReferenceNumber));
-                        if(parameterBuffer) {
-                            emit gotUpload(parameterBuffer->toInt());
-                        }
-                    }
+                    handleDownloadFileReply(parameterBuffer);
                     break;
                 case Transaction::DeleteFile:
-                    {
-                        emit receivedFileDeleteResponse(m_receivedTransaction->errorCode());
-                    }
+                    handleDeleteFileReply();
                     break;
                 case Transaction::GetUserInfo:
                     m_userManager.clearAllUsers();
@@ -861,41 +851,19 @@ void ConnectionController::onSocketData() {
             }
             break;
         case 106:
-            parameterBuffer = m_receivedTransaction->getParameterById(toInt(Parameter::ChatMessage));
-            if(parameterBuffer) {
-                emit gotChatMessage(parameterBuffer->toString());
-            }
+            handleChatMessage(parameterBuffer);
             break;
 
         case 109:
-            parameterBuffer = m_receivedTransaction->getParameterById(toInt(Parameter::ChatMessage));
-            if(parameterBuffer) {
-                m_serverInfo.agreement() = parameterBuffer->toString();
-            }
+            handleServerAgreement(parameterBuffer);
             break;
 
         case 113:
-            parameterBuffer = m_receivedTransaction->getParameterById(toInt(Parameter::UserId));
-            if(parameterBuffer) {
-                quint16 uid = parameterBuffer->toShort();
-
-                if(uid) {
-                    sendPMToUser(uid, QString::fromUtf8("I'm sorry, this client does not support private chats yet. Please use private messages\0"), true);
-                }
-            }
+            handlePrivateChatRequest(parameterBuffer);
             break;
 
         case 122:
-            parameterBuffer = m_receivedTransaction->getParameterById(toInt(Parameter::ServerBannerType));
-            if (parameterBuffer) {
-                quint32 bannerType = parameterBuffer->toInt();
-
-                if (bannerType == 1) {
-                    parameterBuffer = m_receivedTransaction->getParameterById(toInt(Parameter::ServerBannerUrl));
-                    m_serverInfo.bannerURL() = parameterBuffer->toString();
-                    emit gotServerBannerURL(m_serverInfo.bannerURL());
-                }
-            }
+            handleServerBanner(parameterBuffer);
             break;
 
         case 211:
@@ -1037,5 +1005,64 @@ void ConnectionController::onSocketData() {
 }
 
 std::string ConnectionController::getUserHash(HotlineUser * user) {
-    return m_userManager.getUserHash(user);
+    return std::to_string(user->id) + "_" + user->name.toStdString();
 }
+
+// Transaction Reply Handlers
+
+void ConnectionController::handleServerMessageReply(TransactionParameter*& parameterBuffer) {
+    parameterBuffer = m_receivedTransaction->getParameterById(toInt(Parameter::ChatMessage));
+    if(parameterBuffer) {
+        emit gotLinearNews(parameterBuffer->toString());
+    }
+}
+
+void ConnectionController::handleDeleteFileReply() {
+    emit receivedFileDeleteResponse(m_receivedTransaction->errorCode());
+}
+
+void ConnectionController::handleDownloadFileReply(TransactionParameter*& parameterBuffer) {
+    parameterBuffer = m_receivedTransaction->getParameterById(toInt(Parameter::ReferenceNumber));
+    if(parameterBuffer) {
+        emit gotUpload(parameterBuffer->toInt());
+    }
+}
+
+// Non-reply Transaction Handlers
+
+void ConnectionController::handleChatMessage(TransactionParameter*& parameterBuffer) {
+    parameterBuffer = m_receivedTransaction->getParameterById(toInt(Parameter::ChatMessage));
+    if(parameterBuffer) {
+        emit gotChatMessage(parameterBuffer->toString());
+    }
+}
+
+void ConnectionController::handleServerAgreement(TransactionParameter*& parameterBuffer) {
+    parameterBuffer = m_receivedTransaction->getParameterById(toInt(Parameter::ChatMessage));
+    if(parameterBuffer) {
+        m_serverInfo.agreement() = parameterBuffer->toString();
+    }
+}
+
+void ConnectionController::handlePrivateChatRequest(TransactionParameter*& parameterBuffer) {
+    parameterBuffer = m_receivedTransaction->getParameterById(toInt(Parameter::UserId));
+    if(parameterBuffer) {
+        quint16 uid = parameterBuffer->toShort();
+        if(uid) {
+            sendPMToUser(uid, QString::fromUtf8("I'm sorry, this client does not support private chats yet. Please use private messages\0"), true);
+        }
+    }
+}
+
+void ConnectionController::handleServerBanner(TransactionParameter*& parameterBuffer) {
+    parameterBuffer = m_receivedTransaction->getParameterById(toInt(Parameter::ServerBannerType));
+    if (parameterBuffer) {
+        quint32 bannerType = parameterBuffer->toInt();
+        if (bannerType == 1) {
+            parameterBuffer = m_receivedTransaction->getParameterById(toInt(Parameter::ServerBannerUrl));
+            m_serverInfo.bannerURL() = parameterBuffer->toString();
+            emit gotServerBannerURL(m_serverInfo.bannerURL());
+        }
+    }
+}
+
