@@ -13,7 +13,7 @@ public:
 
     void addData(const char * data);
 
-    char * bytes();
+    QByteArray toByteArray() const;
     void addParameter(qint16 parameterID, qint16 parameterLength, const char * parameterData);
     void addParameter(qint16 parameterID, qint32 parameterData);
 
@@ -27,7 +27,7 @@ public:
 
     void setDataLength(qint32 l);
 
-    quint32 length();
+    quint32 length() const;
 
     TransactionParameter * getParameterById(qint16 parameterID);
     TransactionParameter * getParameter(quint32 i);

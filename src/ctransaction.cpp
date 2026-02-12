@@ -160,8 +160,9 @@ void CTransaction::addData(const char * data) {
     }
 }
 
-char * CTransaction::bytes() {
-    char * b = (char *) malloc(sizeof(char) * length());
+QByteArray CTransaction::toByteArray() const {
+    QByteArray buffer(length(), Qt::Uninitialized);
+    char* b = buffer.data();
 
     qint16 reply = qToBigEndian(pIsReply);
     memcpy(b, &reply, 2);
@@ -212,7 +213,7 @@ char * CTransaction::bytes() {
         offset += 4 + pParameters[i]->length();
     }
 
-    return b;
+    return buffer;
 }
 
 void CTransaction::addParameter(qint16 parameterID, qint16 parameterLength, const char * parameterData) {
@@ -268,7 +269,7 @@ quint16 CTransaction::numberOfParameters() {
     return pNumberOfParameters;
 }
 
-quint32 CTransaction::length() {
+quint32 CTransaction::length() const {
     qint32 len = 22;
 
     for(quint32 i=0; i<pParameters.size(); i++) {

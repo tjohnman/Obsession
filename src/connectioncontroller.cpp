@@ -116,7 +116,8 @@ void ConnectionController::requestAccount(QString login)
 
 void ConnectionController::sendTransaction(CTransaction * t, bool expectReply) {
     if(isConnected()) {
-        pSocket.write(t->bytes(), t->length());
+        QByteArray transactionData = t->toByteArray();
+        pSocket.write(transactionData);
         if(expectReply) {
             m_transactionQueue.add(t);
         } else {
