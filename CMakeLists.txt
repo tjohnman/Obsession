@@ -109,6 +109,7 @@ set(HEADERS
     src/TextHelper.h
     src/SettingsManager.h
     src/FileTypeMapper.h
+    src/HotlineProtocol.h
     src/dialogprivileges.h
     src/dialogrequestaccount.h
     src/dialogcreateaccount.h

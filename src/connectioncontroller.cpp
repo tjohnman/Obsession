@@ -1,4 +1,5 @@
 #include "connectioncontroller.h"
+#include "HotlineProtocol.h"
 #include <QSettings>
 #include <QStringList>
 #include <QDir>
@@ -12,6 +13,8 @@
 #include "version.h"
 #include "TextHelper.h"
 #include "SettingsManager.h"
+
+using namespace HotlineProtocol;
 
 ConnectionController::ConnectionController()
 {
@@ -98,7 +101,7 @@ void ConnectionController::broadcast(QString text)
 {
     CTransaction * trans = createTransaction(355);
     QByteArray arr = TextHelper::EncodeText(text);
-    trans->addParameter(101, arr.size(), arr.data());
+    trans->addParameter(toInt(Parameter::ChatMessage), arr.size(), arr.data());
     sendTransaction(trans);
 }
 
@@ -106,7 +109,7 @@ void ConnectionController::requestAccount(QString login)
 {
     QByteArray loginArr = TextHelper::EncodeText(login);
     CTransaction * t = createTransaction(352);
-    t->addParameter(105, loginArr.size(), loginArr.data());
+    t->addParameter(toInt(Parameter::PrivateChat), loginArr.size(), loginArr.data());
     sendTransaction(t, true);
 }
 
@@ -126,15 +129,15 @@ QString ConnectionController::serverName() {
 }
 
 void ConnectionController::sendChatText(QString text) {
-    CTransaction * chatTransaction = new CTransaction(105, pTaskIDCounter++);
-    chatTransaction->addParameter(101, TextHelper::EncodeText(text).size(), TextHelper::EncodeText(text).data());
+    CTransaction * chatTransaction = new CTransaction(Transaction::SendChat, pTaskIDCounter++);
+    chatTransaction->addParameter(toInt(Parameter::ChatMessage), TextHelper::EncodeText(text).size(), TextHelper::EncodeText(text).data());
     sendTransaction(chatTransaction);
 }
 
 void ConnectionController::sendEmote(QString text) {
-    CTransaction * chatTransaction = new CTransaction(105, pTaskIDCounter++);
-    chatTransaction->addParameter(101, TextHelper::EncodeText(text).size(), TextHelper::EncodeText(text).data());
-    chatTransaction->addParameter(109, 1);
+    CTransaction * chatTransaction = new CTransaction(Transaction::SendChat, pTaskIDCounter++);
+    chatTransaction->addParameter(toInt(Parameter::ChatMessage), TextHelper::EncodeText(text).size(), TextHelper::EncodeText(text).data());
+    chatTransaction->addParameter(toInt(Parameter::ChatOptions), 1);
     sendTransaction(chatTransaction);
 }
 
@@ -162,9 +165,9 @@ void ConnectionController::sendUserInfo() {
     auto& settings = SettingsManager::instance();
     pNickname = settings.value(QString::fromUtf8("nick"), QString::fromUtf8("unnamed")).toString();
     pIconID = settings.value("icon", 25096).toString().toShort();
-    CTransaction * uinfoTransaction = new CTransaction(304, pTaskIDCounter++);
-    uinfoTransaction->addParameter(102, TextHelper::EncodeText(pNickname).size(), TextHelper::EncodeText(pNickname).data());
-    uinfoTransaction->addParameter(104, pIconID);
+    CTransaction * uinfoTransaction = new CTransaction(Transaction::SetUserInfo, pTaskIDCounter++);
+    uinfoTransaction->addParameter(toInt(Parameter::UserLogin), TextHelper::EncodeText(pNickname).size(), TextHelper::EncodeText(pNickname).data());
+    uinfoTransaction->addParameter(toInt(Parameter::UserIconId), pIconID);
     sendTransaction(uinfoTransaction);
 }
 
@@ -198,20 +201,20 @@ void ConnectionController::requestUserInfo(quint16 id)
 {
     qint32 task = pTaskIDCounter++;
     m_UserInfoTaskMap[task] = id;
-    CTransaction * PMTransaction = new CTransaction(303, task);
-    PMTransaction->addParameter(103, id);
+    CTransaction * PMTransaction = new CTransaction(Transaction::UserChange, task);
+    PMTransaction->addParameter(toInt(Parameter::UserId), id);
     sendTransaction(PMTransaction, true);
 }
 
 void ConnectionController::sendPMToUser(quint16 uid, QString message, bool automatic) {
-    CTransaction * PMTransaction = new CTransaction(108, pTaskIDCounter++);
-    PMTransaction->addParameter(103, uid);
+    CTransaction * PMTransaction = new CTransaction(Transaction::SendPrivateMessage, pTaskIDCounter++);
+    PMTransaction->addParameter(toInt(Parameter::UserId), uid);
     if(automatic) {
-        PMTransaction->addParameter(113, 4);
+        PMTransaction->addParameter(toInt(Parameter::ChatSubject), 4);
     } else {
-        PMTransaction->addParameter(113, 1);
+        PMTransaction->addParameter(toInt(Parameter::ChatSubject), 1);
     }
-    PMTransaction->addParameter(101, TextHelper::EncodeText(message).size(), TextHelper::EncodeText(message).data());
+    PMTransaction->addParameter(toInt(Parameter::ChatMessage), TextHelper::EncodeText(message).size(), TextHelper::EncodeText(message).data());
     sendTransaction(PMTransaction);
 }
 
@@ -268,18 +271,18 @@ void ConnectionController::onSocketConnected() {
     }
     connect(&pSocket, SIGNAL(readyRead()), this, SLOT(onSocketData()));
 
-    CTransaction * loginTransaction = new CTransaction(107, pTaskIDCounter++);
-    loginTransaction->addParameter(105, pLogin.length(), pLogin.data());
+    CTransaction * loginTransaction = new CTransaction(Transaction::Login, pTaskIDCounter++);
+    loginTransaction->addParameter(toInt(Parameter::PrivateChat), pLogin.length(), pLogin.data());
     if(pPassword.length() > 0) {
-        loginTransaction->addParameter(106, pPassword.length(), pPassword.data());
+        loginTransaction->addParameter(toInt(Parameter::UserPassword), pPassword.length(), pPassword.data());
     }
-    loginTransaction->addParameter(102, TextHelper::EncodeText(pNickname).size(), TextHelper::EncodeText(pNickname).data());
+    loginTransaction->addParameter(toInt(Parameter::UserLogin), TextHelper::EncodeText(pNickname).size(), TextHelper::EncodeText(pNickname).data());
 
     quint16 iconID = qToBigEndian((quint16)3520);
     quint16 ver = qToBigEndian(pClientVersion);
 
-    loginTransaction->addParameter(104, iconID);
-    loginTransaction->addParameter(160, ver);
+    loginTransaction->addParameter(toInt(Parameter::UserIconId), iconID);
+    loginTransaction->addParameter(toInt(Parameter::ProtocolVersion), ver);
 
     if(protocol_extensions.pitbull) {
         loginTransaction->addParameter(163, 4, (char *)"OBSE");
@@ -440,7 +443,7 @@ void ConnectionController::onSocketData() {
     TransactionParameter * parameterBuffer;
 
     if(receivedTransaction->errorCode() != 0) {
-        parameterBuffer = receivedTransaction->getParameterById(100);
+        parameterBuffer = receivedTransaction->getParameterById(toInt(Parameter::ErrorCode));
         if(parameterBuffer) {
             emit serverError(parameterBuffer->toString());
         }
@@ -450,13 +453,13 @@ void ConnectionController::onSocketData() {
         for(quint32 i=0; i<pPendingTransactions.size(); i++) {
             if(receivedTransaction->taskID() == pPendingTransactions[i]->taskID()) {
                 switch(pPendingTransactions[i]->transactionID()) {
-                case 101:
-                    parameterBuffer = receivedTransaction->getParameterById(101);
+                case Transaction::ServerMessage:
+                    parameterBuffer = receivedTransaction->getParameterById(toInt(Parameter::ChatMessage));
                     if(parameterBuffer) {
                         emit gotLinearNews(parameterBuffer->toString());
                     }
                     break;
-                case 107:
+                case Transaction::Login:
                     {
                     auto& settings = SettingsManager::instance();
                     pNickname = settings.value(QString::fromUtf8("nick"), QString::fromUtf8("unnamed")).toString();
@@ -464,7 +467,7 @@ void ConnectionController::onSocketData() {
                     sendUserInfo();
 
                     if(receivedTransaction->errorCode() == 0) {
-                        parameterBuffer = receivedTransaction->getParameterById(162);
+                        parameterBuffer = receivedTransaction->getParameterById(toInt(Parameter::ServerBanner));
                         if(parameterBuffer) {
                             if(parameterBuffer->type() == TYPE_STRING) {
                                 pServerName = parameterBuffer->toString();
@@ -495,7 +498,7 @@ void ConnectionController::onSocketData() {
                     }
                     break;
                     }
-                case 126:
+                case Transaction::AgreementAccepted:
                     if(pServerProtocolExtensions.pitbull) {
                     /*
                     125 is sending an image
@@ -532,7 +535,7 @@ void ConnectionController::onSocketData() {
                     */
                     }
                     break;
-                case 200:
+                case Transaction::GetFileListReply:
                     {
                     std::vector<s_hotlineFile *> fileList;
                     for(quint32 i=0; i<receivedTransaction->numberOfParameters(); i++) {
@@ -564,7 +567,7 @@ void ConnectionController::onSocketData() {
                     emit gotFileList(fileList);
                     }
                     break;
-                case 202:
+                case Transaction::GetFileInfo:
                     {
                     quint32 transferSize = 0;
                     quint32 referenceNumber = 0;
@@ -578,12 +581,12 @@ void ConnectionController::onSocketData() {
                             transferSize = parameterBuffer->toInt();
                         }
                     }
-                    parameterBuffer = receivedTransaction->getParameterById(107);
+                    parameterBuffer = receivedTransaction->getParameterById(toInt(Parameter::ReferenceNumber));
                     if(parameterBuffer) {
                         referenceNumber = parameterBuffer->toInt();
                     }
 
-                    parameterBuffer = receivedTransaction->getParameterById(116);
+                    parameterBuffer = receivedTransaction->getParameterById(toInt(Parameter::QueuePosition));
                     quint32 queuePosition = 0;
                     if(parameterBuffer) {
                         quint16 squeue = 0;
@@ -605,20 +608,20 @@ void ConnectionController::onSocketData() {
                     emit gotFile(referenceNumber, transferSize, queuePosition);
                     break;
                     }
-                case 203:
+                case Transaction::DownloadFile:
                     {
-                        parameterBuffer = receivedTransaction->getParameterById(107);
+                        parameterBuffer = receivedTransaction->getParameterById(toInt(Parameter::ReferenceNumber));
                         if(parameterBuffer) {
                             emit gotUpload(parameterBuffer->toInt());
                         }
                     }
                     break;
-                case 204:
+                case Transaction::DeleteFile:
                     {
                         emit receivedFileDeleteResponse(receivedTransaction->errorCode());
                     }
                     break;
-                case 300:
+                case Transaction::GetUserInfo:
                     while(pUsers.size() > 0) {
                         s_user * u = pUsers.back();
                         pUsers.pop_back();
@@ -661,20 +664,20 @@ void ConnectionController::onSocketData() {
                     }
 
                  break;
-                case 303:
+                case Transaction::UserChange:
                 {
-                    TransactionParameter * userNameParameter = receivedTransaction->getParameterById(102);
-                    TransactionParameter * userInfoParameter = receivedTransaction->getParameterById(101);
+                    TransactionParameter * userNameParameter = receivedTransaction->getParameterById(toInt(Parameter::UserLogin));
+                    TransactionParameter * userInfoParameter = receivedTransaction->getParameterById(toInt(Parameter::ChatMessage));
 
                     if(userNameParameter && userInfoParameter) {
                         emit gotUserInfo(userNameParameter->toString(), userInfoParameter->toString(), m_UserInfoTaskMap[receivedTransaction->taskID()]);
                     }
                 }
                 break;
-                case 352:
+                case Transaction::GetNewsCategoryListReply:
                 {
-                    parameterBuffer = receivedTransaction->getParameterById(110);
-                    TransactionParameter * loginParameter = receivedTransaction->getParameterById(105);
+                    parameterBuffer = receivedTransaction->getParameterById(toInt(Parameter::UserData));
+                    TransactionParameter * loginParameter = receivedTransaction->getParameterById(toInt(Parameter::PrivateChat));
                     if(parameterBuffer && loginParameter)
                     {
                         for(int i=0; i<loginParameter->length(); ++i)
@@ -694,7 +697,7 @@ void ConnectionController::onSocketData() {
                         memcpy(&permissions[6], parameterBuffer->data()+6, 1);
                         memcpy(&permissions[7], parameterBuffer->data()+7, 1);
 
-                        TransactionParameter * passwordParameter = receivedTransaction->getParameterById(106);
+                        TransactionParameter * passwordParameter = receivedTransaction->getParameterById(toInt(Parameter::UserPassword));
                         if (passwordParameter) {
                             QString password = passwordParameter->toString();
                             emit gotPermissions(login, password, permissions[0], permissions[1], permissions[2], permissions[3], permissions[4], permissions[5], permissions[6], permissions[7]);
@@ -704,7 +707,7 @@ void ConnectionController::onSocketData() {
                     break;
                  case 355:
                     {
-                        parameterBuffer = receivedTransaction->getParameterById(101);
+                        parameterBuffer = receivedTransaction->getParameterById(toInt(Parameter::ChatMessage));
                         if(parameterBuffer) {
                             emit gotBroadcast(parameterBuffer->toString());
                         }
@@ -824,12 +827,12 @@ void ConnectionController::onSocketData() {
                         }
                     }
                 break;
-                case 400:
+                case Transaction::UploadFileReply:
                     {
                         QString text, poster, timestamp;
                         char * t;
 
-                        parameterBuffer = receivedTransaction->getParameterById(333);
+                        parameterBuffer = receivedTransaction->getParameterById(toInt(Parameter::NewsArticleData));
                         if(parameterBuffer) {
                             t = (char *) malloc(parameterBuffer->length()+1);
                             memcpy(t, parameterBuffer->data(), parameterBuffer->length());
@@ -837,7 +840,7 @@ void ConnectionController::onSocketData() {
                             text = QString::fromUtf8(t);
                             free(t);
                         }
-                        parameterBuffer = receivedTransaction->getParameterById(329);
+                        parameterBuffer = receivedTransaction->getParameterById(toInt(Parameter::NewsArticleDate));
                         if(parameterBuffer) {
                             t = (char *) malloc(parameterBuffer->length()+1);
                             memcpy(t, parameterBuffer->data(), parameterBuffer->length());
@@ -845,7 +848,7 @@ void ConnectionController::onSocketData() {
                             poster = QString::fromUtf8(t);
                             free(t);
                         }
-                        parameterBuffer = receivedTransaction->getParameterById(330);
+                        parameterBuffer = receivedTransaction->getParameterById(toInt(Parameter::NewsArticleParent));
                         if(parameterBuffer) {
                             quint16 year;
                             memcpy(&year, parameterBuffer->data(), 2);
@@ -997,33 +1000,33 @@ void ConnectionController::onSocketData() {
     } else { // NOT A REPLY
         switch(receivedTransaction->transactionID()) {
         case 104:
-            parameterBuffer = receivedTransaction->getParameterById(103);
-            if(parameterBuffer && receivedTransaction->getParameterById(101)) {
+            parameterBuffer = receivedTransaction->getParameterById(toInt(Parameter::UserId));
+            if(parameterBuffer && receivedTransaction->getParameterById(toInt(Parameter::ChatMessage))) {
                 quint16 uid = parameterBuffer->toShort();
-                emit gotPM(receivedTransaction->getParameterById(101)->toString(), uid);
+                emit gotPM(receivedTransaction->getParameterById(toInt(Parameter::ChatMessage))->toString(), uid);
             } else {
-                parameterBuffer = receivedTransaction->getParameterById(101);
+                parameterBuffer = receivedTransaction->getParameterById(toInt(Parameter::ChatMessage));
                 if(parameterBuffer) {
                     emit serverError(parameterBuffer->toString());
                 }
             }
             break;
         case 106:
-            parameterBuffer = receivedTransaction->getParameterById(101);
+            parameterBuffer = receivedTransaction->getParameterById(toInt(Parameter::ChatMessage));
             if(parameterBuffer) {
                 emit gotChatMessage(parameterBuffer->toString());
             }
             break;
 
         case 109:
-            parameterBuffer = receivedTransaction->getParameterById(101);
+            parameterBuffer = receivedTransaction->getParameterById(toInt(Parameter::ChatMessage));
             if(parameterBuffer) {
                 pServerAgreement = parameterBuffer->toString();
             }
             break;
 
         case 113:
-            parameterBuffer = receivedTransaction->getParameterById(103);
+            parameterBuffer = receivedTransaction->getParameterById(toInt(Parameter::UserId));
             if(parameterBuffer) {
                 quint16 uid = parameterBuffer->toShort();
 
@@ -1034,12 +1037,12 @@ void ConnectionController::onSocketData() {
             break;
 
         case 122:
-            parameterBuffer = receivedTransaction->getParameterById(152);
+            parameterBuffer = receivedTransaction->getParameterById(toInt(Parameter::ServerBannerType));
             if (parameterBuffer) {
                 quint32 bannerType = parameterBuffer->toInt();
 
                 if (bannerType == 1) {
-                    parameterBuffer = receivedTransaction->getParameterById(153);
+                    parameterBuffer = receivedTransaction->getParameterById(toInt(Parameter::ServerBannerUrl));
                     pServerBannerURL = parameterBuffer->toString();
                     emit gotServerBannerURL(pServerBannerURL);
                 }
@@ -1049,12 +1052,12 @@ void ConnectionController::onSocketData() {
         case 211:
             {
                 quint32 referenceNumber = -1;
-                parameterBuffer = receivedTransaction->getParameterById(107);
+                parameterBuffer = receivedTransaction->getParameterById(toInt(Parameter::ReferenceNumber));
                 if(parameterBuffer) {
                     referenceNumber = parameterBuffer->toInt();
                 }
 
-                parameterBuffer = receivedTransaction->getParameterById(116);
+                parameterBuffer = receivedTransaction->getParameterById(toInt(Parameter::QueuePosition));
                 quint32 queuePosition = 0;
                 if(parameterBuffer) {
                     quint16 squeue = 0;
@@ -1077,8 +1080,8 @@ void ConnectionController::onSocketData() {
             }
 
         case 301:
-            if(receivedTransaction->getParameterById(103)) {
-                parameterBuffer = receivedTransaction->getParameterById(103);
+            if(receivedTransaction->getParameterById(toInt(Parameter::UserId))) {
+                parameterBuffer = receivedTransaction->getParameterById(toInt(Parameter::UserId));
 
                 if(!parameterBuffer) {
                     break;
@@ -1088,7 +1091,7 @@ void ConnectionController::onSocketData() {
 
                 s_user * user = getUserByUid(uid);
                 if(user) { // Update user
-                    parameterBuffer = receivedTransaction->getParameterById(104);
+                    parameterBuffer = receivedTransaction->getParameterById(toInt(Parameter::UserIconId));
                     if(parameterBuffer) {
                         quint16 newIcon = parameterBuffer->toShort();
 
@@ -1103,12 +1106,12 @@ void ConnectionController::onSocketData() {
                         user->iconPath = new QString(QString::fromUtf8(":/icons/") + QString::number(user->icon) + QString::fromUtf8(".png"));
                     }
 
-                    parameterBuffer = receivedTransaction->getParameterById(112);
+                    parameterBuffer = receivedTransaction->getParameterById(toInt(Parameter::UserFlags));
                     if(parameterBuffer) {
                         user->flags = parameterBuffer->toShort();
                     }
 
-                    parameterBuffer = receivedTransaction->getParameterById(102);
+                    parameterBuffer = receivedTransaction->getParameterById(toInt(Parameter::UserLogin));
 
                     if(parameterBuffer) {
                         QString oldName = TextHelper::DecodeText(user->name, user->nameLength);
@@ -1131,18 +1134,18 @@ void ConnectionController::onSocketData() {
                     s_user * newUser = (s_user *) malloc(sizeof(s_user));
                     newUser->id = uid;
 
-                    parameterBuffer = receivedTransaction->getParameterById(104);
+                    parameterBuffer = receivedTransaction->getParameterById(toInt(Parameter::UserIconId));
                     if(parameterBuffer) {
                         newUser->icon = parameterBuffer->toShort();
                         newUser->iconPath = new QString(QString::fromUtf8("icons/") + QString::number(newUser->icon) + QString::fromUtf8(".png"));
                     }
 
-                    parameterBuffer = receivedTransaction->getParameterById(112);
+                    parameterBuffer = receivedTransaction->getParameterById(toInt(Parameter::UserFlags));
                     if(parameterBuffer) {
                         newUser->flags = parameterBuffer->toShort();
                     }
 
-                    parameterBuffer = receivedTransaction->getParameterById(102);
+                    parameterBuffer = receivedTransaction->getParameterById(toInt(Parameter::UserLogin));
                     if(parameterBuffer) {
                         newUser->name = (char *) malloc(sizeof(char)*parameterBuffer->length());
                         memcpy(newUser->name, parameterBuffer->data(), parameterBuffer->length());
@@ -1157,7 +1160,7 @@ void ConnectionController::onSocketData() {
             }
             break;
         case 302:
-            parameterBuffer = receivedTransaction->getParameterById(103);
+            parameterBuffer = receivedTransaction->getParameterById(toInt(Parameter::UserId));
             if(parameterBuffer) {
                 quint16 uid = parameterBuffer->toShort();
                 s_user * user = getUserByUid(uid);
