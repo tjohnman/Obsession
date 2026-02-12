@@ -531,27 +531,26 @@ void ConnectionController::onSocketData() {
                     break;
                 case Transaction::GetFileListReply:
                     {
-                    std::vector<s_hotlineFile *> fileList;
+                    std::vector<HotlineFile *> fileList;
                     for(quint32 i=0; i<receivedTransaction->numberOfParameters(); i++) {
                         parameterBuffer = receivedTransaction->getParameter(i);
                         if(parameterBuffer) {
                             if(parameterBuffer->id() == 200) {
-                                s_hotlineFile * file = (s_hotlineFile *) malloc(sizeof(s_hotlineFile));
+                                HotlineFile * file = new HotlineFile();
 
-                                file->type = (char *) malloc(5);
+                                // Extract 4-byte type code
+                                file->type = QString::fromLatin1(parameterBuffer->data(), 4);
 
-                                memcpy(file->type, parameterBuffer->data(), 4);
-                                file->type[4] = '\0';
-
+                                // Extract size
                                 memcpy(&file->size, parameterBuffer->data()+8, 4);
                                 file->size = qFromBigEndian(file->size);
 
-                                memcpy(&file->nameSize, parameterBuffer->data()+18, 2);
-                                file->nameSize = qFromBigEndian(file->nameSize);
-
-                                file->name = (char *) malloc(sizeof(char)*file->nameSize+1);
-                                memcpy(file->name, parameterBuffer->data()+20, file->nameSize);
-                                file->name[file->nameSize] = '\0';
+                                // Extract name
+                                quint16 nameSize;
+                                memcpy(&nameSize, parameterBuffer->data()+18, 2);
+                                nameSize = qFromBigEndian(nameSize);
+                                
+                                file->name = QString::fromUtf8(parameterBuffer->data()+20, nameSize);
 
                                 fileList.push_back(file);
                             }

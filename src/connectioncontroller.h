@@ -109,7 +109,7 @@ signals:
     void gotBroadcast(QString str);
     void userListChanged();
     void gotPM(QString, qint16);
-    void gotFileList(std::vector<s_hotlineFile *>);
+    void gotFileList(std::vector<HotlineFile *>);
     void serverError(QString);
     void socketError(QString);
     void connected();

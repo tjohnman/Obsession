@@ -42,7 +42,7 @@ private:
     QString _m_RawPath;
 
 private slots:
-    void onGotFileList(std::vector<s_hotlineFile *>);
+    void onGotFileList(std::vector<HotlineFile *>);
     void onDoubleClick(QModelIndex);
     void goDirectoryUp();
     void requestFile();

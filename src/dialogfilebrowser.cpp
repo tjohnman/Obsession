@@ -16,7 +16,7 @@ DialogFileBrowser::DialogFileBrowser(ConnectionController * c, QWidget *parent) 
     ui->setupUi(this);
     connection = c;
     path = _m_RawPath = QString::fromUtf8("/");
-    connect(connection, SIGNAL(gotFileList(std::vector<s_hotlineFile *>)), this, SLOT(onGotFileList(std::vector<s_hotlineFile *>)));
+    connect(connection, SIGNAL(gotFileList(std::vector<HotlineFile *>)), this, SLOT(onGotFileList(std::vector<HotlineFile *>)));
     connect(ui->treeWidget, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(onDoubleClick(QModelIndex)));
     connect(ui->treeWidget, SIGNAL(clicked(QModelIndex)), this, SLOT(selectionChange()));
 
@@ -133,17 +133,19 @@ void DialogFileBrowser::onDoubleClick(QModelIndex model) {
     }
 }
 
-void DialogFileBrowser::onGotFileList(std::vector<s_hotlineFile *> list) {
+void DialogFileBrowser::onGotFileList(std::vector<HotlineFile *> list) {
     ui->treeWidget->clear();
 
     for(quint32 i=0; i<list.size(); i++) {
         QTreeWidgetItem * item = new QTreeWidgetItem();
-        QString _n1 = TextHelper::DecodeText(list[i]->name, list[i]->nameSize);
-        QString _n = TextHelper::DecodeTextAutoUTF8(list[i]->name, list[i]->nameSize);
+        QByteArray nameUtf8 = list[i]->name.toUtf8();
+        QString _n1 = TextHelper::DecodeText(nameUtf8.constData(), nameUtf8.length());
+        QString _n = TextHelper::DecodeTextAutoUTF8(nameUtf8.constData(), nameUtf8.length());
         _m_RawNames[_n] = _n1;
         item->setData(0, 0, _n);
         qint32 size = list[i]->size;
-        if(!strncmp(list[i]->type, "fldr", 4)) {
+        QByteArray typeUtf8 = list[i]->type.toLatin1();
+        if(!strncmp(typeUtf8.constData(), "fldr", 4)) {
             item->setData(1, 0, QString::number(size) + (size == 1 ? QString::fromUtf8(" item") : QString::fromUtf8(" items")));
         } else {
             if(size > 1024) {
@@ -171,7 +173,7 @@ void DialogFileBrowser::onGotFileList(std::vector<s_hotlineFile *> list) {
         item->setData(3, 0, size);
         item->setTextAlignment(1, Qt::AlignRight);
 
-        if(!strncmp(list[i]->type, "fldr", 4)) {
+        if(!strncmp(typeUtf8.constData(), "fldr", 4)) {
             item->setIcon(0, QIcon(QString::fromUtf8(":/files/interfaceIcons/filesFolder.png")));
         } else {
             // Use FileTypeMapper for clean, maintainable file type detection
@@ -184,7 +186,7 @@ void DialogFileBrowser::onGotFileList(std::vector<s_hotlineFile *> list) {
             }
             
             // Then try type code detection (overrides extension if found)
-            QIcon typeCodeIcon = FileTypeMapper::instance().getIconByTypeCode(list[i]->type);
+            QIcon typeCodeIcon = FileTypeMapper::instance().getIconByTypeCode(typeUtf8.constData());
             if (!typeCodeIcon.isNull()) {
                 icon = typeCodeIcon;
             }
@@ -197,9 +199,12 @@ void DialogFileBrowser::onGotFileList(std::vector<s_hotlineFile *> list) {
             }
         }
 
-        item->setData(2, 0, QString::fromUtf8(list[i]->type));
+        item->setData(2, 0, list[i]->type);
 
         ui->treeWidget->addTopLevelItem(item);
+        
+        // Clean up allocated file
+        delete list[i];
     }
     ui->label->setText(QString::number(list.size())+ QString::fromUtf8(" items"));
     ui->treeWidget->setEnabled(true);
