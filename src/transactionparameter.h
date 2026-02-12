@@ -10,6 +10,10 @@ class TransactionParameter : public QObject
     Q_OBJECT
 public:
     TransactionParameter(s_parameter parameterData);
+    
+    // Modern constructor that avoids s_parameter struct
+    TransactionParameter(quint16 id, quint16 length, qint32 type, const char* data);
+    
     ~TransactionParameter() = default;
 
     quint16 id();

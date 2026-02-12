@@ -17,6 +17,20 @@ TransactionParameter::TransactionParameter(s_parameter parameterData) {
     memcpy(m_data.data(), parameterData.data, pLength);
 }
 
+TransactionParameter::TransactionParameter(quint16 id, quint16 length, qint32 type, const char* data) {
+    QObject();
+
+    pId = id;
+    pLength = length;
+    pType = type;
+    
+    // Use vector for automatic memory management
+    m_data.resize(pLength);
+    if (data && pLength > 0) {
+        memcpy(m_data.data(), data, pLength);
+    }
+}
+
 quint16 TransactionParameter::id() {
     return pId;
 }

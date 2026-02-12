@@ -66,139 +66,94 @@ void CTransaction::addData(const char * data) {
         id = qFromBigEndian(id);
         size = qFromBigEndian(size);
 
-
-        s_parameter newParameter;
-        newParameter.type = -1;
-
-        newParameter.id = id;
-        newParameter.length = size;
-
-        newParameter.data = (char *) malloc(size);
-        memcpy(newParameter.data, data + 4 + offset, size);
-
-        memcpy(&newParameter.intValue, data + 4 + offset, 4);
-        newParameter.intValue = qFromBigEndian(newParameter.intValue);
-        memcpy(&newParameter.shortValue, data + 4 + offset, 2);
-        newParameter.shortValue = qFromBigEndian(newParameter.shortValue);
-
+        // Determine parameter type based on ID
+        qint32 paramType = -1;
+        quint16 paramLength = size;
+        
         switch(id) {
         case 100:
-            newParameter.type = TYPE_STRING;
-            break;
         case 101:
-            newParameter.type = TYPE_STRING;
-            break;
         case 102:
-            newParameter.type = TYPE_STRING;
+            paramType = TYPE_STRING;
             break;
         case 103:
-            newParameter.type = TYPE_SHORT;
-            newParameter.length = 2;
-            break;
         case 104:
-            newParameter.type = TYPE_SHORT;
-            newParameter.length = 2;
+            paramType = TYPE_SHORT;
+            paramLength = 2;
             break;
         case 105:
         case 106:
-            newParameter.type = TYPE_STRING;
+            paramType = TYPE_STRING;
             break;
         case 107:
-            newParameter.type = TYPE_INT;
-            newParameter.length = 4;
+            paramType = TYPE_INT;
+            paramLength = 4;
             break;
         case 108:
             if(size <= 2) {
-                newParameter.type = TYPE_SHORT;
-                newParameter.length = 2;
+                paramType = TYPE_SHORT;
+                paramLength = 2;
             } else {
-                newParameter.type = TYPE_INT;
-                newParameter.length = 4;
+                paramType = TYPE_INT;
+                paramLength = 4;
             }
             break;
         case 112:
-            newParameter.type = TYPE_SHORT;
-            newParameter.length = 2;
+            paramType = TYPE_SHORT;
+            paramLength = 2;
             break;
         case 110:
         case 115:
-            newParameter.type = TYPE_STRING;
+            paramType = TYPE_STRING;
             break;
         case 116:
             if(size <= 2) {
-                newParameter.type = TYPE_SHORT;
-                newParameter.length = 2;
+                paramType = TYPE_SHORT;
+                paramLength = 2;
             } else {
-                newParameter.type = TYPE_INT;
-                newParameter.length = 4;
+                paramType = TYPE_INT;
+                paramLength = 4;
             }
             break;
         case 160:
-            newParameter.type = TYPE_SHORT;
-            newParameter.length = 2;
-            break;
         case 161:
-            newParameter.type = TYPE_SHORT;
-            newParameter.length = 2;
+            paramType = TYPE_SHORT;
+            paramLength = 2;
             break;
         case 162:
-            newParameter.type = TYPE_STRING;
-            break;
         case 200:
-            newParameter.type = TYPE_STRING;
+            paramType = TYPE_STRING;
             break;
         case 207:
             if(size <= 2) {
-                newParameter.type = TYPE_SHORT;
-                newParameter.length = 2;
+                paramType = TYPE_SHORT;
+                paramLength = 2;
             } else {
-                newParameter.type = TYPE_INT;
-                newParameter.length = 4;
+                paramType = TYPE_INT;
+                paramLength = 4;
             }
             break;
         case 300:
-            newParameter.type = TYPE_STRING;
-            break;
         case 320:
-            newParameter.type = TYPE_STRING;
-            break;
         case 321:
-            newParameter.type = TYPE_STRING;
-            break;
         case 323:
-            newParameter.type = TYPE_STRING;
-            break;
         case 327:  // Unknown news parameter - handle as string
         case 328:  // Unknown news parameter - handle as string
-            newParameter.type = TYPE_STRING;
-            break;
         case 329:
-            newParameter.type = TYPE_STRING;
-            break;
         case 330:
-            newParameter.type = TYPE_STRING;
-            break;
         case 331:  // Unknown news parameter - handle as string
         case 332:  // Unknown news parameter - handle as string
-            newParameter.type = TYPE_STRING;
-            break;
         case 333:
-            newParameter.type = TYPE_STRING;
-            break;
         case 335:  // Unknown news parameter - handle as string
         case 336:  // Unknown news parameter - handle as string
-            newParameter.type = TYPE_STRING;
+            paramType = TYPE_STRING;
             break;
         default:
             qDebug() << "Warning: Unknown parameter id " << id << "ignored";
         }
 
-        if(newParameter.type != -1) {
-            pParameters.push_back(new TransactionParameter(newParameter));
-        }
-
-        if (newParameter.data != 0) {
-            free(newParameter.data);
+        if(paramType != -1) {
+            pParameters.push_back(new TransactionParameter(id, paramLength, paramType, data + 4 + offset));
         }
 
         offset += 4 + size;
@@ -261,59 +216,31 @@ char * CTransaction::bytes() {
 }
 
 void CTransaction::addParameter(qint16 parameterID, qint16 parameterLength, const char * parameterData) {
-    s_parameter newParameter;
-    newParameter.type = TYPE_STRING;
-    newParameter.id = parameterID;
-    newParameter.length = parameterLength;
-    newParameter.data = (char *) malloc(parameterLength);
-
-    memcpy(&newParameter.shortValue, parameterData, 2);
-    newParameter.shortValue = qFromBigEndian(newParameter.shortValue);
-
-    memcpy(&newParameter.intValue, parameterData, 4);
-    newParameter.intValue = qFromBigEndian(newParameter.intValue);
-
-    memcpy(newParameter.data, parameterData, parameterLength);
-    pParameters.push_back(new TransactionParameter(newParameter));
+    pParameters.push_back(new TransactionParameter(parameterID, parameterLength, TYPE_STRING, parameterData));
     pNumberOfParameters = pParameters.size();
     pDataLength += parameterLength + 4;
-    
-    // Free temporary buffer after TransactionParameter makes its own copy
-    free(newParameter.data);
 }
 
 void CTransaction::addParameter(qint16 parameterID, qint32 parameterData) {
-    s_parameter newParameter;
-    newParameter.id = parameterID;
-
     if(parameterData > 65535) {
-        newParameter.type = TYPE_INT;
-        newParameter.length = 4;
-        newParameter.intValue = parameterData;
-        newParameter.shortValue = 0;
-
-        newParameter.data = (char *) malloc(4);
-        parameterData = qToBigEndian(parameterData);
-        memcpy(newParameter.data, &parameterData, 4);
-
+        // Use 4-byte INT type
+        char buffer[4];
+        quint32 bigEndianData = qToBigEndian(parameterData);
+        memcpy(buffer, &bigEndianData, 4);
+        
+        pParameters.push_back(new TransactionParameter(parameterID, 4, TYPE_INT, buffer));
         pDataLength += 8;
     } else {
-        newParameter.type = TYPE_SHORT;
-        newParameter.length = 2;
-        newParameter.shortValue = parameterData;
-        newParameter.intValue = parameterData;
-
-        newParameter.data = (char *) malloc(2);
-        quint16 shortParameterData = parameterData;
-        shortParameterData = qToBigEndian(shortParameterData);
-        memcpy(newParameter.data, &shortParameterData, 2);
-
+        // Use 2-byte SHORT type
+        char buffer[2];
+        quint16 shortData = static_cast<quint16>(parameterData);
+        quint16 bigEndianData = qToBigEndian(shortData);
+        memcpy(buffer, &bigEndianData, 2);
+        
+        pParameters.push_back(new TransactionParameter(parameterID, 2, TYPE_SHORT, buffer));
         pDataLength += 6;
     }
-    pParameters.push_back(new TransactionParameter(newParameter));
     pNumberOfParameters = pParameters.size();
-
-    free(newParameter.data);
 }
 
 
