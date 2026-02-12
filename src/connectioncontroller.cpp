@@ -267,6 +267,9 @@ void ConnectionController::onSocketConnected() {
 
     quint16 serverVersion = (static_cast<quint16>(serverMagicBytes[6]) << 8) | static_cast<quint16>(serverMagicBytes[7]);
 
+    // Connect socket data handler
+    connect(&pSocket, SIGNAL(readyRead()), this, SLOT(onSocketData()));
+
     CTransaction * loginTransaction = new CTransaction(Transaction::Login, m_taskIdGenerator.next());
     loginTransaction->addParameter(toInt(Parameter::PrivateChat), m_clientState.encodedLogin().length(), m_clientState.encodedLogin().data());
     if(m_clientState.encodedPassword().length() > 0) {
