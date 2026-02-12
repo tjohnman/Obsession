@@ -4,6 +4,7 @@
 #include <QTcpSocket>
 #include <QByteArray>
 #include <vector>
+#include <memory>
 #include "ctransaction.h"
 #include "UserManager.h"
 #include "ServerInfo.h"
@@ -65,7 +66,7 @@ private:
 
     void sendUserInfo();
 
-    CTransaction * receivedTransaction;
+    std::unique_ptr<CTransaction> m_receivedTransaction;
 
     std::map<qint32,quint16> m_UserInfoTaskMap;
 
