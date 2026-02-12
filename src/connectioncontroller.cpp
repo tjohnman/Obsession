@@ -32,7 +32,7 @@ ConnectionController::ConnectionController()
     // TODO: Preferences
     auto& settings = SettingsManager::instance();
     m_clientState.setNickname(settings.value(QString::fromUtf8("nick"), QString::fromUtf8("unnamed")).toString());
-    m_clientState.setIconID((quint16) settings.value("icon", 25096).toString().toShort());
+    m_clientState.setIconID(static_cast<quint16>(settings.value("icon", 25096).toString().toShort()));
 
     m_clientState.setAFK(false);
 
@@ -265,7 +265,7 @@ void ConnectionController::onSocketConnected() {
         return;
     }
 
-    quint16 serverVersion = ((quint16)serverMagicBytes[6] << 8) | (quint16)serverMagicBytes[7];
+    quint16 serverVersion = (static_cast<quint16>(serverMagicBytes[6]) << 8) | static_cast<quint16>(serverMagicBytes[7]);
 
     CTransaction * loginTransaction = new CTransaction(Transaction::Login, m_taskIdGenerator.next());
     loginTransaction->addParameter(toInt(Parameter::PrivateChat), m_clientState.encodedLogin().length(), m_clientState.encodedLogin().data());
@@ -279,7 +279,7 @@ void ConnectionController::onSocketConnected() {
     loginTransaction->addParameter(151, ver);
 
     if(protocol_extensions.pitbull()) {
-        loginTransaction->addParameter(163, 4, (char *)"OBSE");
+        loginTransaction->addParameter(163, 4, const_cast<char*>("OBSE"));
         loginTransaction->addParameter(164, VERSION_MAJOR*10 + VERSION_MINOR);
     }
 
@@ -1056,7 +1056,7 @@ void ConnectionController::handleNewsItemsReply(TransactionParameter*& parameter
                 quint16 _typeshort;
                 memcpy(&_typeshort, parameterBuffer->data(), 2);
                 _typeshort = qFromBigEndian(_typeshort);
-                _type = (unsigned char) _typeshort;
+                _type = static_cast<unsigned char>(_typeshort);
 
                 if(_typeshort == 2) { // Bundle
                     unsigned char ns;

@@ -180,7 +180,7 @@ QByteArray CTransaction::toByteArray() const {
     memcpy(b+12, &len, 4);
     memcpy(b+16, &len, 4);
 
-    qint16 paramNum = qToBigEndian((qint16)pParameters.size());
+    qint16 paramNum = qToBigEndian(static_cast<qint16>(pParameters.size()));
     memcpy(b+20, &paramNum, 2);
 
     qint32 offset = 0;
