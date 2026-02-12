@@ -248,26 +248,20 @@ void ConnectionController::onSocketConnected() {
     char clientMagicBytes[12] = {0x54, 0x52, 0x54, 0x50, 0x48, 0x4f, 0x54, 0x4c, 0x00, 0x01, 0x00, 0x02};
     char serverMagicBytes[8] = {0x54, 0x52, 0x54, 0x50, 0x00, 0x00, 0x00, 0x00};
 
-    qint32 len = pSocket.read(serverMagicBytes, 8);
+    pSocket.write(clientMagicBytes, 12);
+    pSocket.waitForReadyRead(30000);
+    QByteArray response = pSocket.readAll();
 
-    if(len < 8 || memcmp(clientMagicBytes, serverMagicBytes, 4) != 0) {
-        pSocket.close();
-        // emit error
-        return;
+    for(quint32 i=0; i<8; i++) {
+        if(response.data()[i] != serverMagicBytes[i]) {
+            qDebug() << "Handshake failed";
+            return;
+        }
     }
 
-    char errorCode[4];
-    qint32 errorCodeLen = pSocket.read(errorCode, 4);
-
-    if(errorCodeLen != 4 || errorCode[3] != 0) {
-        pSocket.close();
-        // emit error
-        return;
+    if(pSocket.bytesAvailable()) {
+        pSocket.readAll();
     }
-
-    quint16 serverVersion = (static_cast<quint16>(serverMagicBytes[6]) << 8) | static_cast<quint16>(serverMagicBytes[7]);
-
-    // Connect socket data handler
     connect(&pSocket, SIGNAL(readyRead()), this, SLOT(onSocketData()));
 
     CTransaction * loginTransaction = new CTransaction(Transaction::Login, m_taskIdGenerator.next());
