@@ -1,6 +1,7 @@
 #include "downloadmanager.h"
 #include <QSettings>
 #include <QStandardPaths>
+#include <vector>
 #include "dialogerror.h"
 #include "TextHelper.h"
 #include "SettingsManager.h"
@@ -113,22 +114,22 @@ void DownloadManager::sendDownloadRequestToServer(CDownload * download) {
         pathlen += TextHelper::EncodeText(levels.at(i)).size();
     }
 
-    char * pathdata = (char *) malloc(sizeof(char)*pathlen);
+    std::vector<char> pathdata(pathlen);
 
     directorylevels = qToBigEndian(directorylevels);
-    memcpy(pathdata, &directorylevels, 2);
+    memcpy(pathdata.data(), &directorylevels, 2);
 
     qint32 offset = 0;
     for(qint32 i=0; i<levels.count(); i++) {
-        memset(pathdata+offset+2, 0, 2);
+        memset(pathdata.data()+offset+2, 0, 2);
         QString level = levels.at(i);
         unsigned char len = TextHelper::EncodeText(level).size();
 
-        memcpy(pathdata+offset+4, &len, 1);
-        memcpy(pathdata+offset+5, TextHelper::EncodeText(level).data(), len);
+        memcpy(pathdata.data()+offset+4, &len, 1);
+        memcpy(pathdata.data()+offset+5, TextHelper::EncodeText(level).data(), len);
         offset += 3+len;
     }
-    fileRequest->addParameter(202, pathlen, pathdata);
+    fileRequest->addParameter(202, pathlen, pathdata.data());
 
     // Look for existing data
 

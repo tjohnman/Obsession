@@ -7,6 +7,7 @@
 #include <QMimeData>
 #include <QFileDialog>
 #include <QUrl>
+#include <vector>
 
 DialogFileBrowser::DialogFileBrowser(ConnectionController * c, QWidget *parent) :
     QDialog(parent),
@@ -99,22 +100,22 @@ void DialogFileBrowser::load() {
             pathlen += TextHelper::EncodeText(_m_RawNames[level]).length();
         }
 
-        char * pathdata = (char *) malloc(sizeof(char)*pathlen);
+        std::vector<char> pathdata(pathlen);
 
         directorylevels = qToBigEndian(directorylevels);
-        memcpy(pathdata, &directorylevels, 2);
+        memcpy(pathdata.data(), &directorylevels, 2);
 
         qint32 offset = 0;
         for(qint32 i=0; i<levels.count(); i++) {
-            memset(pathdata+offset+2, 0, 2);
+            memset(pathdata.data()+offset+2, 0, 2);
             QString level = levels.at(i);
             unsigned char len = (unsigned char)TextHelper::EncodeText(_m_RawNames[level]).length();
-            memcpy(pathdata+offset+4, &len, 1);
-            memcpy(pathdata+offset+5, TextHelper::EncodeText(_m_RawNames[level]).data(), len);
+            memcpy(pathdata.data()+offset+4, &len, 1);
+            memcpy(pathdata.data()+offset+5, TextHelper::EncodeText(_m_RawNames[level]).data(), len);
             offset += 3+len;
         }
 
-        fileListTransaction->addParameter(202, pathlen, pathdata);
+        fileListTransaction->addParameter(202, pathlen, pathdata.data());
     }
     connection->sendTransaction(fileListTransaction, true);
     ui->label->setText(QString::fromUtf8("loading..."));
@@ -256,23 +257,23 @@ void DialogFileBrowser::requestFileDelete()
         pathlen += TextHelper::EncodeText(_m_RawNames[level]).length();
     }
 
-    char * pathdata = (char *) malloc(sizeof(char)*pathlen);
+    std::vector<char> pathdata(pathlen);
 
     directorylevels = qToBigEndian(directorylevels);
-    memcpy(pathdata, &directorylevels, 2);
+    memcpy(pathdata.data(), &directorylevels, 2);
 
     qint32 offset = 0;
     for(qint32 i=0; i<levels.count(); i++) {
-        memset(pathdata+offset+2, 0, 2);
+        memset(pathdata.data()+offset+2, 0, 2);
         QString level = levels.at(i);
         unsigned char len = (unsigned char)TextHelper::EncodeText(_m_RawNames[level]).length();
 
-        memcpy(pathdata+offset+4, &len, 1);
-        memcpy(pathdata+offset+5, TextHelper::EncodeText(_m_RawNames[level]).data(), len);
+        memcpy(pathdata.data()+offset+4, &len, 1);
+        memcpy(pathdata.data()+offset+5, TextHelper::EncodeText(_m_RawNames[level]).data(), len);
         offset += 3+len;
     }
 
-    transaction->addParameter(202, pathlen, pathdata);
+    transaction->addParameter(202, pathlen, pathdata.data());
 
     connect(connection, SIGNAL(receivedFileDeleteResponse(qint32)), this, SLOT(gotFileDeleteResponse(qint32)));
 
@@ -314,23 +315,23 @@ void DialogFileBrowser::requestUpload() {
         pathlen += TextHelper::EncodeText(_m_RawNames[level]).length();
     }
 
-    char * pathdata = (char *) malloc(sizeof(char)*pathlen);
+    std::vector<char> pathdata(pathlen);
 
     directorylevels = qToBigEndian(directorylevels);
-    memcpy(pathdata, &directorylevels, 2);
+    memcpy(pathdata.data(), &directorylevels, 2);
 
     qint32 offset = 0;
     for(qint32 i=0; i<levels.count(); i++) {
-        memset(pathdata+offset+2, 0, 2);
+        memset(pathdata.data()+offset+2, 0, 2);
         QString level = levels.at(i);
         unsigned char len = (unsigned char)TextHelper::EncodeText(_m_RawNames[level]).length();
 
-        memcpy(pathdata+offset+4, &len, 1);
+        memcpy(pathdata.data()+offset+4, &len, 1);
         qDebug() << TextHelper::EncodeText(_m_RawNames[level]);
-        memcpy(pathdata+offset+5, TextHelper::EncodeText(_m_RawNames[level]).data(), len);
+        memcpy(pathdata.data()+offset+5, TextHelper::EncodeText(_m_RawNames[level]).data(), len);
         offset += 3+len;
     }
-    uploadRequest->addParameter(202, pathlen, pathdata);
+    uploadRequest->addParameter(202, pathlen, pathdata.data());
     uploadRequest->addParameter(108, (quint32)uploadedFile.size());
     connection->sendTransaction(uploadRequest, true);
 

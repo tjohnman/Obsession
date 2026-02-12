@@ -277,6 +277,9 @@ void CTransaction::addParameter(qint16 parameterID, qint16 parameterLength, cons
     pParameters.push_back(new TransactionParameter(newParameter));
     pNumberOfParameters = pParameters.size();
     pDataLength += parameterLength + 4;
+    
+    // Free temporary buffer after TransactionParameter makes its own copy
+    free(newParameter.data);
 }
 
 void CTransaction::addParameter(qint16 parameterID, qint32 parameterData) {

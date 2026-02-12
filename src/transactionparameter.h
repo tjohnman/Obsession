@@ -2,6 +2,7 @@
 #define TRANSACTIONPARAMETER_H
 
 #include <QObject>
+#include <vector>
 #include "defines.h"
 
 class TransactionParameter : public QObject
@@ -9,7 +10,7 @@ class TransactionParameter : public QObject
     Q_OBJECT
 public:
     TransactionParameter(s_parameter parameterData);
-    ~TransactionParameter();
+    ~TransactionParameter() = default;
 
     quint16 id();
     quint16 length();
@@ -25,7 +26,7 @@ private:
     quint16 pId;
     quint16 pLength;
     qint32 pType;
-    char * pData;
+    std::vector<char> m_data;
 };
 
 #endif // TRANSACTIONPARAMETER_H

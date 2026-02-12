@@ -2,6 +2,7 @@
 #include "ui_widgetnews.h"
 #include "ctransaction.h"
 #include <QSettings>
+#include <vector>
 #include "TextHelper.h"
 #include "dialognewnewsmessage.h"
 #include "SettingsManager.h"
@@ -74,22 +75,22 @@ void WidgetNews::getNews() {
                 pathlen += level.length();
             }
 
-            char * pathdata = (char *) malloc(sizeof(char)*pathlen);
+            std::vector<char> pathdata(pathlen);
 
             directorylevels = qToBigEndian(directorylevels);
-            memcpy(pathdata, &directorylevels, 2);
+            memcpy(pathdata.data(), &directorylevels, 2);
 
             qint32 offset = 0;
             for(qint32 i=0; i<levels.count(); i++) {
-                memset(pathdata+offset+2, 0, 2);
+                memset(pathdata.data()+offset+2, 0, 2);
                 QString level = levels.at(i);
                 unsigned char len = level.length();
-                memcpy(pathdata+offset+4, &len, 1);
-                memcpy(pathdata+offset+5, TextHelper::EncodeText(level).data(), len);
+                memcpy(pathdata.data()+offset+4, &len, 1);
+                memcpy(pathdata.data()+offset+5, TextHelper::EncodeText(level).data(), len);
                 offset += 3+len;
             }
 
-            getTransaction->addParameter(325, pathlen, pathdata);
+            getTransaction->addParameter(325, pathlen, pathdata.data());
         }
     }
 

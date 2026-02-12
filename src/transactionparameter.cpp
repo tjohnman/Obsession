@@ -11,12 +11,10 @@ TransactionParameter::TransactionParameter(s_parameter parameterData) {
     pId = parameterData.id;
     pLength = parameterData.length;
     pType = parameterData.type;
-    pData = (char *) malloc(pLength);
-    memcpy(pData, parameterData.data, pLength);
-}
-
-TransactionParameter::~TransactionParameter() {
-    free(pData);
+    
+    // Use vector for automatic memory management
+    m_data.resize(pLength);
+    memcpy(m_data.data(), parameterData.data, pLength);
 }
 
 quint16 TransactionParameter::id() {
@@ -32,8 +30,9 @@ qint32 TransactionParameter::type() {
 }
 
 QString TransactionParameter::toString() {
-    char * buff = (char *) malloc(pLength + 1);
-    memcpy(buff, pData, pLength);
+    // Create a null-terminated copy for string conversion
+    std::vector<char> buff(pLength + 1);
+    memcpy(buff.data(), m_data.data(), pLength);
     buff[pLength] = '\0';
 
     auto& settings = SettingsManager::instance();
@@ -44,31 +43,30 @@ QString TransactionParameter::toString() {
     {
         decoder = QStringDecoder("Apple Roman");
     }
-    QString string = decoder.decode(QByteArrayView(buff, pLength));
-    free(buff);
+    QString string = decoder.decode(QByteArrayView(buff.data(), pLength));
 
     return string;
 }
 
 const char * TransactionParameter::data() {
-    return pData;
+    return m_data.data();
 }
 
 void TransactionParameter::setData(size_t offset, char byte) {
     if (offset >= pLength) return;
-    pData[offset] = byte;
+    m_data[offset] = byte;
 }
 
 quint16 TransactionParameter::toShort() {
     quint16 result;
-    memcpy(&result, pData, 2);
+    memcpy(&result, m_data.data(), 2);
     return qFromBigEndian(result);
 }
 
 quint32 TransactionParameter::toInt() {
     if (pLength < 4) return (quint32) toShort();
     quint32 result;
-    memcpy(&result, pData, 4);
+    memcpy(&result, m_data.data(), 4);
     return qFromBigEndian(result);
 }
 
@@ -80,7 +78,7 @@ QVariant TransactionParameter::value() {
     } else if (pType == TYPE_STRING) {
         return QVariant(toString());
     } else {
-        QByteArray bytes(pData, pLength);
+        QByteArray bytes(m_data.data(), pLength);
         return QVariant(bytes);
     }
 }
