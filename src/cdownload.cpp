@@ -23,7 +23,7 @@ CDownload::CDownload()
     downloadSpeed = 0;
     queuePosition = -1;
     pathOnServer = QString::fromUtf8("/");
-    connection = NULL;
+    connection = nullptr;
     file = new QFile();
     inited = false;
     forced = false;

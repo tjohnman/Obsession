@@ -19,7 +19,7 @@ DownloadManager::DownloadManager(ConnectionController * c)
 
 uint DownloadManager::cleanIdle() {
     quint32 deleted = 1;
-    CDownload * download = NULL;
+    CDownload * download = nullptr;
     while(deleted) {
         deleted = 0;
         for(quint32 i=0; i<downloads.size(); i++) {
@@ -151,7 +151,7 @@ void DownloadManager::sendDownloadRequestToServer(CDownload * download) {
 }
 
 void DownloadManager::onQueueUpdate(quint32 ref, quint32 pos) {
-    CDownload * download = NULL;
+    CDownload * download = nullptr;
     for(quint32 i=0; i<downloads.size(); i++) {
         if(downloads[i]->referenceNumber == ref) {
             download = downloads[i];
@@ -212,21 +212,21 @@ void DownloadManager::onRequestedFile(QString name, qint32 size, QString path) {
 }
 
 void DownloadManager::addDownload(quint32 ref, quint32 size, quint32 queuepos) {
-    CDownload * newDownload = NULL;
+    CDownload * newDownload = nullptr;
     for(quint32 i=0; i<downloads.size(); i++) {
         if(downloads[i]->fileSize == size) {
             newDownload = downloads[i];
         }
     }
 
-    if(newDownload == NULL) {
+    if(newDownload == nullptr) {
         for(quint32 i=0; i<downloads.size(); i++) {
             if(!downloads[i]->matched) {
                 newDownload = downloads[i];
                 break;
             }
         }
-        if(newDownload == NULL) {
+        if(newDownload == nullptr) {
             qDebug() << "Could not match download to file.";
             return;
         }

@@ -13,7 +13,7 @@ UploadManager::UploadManager(ConnectionController * c)
 
 uint UploadManager::cleanIdle() {
     quint32 deleted = 1;
-    CUpload * upload = NULL;
+    CUpload * upload = nullptr;
     while(deleted) {
         deleted = 0;
         for(quint32 i=0; i<uploads.size(); i++) {
@@ -58,7 +58,7 @@ void UploadManager::onRequestedFile(QString name, qint32 size) {
 }
 
 void UploadManager::addUpload(quint32 ref) {
-    CUpload * upload = NULL;
+    CUpload * upload = nullptr;
     for(quint32 i=0; i<uploads.size(); i++) {
         if(uploads[i]->pending) {
             upload = uploads[i];
@@ -66,7 +66,7 @@ void UploadManager::addUpload(quint32 ref) {
         }
     }
 
-    if(upload == NULL) {
+    if(upload == nullptr) {
         qDebug() << "Error. Item was not in upload list.";
     }
 

@@ -34,7 +34,7 @@ ConnectionController::ConnectionController()
     pTaskIDCounter = 0;
 
     pReconnectionAttempts = 0;
-    receivedTransaction = NULL;
+    receivedTransaction = nullptr;
 
     pTimeoutTimer.setSingleShot(true);
     pTimeoutTimer.setInterval(10000);
@@ -174,7 +174,7 @@ s_user * ConnectionController::getUserByUid(qint16 uid) {
             return pUsers[i];
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 s_user * ConnectionController::getUserByName(QString name) {
@@ -183,7 +183,7 @@ s_user * ConnectionController::getUserByName(QString name) {
             return pUsers[i];
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 std::vector<s_user *> * ConnectionController::getUserList() {
@@ -419,7 +419,7 @@ void ConnectionController::onNameChanged() {
 }
 
 void ConnectionController::onSocketData() {
-    if(receivedTransaction == NULL) {
+    if(receivedTransaction == nullptr) {
         QByteArray dataArray = pSocket.read(22);
 
         receivedTransaction = new CTransaction(dataArray.constData());
@@ -651,7 +651,7 @@ void ConnectionController::onSocketData() {
                                 memcpy(newUser->name, parameterBuffer->data() + 8, newUser->nameLength);
                                 newUser->name[newUser->nameLength] = '\0';
 
-                                newUser->infoWindow = NULL;
+                                newUser->infoWindow = nullptr;
 
                                 pUsers.push_back(newUser);
 
@@ -1187,9 +1187,9 @@ void ConnectionController::onSocketData() {
         }
     }
 
-    parameterBuffer = NULL;
+    parameterBuffer = nullptr;
     delete receivedTransaction;
-    receivedTransaction = NULL;
+    receivedTransaction = nullptr;
 
     if(pSocket.bytesAvailable()) {
         onSocketData();

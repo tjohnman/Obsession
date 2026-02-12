@@ -36,7 +36,7 @@ void WidgetNews::clear() {
 }
 
 void WidgetNews::getNews() {
-    CTransaction * getTransaction = NULL;
+    CTransaction * getTransaction = nullptr;
 
     if(!ui->treeWidget->currentItem()) {
         ui->treeWidget->clear();
@@ -149,7 +149,7 @@ void WidgetNews::onNewsArticleText(QString t, QString poster, QString timestamp)
 }
 
 void WidgetNews::onNewsItems(QString _name, quint32 id, quint32 pid) {
-    QTreeWidgetItem * currentItem = NULL;
+    QTreeWidgetItem * currentItem = nullptr;
     if(ui->treeWidget->currentItem()) {
         currentItem = ui->treeWidget->currentItem();
     }
@@ -181,7 +181,7 @@ void WidgetNews::onNewsItems(QString _name, quint32 id, quint32 pid) {
 }
 
 void WidgetNews::onNewsCategory(unsigned char _type, QString _name) {
-    QTreeWidgetItem * currentItem = NULL;
+    QTreeWidgetItem * currentItem = nullptr;
     if(ui->treeWidget->currentItem()) {
         currentItem = ui->treeWidget->currentItem();
     }

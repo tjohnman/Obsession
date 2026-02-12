@@ -609,7 +609,7 @@ void MainWindow::onOpenUserInfo(QString username, QString info, quint16 uid) {
 
     s_user * user = connection->getUserByUid(uid);
     if(user) {
-        if(user->infoWindow == NULL) {
+        if(user->infoWindow == nullptr) {
             user->infoWindow = new DialogUserInfo(uid, connection, this);
         }
         user->infoWindow->gotUserInfo(username, info);
