@@ -192,7 +192,7 @@ QString ConnectionController::serverAgreement() const {
 void ConnectionController::requestUserInfo(quint16 id)
 {
     qint32 task = m_taskIdGenerator.next();
-    m_UserInfoTaskMap[task] = id;
+    m_userInfoTracker.registerRequest(task, id);
     CTransaction * PMTransaction = new CTransaction(Transaction::UserChange, task);
     PMTransaction->addParameter(toInt(Parameter::UserId), id);
     sendTransaction(PMTransaction, true);
@@ -846,7 +846,8 @@ void ConnectionController::handleUserChangeReply(TransactionParameter*& paramete
     TransactionParameter * userInfoParameter = m_receivedTransaction->getParameterById(toInt(Parameter::ChatMessage));
 
     if(userNameParameter && userInfoParameter) {
-        emit gotUserInfo(userNameParameter->toString(), userInfoParameter->toString(), m_UserInfoTaskMap[m_receivedTransaction->taskID()]);
+        emit gotUserInfo(userNameParameter->toString(), userInfoParameter->toString(), 
+                        m_userInfoTracker.getUserIdForTask(m_receivedTransaction->taskID()));
     }
 }
 

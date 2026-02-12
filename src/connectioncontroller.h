@@ -14,6 +14,7 @@
 #include "ConnectionState.h"
 #include "TaskIdGenerator.h"
 #include "NewsProtocolParser.h"
+#include "UserInfoTracker.h"
 #include <QtEndian>
 #include <QDate>
 #include <QTimer>
@@ -64,12 +65,11 @@ private:
     ProtocolExtensions m_protocolExtensions;
     ConnectionState m_connectionState;
     TaskIdGenerator m_taskIdGenerator;
+    UserInfoTracker m_userInfoTracker;
 
     void sendUserInfo();
 
     std::unique_ptr<CTransaction> m_receivedTransaction;
-
-    std::map<qint32,quint16> m_UserInfoTaskMap;
 
     ProtocolExtensions checkForProtocolExtensions();
 
