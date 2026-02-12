@@ -114,6 +114,7 @@ set(HEADERS
     src/DateTimeParser.h
     src/UserManager.h
     src/ServerInfo.h
+    src/TransactionQueue.h
     src/dialogprivileges.h
     src/dialogrequestaccount.h
     src/dialogcreateaccount.h

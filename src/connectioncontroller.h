@@ -7,6 +7,7 @@
 #include "ctransaction.h"
 #include "UserManager.h"
 #include "ServerInfo.h"
+#include "TransactionQueue.h"
 #include <QtEndian>
 #include <QDate>
 #include <QTimer>
@@ -56,7 +57,7 @@ public:
     QByteArray pLogin;
 
 private:
-    std::vector<CTransaction *> pPendingTransactions;
+    TransactionQueue m_transactionQueue;
     UserManager m_userManager;
 
     QByteArray pPassword;

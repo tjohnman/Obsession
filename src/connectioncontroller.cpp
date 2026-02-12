@@ -121,7 +121,7 @@ void ConnectionController::sendTransaction(CTransaction * t, bool expectReply) {
     if(isConnected()) {
         pSocket.write(t->bytes(), t->length());
         if(expectReply) {
-            pPendingTransactions.push_back(t);
+            m_transactionQueue.add(t);
         } else {
             delete t;
         }
@@ -444,9 +444,9 @@ void ConnectionController::onSocketData() {
     }
 
     if(receivedTransaction->isReply()) {
-        for(quint32 i=0; i<pPendingTransactions.size(); i++) {
-            if(receivedTransaction->taskID() == pPendingTransactions[i]->taskID()) {
-                switch(pPendingTransactions[i]->transactionID()) {
+        CTransaction* pendingTrans = m_transactionQueue.findByTaskId(receivedTransaction->taskID());
+        if(pendingTrans) {
+            switch(pendingTrans->transactionID()) {
                 case Transaction::ServerMessage:
                     parameterBuffer = receivedTransaction->getParameterById(toInt(Parameter::ChatMessage));
                     if(parameterBuffer) {
@@ -843,18 +843,10 @@ void ConnectionController::onSocketData() {
                     }
                     break;
                 }
-                pPendingTransactions[i]->done = true;
-            }
+                m_transactionQueue.markComplete(receivedTransaction->taskID());
         }
 
-        for(quint32 i=0; i<pPendingTransactions.size(); i++) {
-            if(pPendingTransactions[i]->done) {
-                CTransaction * t = pPendingTransactions[i];
-                pPendingTransactions[i] = pPendingTransactions.back();
-                pPendingTransactions.pop_back();
-                delete t;
-            }
-        }
+        m_transactionQueue.removeCompleted();
     } else { // NOT A REPLY
         switch(receivedTransaction->transactionID()) {
         case 104:
