@@ -5,18 +5,6 @@
 #include <QSettings>
 #include "SettingsManager.h"
 
-TransactionParameter::TransactionParameter(s_parameter parameterData) {
-    QObject();
-
-    pId = parameterData.id;
-    pLength = parameterData.length;
-    pType = parameterData.type;
-    
-    // Use vector for automatic memory management
-    m_data.resize(pLength);
-    memcpy(m_data.data(), parameterData.data, pLength);
-}
-
 TransactionParameter::TransactionParameter(quint16 id, quint16 length, qint32 type, const char* data) {
     QObject();
 

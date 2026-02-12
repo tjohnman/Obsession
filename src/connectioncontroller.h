@@ -92,8 +92,6 @@ private:
 
     t_protocolExtensions checkForProtocolExtensions();
 
-    //void sendCETIdentification(s_user *);
-
 public slots:
     void reconnect();
     void onSocketConnected();

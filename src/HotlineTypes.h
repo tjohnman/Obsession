@@ -174,34 +174,4 @@ public:
     }
 };
 
-// Legacy type aliases for backward compatibility
-// These will allow gradual migration
-typedef struct {
-    quint16 id;
-    quint16 length;
-    qint32 type;
-    char * data;
-    quint16 shortValue;
-    quint32 intValue;
-} s_parameter;
-
-typedef struct {
-    quint16 id;
-    quint16 icon;
-    QString * iconPath;
-    quint16 flags;
-    quint16 nameLength;
-    char * name;
-    bool doesCET;
-    DialogUserInfo * infoWindow;
-    quint32 orderInList;
-} s_user;
-
-typedef struct {
-    char * type;
-    quint32 size;
-    quint16 nameSize;
-    char * name;
-} s_hotlineFile;
-
 #endif // HOTLINETYPES_H
