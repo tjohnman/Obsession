@@ -23,6 +23,9 @@ ConnectionController::ConnectionController()
     connect(&pSocket, SIGNAL(connected()), this, SLOT(onSocketConnected()));
     connect(&pSocket, SIGNAL(errorOccurred(QAbstractSocket::SocketError)), this, SLOT(onSocketError(QAbstractSocket::SocketError)));
     connect(&pTimeoutTimer, SIGNAL(timeout()), this, SLOT(onConnectionTimedOut()));
+    
+    // Connect UserManager signals
+    connect(&m_userManager, &UserManager::userListChanged, this, &ConnectionController::userListChanged);
 
     pServerAgreement = QString();
 
@@ -173,25 +176,15 @@ void ConnectionController::sendUserInfo() {
 }
 
 s_user * ConnectionController::getUserByUid(qint16 uid) {
-    for(quint32 i=0; i<pUsers.size(); i++) {
-        if(pUsers[i]->id == uid) {
-            return pUsers[i];
-        }
-    }
-    return nullptr;
+    return m_userManager.getUserByUid(uid);
 }
 
 s_user * ConnectionController::getUserByName(QString name) {
-    for(quint32 i=0; i<pUsers.size(); i++) {
-        if(name.contains(QString::fromUtf8(pUsers[i]->name))) {
-            return pUsers[i];
-        }
-    }
-    return nullptr;
+    return m_userManager.getUserByName(name);
 }
 
 std::vector<s_user *> * ConnectionController::getUserList() {
-    return &pUsers;
+    return m_userManager.getUserList();
 }
 
 QString ConnectionController::serverAgreement() {
@@ -623,11 +616,7 @@ void ConnectionController::onSocketData() {
                     }
                     break;
                 case Transaction::GetUserInfo:
-                    while(pUsers.size() > 0) {
-                        s_user * u = pUsers.back();
-                        pUsers.pop_back();
-                        free(u);
-                    }
+                    m_userManager.clearAllUsers();
 
                     for(quint32 i=0; i<receivedTransaction->numberOfParameters(); i++) {
                         parameterBuffer = receivedTransaction->getParameter(i);
@@ -657,9 +646,7 @@ void ConnectionController::onSocketData() {
 
                                 newUser->infoWindow = nullptr;
 
-                                pUsers.push_back(newUser);
-
-                                emit userListChanged();
+                                m_userManager.addUser(newUser);
                             }
                         }
                     }
@@ -1025,11 +1012,10 @@ void ConnectionController::onSocketData() {
                         newUser->nameLength = parameterBuffer->length();
                     }
 
-                    pUsers.push_back(newUser);
+                    m_userManager.addUser(newUser);
                     QString message = QString::fromUtf8("                <b>%1 has joined</b>").arg(TextHelper::DecodeText(newUser->name, newUser->nameLength));
                     emit gotChatMessage(message);
                 }
-                emit userListChanged();
             }
             break;
         case 302:
@@ -1047,17 +1033,8 @@ void ConnectionController::onSocketData() {
 
                 QString message = QString::fromUtf8("                <b>%1 has left</b>").arg(TextHelper::DecodeText(user->name, user->nameLength));
                 emit gotChatMessage(message);
-                for(quint32 i=0; i<pUsers.size(); i++) {
-                    if(pUsers[i]->id == uid) {
-                        pUsers[i] = pUsers.back();
-                        pUsers.pop_back();
-                        break;
-                    }
-                }
-
+                m_userManager.removeUser(uid);
                 delete user;
-
-                emit userListChanged();
             }
             break;
         }
@@ -1073,7 +1050,5 @@ void ConnectionController::onSocketData() {
 }
 
 std::string ConnectionController::getUserHash(s_user * user) {
-    QString string;
-    string.append(QString::fromUtf8(user->name));
-    return string.toStdString();
+    return m_userManager.getUserHash(user);
 }

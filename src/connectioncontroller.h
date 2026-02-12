@@ -5,6 +5,7 @@
 #include <QByteArray>
 #include <vector>
 #include "ctransaction.h"
+#include "UserManager.h"
 #include <QtEndian>
 #include <QDate>
 #include <QTimer>
@@ -39,6 +40,8 @@ public:
     s_user * getUserByName(QString name);
     std::vector<s_user *> * getUserList();
 
+    UserManager* userManager() { return &m_userManager; }
+
     CTransaction * createTransaction(qint16 id);
 
     std::string getUserHash(s_user *);
@@ -53,7 +56,7 @@ public:
 
 private:
     std::vector<CTransaction *> pPendingTransactions;
-    std::vector<s_user *> pUsers;
+    UserManager m_userManager;
 
     QByteArray pPassword;
     quint16 pIconID;

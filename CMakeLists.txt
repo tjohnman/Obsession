@@ -111,6 +111,7 @@ set(HEADERS
     src/FileTypeMapper.h
     src/HotlineProtocol.h
     src/DateTimeParser.h
+    src/UserManager.h
     src/dialogprivileges.h
     src/dialogrequestaccount.h
     src/dialogcreateaccount.h
