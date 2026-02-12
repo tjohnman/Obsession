@@ -557,46 +557,8 @@ void ConnectionController::onSocketData() {
                     }
                     break;
                 case Transaction::GetFileInfo:
-                    {
-                    quint32 transferSize = 0;
-                    quint32 referenceNumber = 0;
-
-                    parameterBuffer = m_receivedTransaction->getParameterById(207);
-                    if(parameterBuffer) {
-                        transferSize = parameterBuffer->toInt();
-                    } else {
-                        parameterBuffer = m_receivedTransaction->getParameterById(108);
-                        if(parameterBuffer) {
-                            transferSize = parameterBuffer->toInt();
-                        }
-                    }
-                    parameterBuffer = m_receivedTransaction->getParameterById(toInt(Parameter::ReferenceNumber));
-                    if(parameterBuffer) {
-                        referenceNumber = parameterBuffer->toInt();
-                    }
-
-                    parameterBuffer = m_receivedTransaction->getParameterById(toInt(Parameter::QueuePosition));
-                    quint32 queuePosition = 0;
-                    if(parameterBuffer) {
-                        quint16 squeue = 0;
-                        quint32 iqueue = 0;
-                        if(parameterBuffer->type() == TYPE_SHORT) {
-                            squeue = parameterBuffer->toShort();
-                        } else {
-                            iqueue = parameterBuffer->toInt();
-                        }
-                        if(squeue > 0) {
-                            queuePosition = squeue;
-                        }
-                        if(iqueue > 0) {
-                            queuePosition = iqueue;
-                        }
-                    }
-
-
-                    emit gotFile(referenceNumber, transferSize, queuePosition);
+                    handleGetFileInfoReply(parameterBuffer);
                     break;
-                    }
                 case Transaction::DownloadFile:
                     handleDownloadFileReply(parameterBuffer);
                     break;
@@ -839,16 +801,7 @@ void ConnectionController::onSocketData() {
     } else { // NOT A REPLY
         switch(m_receivedTransaction->transactionID()) {
         case 104:
-            parameterBuffer = m_receivedTransaction->getParameterById(toInt(Parameter::UserId));
-            if(parameterBuffer && m_receivedTransaction->getParameterById(toInt(Parameter::ChatMessage))) {
-                quint16 uid = parameterBuffer->toShort();
-                emit gotPM(m_receivedTransaction->getParameterById(toInt(Parameter::ChatMessage))->toString(), uid);
-            } else {
-                parameterBuffer = m_receivedTransaction->getParameterById(toInt(Parameter::ChatMessage));
-                if(parameterBuffer) {
-                    emit serverError(parameterBuffer->toString());
-                }
-            }
+            handlePrivateMessage(parameterBuffer);
             break;
         case 106:
             handleChatMessage(parameterBuffer);
@@ -867,34 +820,8 @@ void ConnectionController::onSocketData() {
             break;
 
         case 211:
-            {
-                quint32 referenceNumber = -1;
-                parameterBuffer = m_receivedTransaction->getParameterById(toInt(Parameter::ReferenceNumber));
-                if(parameterBuffer) {
-                    referenceNumber = parameterBuffer->toInt();
-                }
-
-                parameterBuffer = m_receivedTransaction->getParameterById(toInt(Parameter::QueuePosition));
-                quint32 queuePosition = 0;
-                if(parameterBuffer) {
-                    quint16 squeue = 0;
-                    quint32 iqueue = 0;
-                    if(parameterBuffer->type() == TYPE_SHORT) {
-                        squeue = parameterBuffer->toShort();
-                    } else {
-                        iqueue = parameterBuffer->toInt();
-                    }
-                    if(squeue > 0) {
-                        queuePosition = squeue;
-                    }
-                    if(iqueue > 0) {
-                        queuePosition = iqueue;
-                    }
-                }
-
-                emit serverUpdatedQueue(referenceNumber, queuePosition);
-                break;
-            }
+            handleQueueUpdate(parameterBuffer);
+            break;
 
         case 301:
             if(m_receivedTransaction->getParameterById(toInt(Parameter::UserId))) {
@@ -975,23 +902,7 @@ void ConnectionController::onSocketData() {
             }
             break;
         case 302:
-            parameterBuffer = m_receivedTransaction->getParameterById(toInt(Parameter::UserId));
-            if(parameterBuffer) {
-                quint16 uid = parameterBuffer->toShort();
-                HotlineUser * user = getUserByUid(uid);
-
-                if(!user) {
-                    // Server reported user left, but it was never here to begin with.
-                    break;
-                }
-
-                emit userLeft(user);
-
-                QByteArray nameUtf8 = user->name.toUtf8();
-                QString message = QString::fromUtf8("                <b>%1 has left</b>").arg(TextHelper::DecodeText(nameUtf8.constData(), nameUtf8.length()));
-                emit gotChatMessage(message);
-                m_userManager.removeUser(uid);
-            }
+            handleUserDisconnected(parameterBuffer);
             break;
         }
     }
@@ -1028,7 +939,59 @@ void ConnectionController::handleDownloadFileReply(TransactionParameter*& parame
     }
 }
 
+void ConnectionController::handleGetFileInfoReply(TransactionParameter*& parameterBuffer) {
+    quint32 transferSize = 0;
+    quint32 referenceNumber = 0;
+
+    parameterBuffer = m_receivedTransaction->getParameterById(207);
+    if(parameterBuffer) {
+        transferSize = parameterBuffer->toInt();
+    } else {
+        parameterBuffer = m_receivedTransaction->getParameterById(108);
+        if(parameterBuffer) {
+            transferSize = parameterBuffer->toInt();
+        }
+    }
+    parameterBuffer = m_receivedTransaction->getParameterById(toInt(Parameter::ReferenceNumber));
+    if(parameterBuffer) {
+        referenceNumber = parameterBuffer->toInt();
+    }
+
+    parameterBuffer = m_receivedTransaction->getParameterById(toInt(Parameter::QueuePosition));
+    quint32 queuePosition = 0;
+    if(parameterBuffer) {
+        quint16 squeue = 0;
+        quint32 iqueue = 0;
+        if(parameterBuffer->type() == TYPE_SHORT) {
+            squeue = parameterBuffer->toShort();
+        } else {
+            iqueue = parameterBuffer->toInt();
+        }
+        if(squeue > 0) {
+            queuePosition = squeue;
+        }
+        if(iqueue > 0) {
+            queuePosition = iqueue;
+        }
+    }
+
+    emit gotFile(referenceNumber, transferSize, queuePosition);
+}
+
 // Non-reply Transaction Handlers
+
+void ConnectionController::handlePrivateMessage(TransactionParameter*& parameterBuffer) {
+    parameterBuffer = m_receivedTransaction->getParameterById(toInt(Parameter::UserId));
+    if(parameterBuffer && m_receivedTransaction->getParameterById(toInt(Parameter::ChatMessage))) {
+        quint16 uid = parameterBuffer->toShort();
+        emit gotPM(m_receivedTransaction->getParameterById(toInt(Parameter::ChatMessage))->toString(), uid);
+    } else {
+        parameterBuffer = m_receivedTransaction->getParameterById(toInt(Parameter::ChatMessage));
+        if(parameterBuffer) {
+            emit serverError(parameterBuffer->toString());
+        }
+    }
+}
 
 void ConnectionController::handleChatMessage(TransactionParameter*& parameterBuffer) {
     parameterBuffer = m_receivedTransaction->getParameterById(toInt(Parameter::ChatMessage));
@@ -1063,6 +1026,54 @@ void ConnectionController::handleServerBanner(TransactionParameter*& parameterBu
             m_serverInfo.bannerURL() = parameterBuffer->toString();
             emit gotServerBannerURL(m_serverInfo.bannerURL());
         }
+    }
+}
+
+void ConnectionController::handleQueueUpdate(TransactionParameter*& parameterBuffer) {
+    quint32 referenceNumber = -1;
+    parameterBuffer = m_receivedTransaction->getParameterById(toInt(Parameter::ReferenceNumber));
+    if(parameterBuffer) {
+        referenceNumber = parameterBuffer->toInt();
+    }
+
+    parameterBuffer = m_receivedTransaction->getParameterById(toInt(Parameter::QueuePosition));
+    quint32 queuePosition = 0;
+    if(parameterBuffer) {
+        quint16 squeue = 0;
+        quint32 iqueue = 0;
+        if(parameterBuffer->type() == TYPE_SHORT) {
+            squeue = parameterBuffer->toShort();
+        } else {
+            iqueue = parameterBuffer->toInt();
+        }
+        if(squeue > 0) {
+            queuePosition = squeue;
+        }
+        if(iqueue > 0) {
+            queuePosition = iqueue;
+        }
+    }
+
+    emit serverUpdatedQueue(referenceNumber, queuePosition);
+}
+
+void ConnectionController::handleUserDisconnected(TransactionParameter*& parameterBuffer) {
+    parameterBuffer = m_receivedTransaction->getParameterById(toInt(Parameter::UserId));
+    if(parameterBuffer) {
+        quint16 uid = parameterBuffer->toShort();
+        HotlineUser * user = getUserByUid(uid);
+
+        if(!user) {
+            // Server reported user left, but it was never here to begin with.
+            return;
+        }
+
+        emit userLeft(user);
+
+        QByteArray nameUtf8 = user->name.toUtf8();
+        QString message = QString::fromUtf8("                <b>%1 has left</b>").arg(TextHelper::DecodeText(nameUtf8.constData(), nameUtf8.length()));
+        emit gotChatMessage(message);
+        m_userManager.removeUser(uid);
     }
 }
 
