@@ -450,111 +450,13 @@ void ConnectionController::onSocketData() {
                     handleServerMessageReply(parameterBuffer);
                     break;
                 case Transaction::Login:
-                    {
-                    auto& settings = SettingsManager::instance();
-                    m_clientState.setNickname(settings.value(QString::fromUtf8("nick"), QString::fromUtf8("unnamed")).toString());
-
-                    sendUserInfo();
-
-                    if(m_receivedTransaction->errorCode() == 0) {
-                        parameterBuffer = m_receivedTransaction->getParameterById(toInt(Parameter::ServerBanner));
-                        if(parameterBuffer) {
-                            if(parameterBuffer->type() == TYPE_STRING) {
-                                m_serverInfo.name() = parameterBuffer->toString();
-                                if(!m_serverInfo.name().isEmpty() && m_serverInfo.name() != QString::fromUtf8(" "))
-                                {
-                                    emit gotServerName();
-                                    emit gotChatMessage(QString::fromUtf8("                <b>Connected to %1</b>").arg(m_serverInfo.name()));
-                                }
-                                else
-                                {
-                                    m_serverInfo.name() = QString::fromUtf8("");
-                                    emit gotChatMessage(QString::fromUtf8("                <b>Connected to %1</b>").arg(m_serverInfo.address()));
-                                }
-                            }
-                            else
-                            {
-                                m_serverInfo.name() = QString::fromUtf8("");
-                                emit gotChatMessage(QString::fromUtf8("                <b>Connection established</b>"));
-                            }
-                        }
-                        else
-                        {
-                            m_serverInfo.name() = QString::fromUtf8("");
-                            emit gotChatMessage(QString::fromUtf8("                <b>Connection established</b>"));
-                        }
-
-                        requestUserList();
-                    }
+                    handleLoginReply(parameterBuffer);
                     break;
-                    }
                 case Transaction::AgreementAccepted:
-                    if(m_protocolExtensions.pitbull()) {
-                    /*
-                    125 is sending an image
-                    126 is recieving one
-                    ￼
-                    // Set Parameters
-                    Parameters.AddString(HFieldType.FileName, fileName);
-                    Parameters.AddBinary(HFieldType.Data, HUtils.ImageToByteArray(image, image.RawFormat));
-                    if (chatId != 0)
-                    Parameters.AddUInt32(HFieldType.ChatId, chatId);
-                    if (opts != 0)
-                    Parameters.AddUInt32(HFieldType.Options, opts);
-                    ￼
-                    fields for sending
-                    ￼
-                    p.AddBinary(HFieldType.UserStamp, client.ToUserStamp().ToBinary());
-                    p.AddString(HFieldType.FileName, fileName);
-                    p.AddBinary(HFieldType.Data, data);
-                    if (opts != 0)
-                    p.AddUInt32(HFieldType.Options, opts);
-                    ￼
-                    fields for recieving
-                    ￼
-                    UserStamp is a special type pitbull uses
-                    ￼
-                    it bascialy contains a username, id, info etc etc
-                    */
-
-                    /*
-                    theres a seperate transaction to send an image to private chat
-                    ￼
-                    SendImg = 123, // Client [Pitbull]
-                    ServerImg = 124, // Server [Pitbull]
-                    */
-                    }
+                    handleAgreementAcceptedReply();
                     break;
                 case Transaction::GetFileListReply:
-                    {
-                    std::vector<HotlineFile *> fileList;
-                    for(quint32 i=0; i<m_receivedTransaction->numberOfParameters(); i++) {
-                        parameterBuffer = m_receivedTransaction->getParameter(i);
-                        if(parameterBuffer) {
-                            if(parameterBuffer->id() == 200) {
-                                HotlineFile * file = new HotlineFile();
-
-                                // Extract 4-byte type code
-                                file->type = QString::fromLatin1(parameterBuffer->data(), 4);
-
-                                // Extract size
-                                memcpy(&file->size, parameterBuffer->data()+8, 4);
-                                file->size = qFromBigEndian(file->size);
-
-                                // Extract name
-                                quint16 nameSize;
-                                memcpy(&nameSize, parameterBuffer->data()+18, 2);
-                                nameSize = qFromBigEndian(nameSize);
-                                
-                                file->name = QString::fromUtf8(parameterBuffer->data()+20, nameSize);
-
-                                fileList.push_back(file);
-                            }
-                        }
-                    }
-
-                    emit gotFileList(fileList);
-                    }
+                    handleGetFileListReply(parameterBuffer);
                     break;
                 case Transaction::GetFileInfo:
                     handleGetFileInfoReply(parameterBuffer);
@@ -566,81 +468,13 @@ void ConnectionController::onSocketData() {
                     handleDeleteFileReply();
                     break;
                 case Transaction::GetUserInfo:
-                    m_userManager.clearAllUsers();
-
-                    for(quint32 i=0; i<m_receivedTransaction->numberOfParameters(); i++) {
-                        parameterBuffer = m_receivedTransaction->getParameter(i);
-                        if(parameterBuffer) {
-                            if(parameterBuffer->id() == 300) {
-                                HotlineUser * newUser = new HotlineUser();
-
-                                memcpy(&newUser->id, parameterBuffer->data(), 2);
-                                newUser->id = qFromBigEndian(newUser->id);
-
-                                memcpy(&newUser->icon, parameterBuffer->data() + 2, 2);
-                                newUser->icon = qFromBigEndian(newUser->icon);
-
-                                newUser->doesCET = false;
-
-                                newUser->iconPath = std::make_unique<QString>(QString::fromUtf8(":/icons/") + QString::number(newUser->icon) + QString::fromUtf8(".png"));
-
-                                memcpy(&newUser->flags, parameterBuffer->data() + 4, 2);
-                                newUser->flags = qFromBigEndian(newUser->flags);
-
-                                quint16 nameLength;
-                                memcpy(&nameLength, parameterBuffer->data() + 6, 2);
-                                nameLength = qFromBigEndian(nameLength);
-
-                                newUser->name = QString::fromUtf8(parameterBuffer->data() + 8, nameLength);
-
-                                newUser->infoWindow = nullptr;
-
-                                m_userManager.addUser(newUser);
-                            }
-                        }
-                    }
-
-                 break;
+                    handleGetUserInfoReply(parameterBuffer);
+                    break;
                 case Transaction::UserChange:
-                {
-                    TransactionParameter * userNameParameter = m_receivedTransaction->getParameterById(toInt(Parameter::UserLogin));
-                    TransactionParameter * userInfoParameter = m_receivedTransaction->getParameterById(toInt(Parameter::ChatMessage));
-
-                    if(userNameParameter && userInfoParameter) {
-                        emit gotUserInfo(userNameParameter->toString(), userInfoParameter->toString(), m_UserInfoTaskMap[m_receivedTransaction->taskID()]);
-                    }
-                }
-                break;
+                    handleUserChangeReply(parameterBuffer);
+                    break;
                 case Transaction::GetNewsCategoryListReply:
-                {
-                    parameterBuffer = m_receivedTransaction->getParameterById(toInt(Parameter::UserData));
-                    TransactionParameter * loginParameter = m_receivedTransaction->getParameterById(toInt(Parameter::PrivateChat));
-                    if(parameterBuffer && loginParameter)
-                    {
-                        for(int i=0; i<loginParameter->length(); ++i)
-                        {
-                            loginParameter->setData(i, 255 - loginParameter->data()[i]);
-                        }
-                        QString login = TextHelper::DecodeText(loginParameter->data(), loginParameter->length());
-
-                        quint8 permissions[8];
-                        memset(permissions, 0, 8);
-                        memcpy(&permissions[0], parameterBuffer->data(), 1);
-                        memcpy(&permissions[1], parameterBuffer->data()+1, 1);
-                        memcpy(&permissions[2], parameterBuffer->data()+2, 1);
-                        memcpy(&permissions[3], parameterBuffer->data()+3, 1);
-                        memcpy(&permissions[4], parameterBuffer->data()+4, 1);
-                        memcpy(&permissions[5], parameterBuffer->data()+5, 1);
-                        memcpy(&permissions[6], parameterBuffer->data()+6, 1);
-                        memcpy(&permissions[7], parameterBuffer->data()+7, 1);
-
-                        TransactionParameter * passwordParameter = m_receivedTransaction->getParameterById(toInt(Parameter::UserPassword));
-                        if (passwordParameter) {
-                            QString password = passwordParameter->toString();
-                            emit gotPermissions(login, password, permissions[0], permissions[1], permissions[2], permissions[3], permissions[4], permissions[5], permissions[6], permissions[7]);
-                        }
-                    }
-                }
+                    handleGetNewsCategoryListReply(parameterBuffer);
                     break;
                  case 355:
                     {
@@ -765,33 +599,7 @@ void ConnectionController::onSocketData() {
                     }
                 break;
                 case Transaction::UploadFileReply:
-                    {
-                        QString text, poster, timestamp;
-                        char * t;
-
-                        parameterBuffer = m_receivedTransaction->getParameterById(toInt(Parameter::NewsArticleData));
-                        if(parameterBuffer) {
-                            t = (char *) malloc(parameterBuffer->length()+1);
-                            memcpy(t, parameterBuffer->data(), parameterBuffer->length());
-                            t[parameterBuffer->length()] = '\0';
-                            text = QString::fromUtf8(t);
-                            free(t);
-                        }
-                        parameterBuffer = m_receivedTransaction->getParameterById(toInt(Parameter::NewsArticleDate));
-                        if(parameterBuffer) {
-                            t = (char *) malloc(parameterBuffer->length()+1);
-                            memcpy(t, parameterBuffer->data(), parameterBuffer->length());
-                            t[parameterBuffer->length()] = '\0';
-                            poster = QString::fromUtf8(t);
-                            free(t);
-                        }
-                        parameterBuffer = m_receivedTransaction->getParameterById(toInt(Parameter::NewsArticleParent));
-                        if(parameterBuffer) {
-                            timestamp = DateTimeParser::parseAndFormat(parameterBuffer->data());
-                        }
-
-                        emit gotNewsArticleText(text, poster, timestamp);
-                    }
+                    handleUploadFileReply(parameterBuffer);
                     break;
                 }
                 m_transactionQueue.markComplete(m_receivedTransaction->taskID());
@@ -1075,5 +883,214 @@ void ConnectionController::handleUserDisconnected(TransactionParameter*& paramet
         emit gotChatMessage(message);
         m_userManager.removeUser(uid);
     }
+}
+
+void ConnectionController::handleGetFileListReply(TransactionParameter*& parameterBuffer) {
+    std::vector<HotlineFile *> fileList;
+    for(quint32 i=0; i<m_receivedTransaction->numberOfParameters(); i++) {
+        parameterBuffer = m_receivedTransaction->getParameter(i);
+        if(parameterBuffer) {
+            if(parameterBuffer->id() == 200) {
+                HotlineFile * file = new HotlineFile();
+
+                // Extract 4-byte type code
+                file->type = QString::fromLatin1(parameterBuffer->data(), 4);
+
+                // Extract size
+                memcpy(&file->size, parameterBuffer->data()+8, 4);
+                file->size = qFromBigEndian(file->size);
+
+                // Extract name
+                quint16 nameSize;
+                memcpy(&nameSize, parameterBuffer->data()+18, 2);
+                nameSize = qFromBigEndian(nameSize);
+                
+                file->name = QString::fromUtf8(parameterBuffer->data()+20, nameSize);
+
+                fileList.push_back(file);
+            }
+        }
+    }
+
+    emit gotFileList(fileList);
+}
+
+void ConnectionController::handleGetUserInfoReply(TransactionParameter*& parameterBuffer) {
+    m_userManager.clearAllUsers();
+
+    for(quint32 i=0; i<m_receivedTransaction->numberOfParameters(); i++) {
+        parameterBuffer = m_receivedTransaction->getParameter(i);
+        if(parameterBuffer) {
+            if(parameterBuffer->id() == 300) {
+                HotlineUser * newUser = new HotlineUser();
+
+                memcpy(&newUser->id, parameterBuffer->data(), 2);
+                newUser->id = qFromBigEndian(newUser->id);
+
+                memcpy(&newUser->icon, parameterBuffer->data() + 2, 2);
+                newUser->icon = qFromBigEndian(newUser->icon);
+
+                newUser->doesCET = false;
+
+                newUser->iconPath = std::make_unique<QString>(QString::fromUtf8(":/icons/") + QString::number(newUser->icon) + QString::fromUtf8(".png"));
+
+                memcpy(&newUser->flags, parameterBuffer->data() + 4, 2);
+                newUser->flags = qFromBigEndian(newUser->flags);
+
+                quint16 nameLength;
+                memcpy(&nameLength, parameterBuffer->data() + 6, 2);
+                nameLength = qFromBigEndian(nameLength);
+
+                newUser->name = QString::fromUtf8(parameterBuffer->data() + 8, nameLength);
+
+                newUser->infoWindow = nullptr;
+
+                m_userManager.addUser(newUser);
+            }
+        }
+    }
+}
+
+void ConnectionController::handleUserChangeReply(TransactionParameter*& parameterBuffer) {
+    TransactionParameter * userNameParameter = m_receivedTransaction->getParameterById(toInt(Parameter::UserLogin));
+    TransactionParameter * userInfoParameter = m_receivedTransaction->getParameterById(toInt(Parameter::ChatMessage));
+
+    if(userNameParameter && userInfoParameter) {
+        emit gotUserInfo(userNameParameter->toString(), userInfoParameter->toString(), m_UserInfoTaskMap[m_receivedTransaction->taskID()]);
+    }
+}
+
+void ConnectionController::handleLoginReply(TransactionParameter*& parameterBuffer) {
+    auto& settings = SettingsManager::instance();
+    m_clientState.setNickname(settings.value(QString::fromUtf8("nick"), QString::fromUtf8("unnamed")).toString());
+
+    sendUserInfo();
+
+    if(m_receivedTransaction->errorCode() == 0) {
+        parameterBuffer = m_receivedTransaction->getParameterById(toInt(Parameter::ServerBanner));
+        if(parameterBuffer) {
+            if(parameterBuffer->type() == TYPE_STRING) {
+                m_serverInfo.name() = parameterBuffer->toString();
+                if(!m_serverInfo.name().isEmpty() && m_serverInfo.name() != QString::fromUtf8(" "))
+                {
+                    emit gotServerName();
+                    emit gotChatMessage(QString::fromUtf8("                <b>Connected to %1</b>").arg(m_serverInfo.name()));
+                }
+                else
+                {
+                    m_serverInfo.name() = QString::fromUtf8("");
+                    emit gotChatMessage(QString::fromUtf8("                <b>Connected to %1</b>").arg(m_serverInfo.address()));
+                }
+            }
+            else
+            {
+                m_serverInfo.name() = QString::fromUtf8("");
+                emit gotChatMessage(QString::fromUtf8("                <b>Connection established</b>"));
+            }
+        }
+        else
+        {
+            m_serverInfo.name() = QString::fromUtf8("");
+            emit gotChatMessage(QString::fromUtf8("                <b>Connection established</b>"));
+        }
+
+        requestUserList();
+    }
+}
+
+void ConnectionController::handleAgreementAcceptedReply() {
+    if(m_protocolExtensions.pitbull()) {
+    /*
+    125 is sending an image
+    126 is recieving one
+    ￼
+    // Set Parameters
+    Parameters.AddString(HFieldType.FileName, fileName);
+    Parameters.AddBinary(HFieldType.Data, HUtils.ImageToByteArray(image, image.RawFormat));
+    if (chatId != 0)
+    Parameters.AddUInt32(HFieldType.ChatId, chatId);
+    if (opts != 0)
+    Parameters.AddUInt32(HFieldType.Options, opts);
+    ￼
+    fields for sending
+    ￼
+    p.AddBinary(HFieldType.UserStamp, client.ToUserStamp().ToBinary());
+    p.AddString(HFieldType.FileName, fileName);
+    p.AddBinary(HFieldType.Data, data);
+    if (opts != 0)
+    p.AddUInt32(HFieldType.Options, opts);
+    ￼
+    fields for recieving
+    ￼
+    UserStamp is a special type pitbull uses
+    ￼
+    it bascialy contains a username, id, info etc etc
+    */
+
+    /*
+    theres a seperate transaction to send an image to private chat
+    ￼
+    SendImg = 123, // Client [Pitbull]
+    ServerImg = 124, // Server [Pitbull]
+    */
+    }
+}
+
+void ConnectionController::handleGetNewsCategoryListReply(TransactionParameter*& parameterBuffer) {
+    parameterBuffer = m_receivedTransaction->getParameterById(toInt(Parameter::UserData));
+    TransactionParameter * loginParameter = m_receivedTransaction->getParameterById(toInt(Parameter::PrivateChat));
+    if(parameterBuffer && loginParameter)
+    {
+        for(int i=0; i<loginParameter->length(); ++i)
+        {
+            loginParameter->setData(i, 255 - loginParameter->data()[i]);
+        }
+        QString login = TextHelper::DecodeText(loginParameter->data(), loginParameter->length());
+
+        quint8 permissions[8];
+        memset(permissions, 0, 8);
+        memcpy(&permissions[0], parameterBuffer->data(), 1);
+        memcpy(&permissions[1], parameterBuffer->data()+1, 1);
+        memcpy(&permissions[2], parameterBuffer->data()+2, 1);
+        memcpy(&permissions[3], parameterBuffer->data()+3, 1);
+        memcpy(&permissions[4], parameterBuffer->data()+4, 1);
+        memcpy(&permissions[5], parameterBuffer->data()+5, 1);
+        memcpy(&permissions[6], parameterBuffer->data()+6, 1);
+        memcpy(&permissions[7], parameterBuffer->data()+7, 1);
+
+        TransactionParameter * passwordParameter = m_receivedTransaction->getParameterById(toInt(Parameter::UserPassword));
+        if (passwordParameter) {
+            QString password = passwordParameter->toString();
+            emit gotPermissions(login, password, permissions[0], permissions[1], permissions[2], permissions[3], permissions[4], permissions[5], permissions[6], permissions[7]);
+        }
+    }
+}
+
+void ConnectionController::handleUploadFileReply(TransactionParameter*& parameterBuffer) {
+    QString text, poster, timestamp;
+    char * t;
+
+    parameterBuffer = m_receivedTransaction->getParameterById(toInt(Parameter::NewsArticleData));
+    if(parameterBuffer) {
+        t = (char *) malloc(parameterBuffer->length()+1);
+        memcpy(t, parameterBuffer->data(), parameterBuffer->length());
+        t[parameterBuffer->length()] = '\0';
+        text = QString::fromUtf8(t);
+        free(t);
+    }
+    parameterBuffer = m_receivedTransaction->getParameterById(toInt(Parameter::NewsArticleDate));
+    if(parameterBuffer) {
+        t = (char *) malloc(parameterBuffer->length()+1);
+        memcpy(t, parameterBuffer->data(), parameterBuffer->length());
+        t[parameterBuffer->length()] = '\0';
+        poster = QString::fromUtf8(t);
+        free(t);
+    }
+    parameterBuffer = m_receivedTransaction->getParameterById(toInt(Parameter::NewsArticleParent));
+    if(parameterBuffer) {
+        timestamp = DateTimeParser::parseAndFormat(parameterBuffer->data());
+    }
+
+    emit gotNewsArticleText(text, poster, timestamp);
 }
 

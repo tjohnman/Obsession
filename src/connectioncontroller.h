@@ -77,6 +77,13 @@ private:
     void handleDeleteFileReply();
     void handleDownloadFileReply(TransactionParameter*& parameterBuffer);
     void handleGetFileInfoReply(TransactionParameter*& parameterBuffer);
+    void handleLoginReply(TransactionParameter*& parameterBuffer);
+    void handleAgreementAcceptedReply();
+    void handleGetFileListReply(TransactionParameter*& parameterBuffer);
+    void handleGetUserInfoReply(TransactionParameter*& parameterBuffer);
+    void handleUserChangeReply(TransactionParameter*& parameterBuffer);
+    void handleGetNewsCategoryListReply(TransactionParameter*& parameterBuffer);
+    void handleUploadFileReply(TransactionParameter*& parameterBuffer);
 
     // Non-reply transaction handlers
     void handlePrivateMessage(TransactionParameter*& parameterBuffer);
@@ -86,6 +93,7 @@ private:
     void handleServerBanner(TransactionParameter*& parameterBuffer);
     void handleQueueUpdate(TransactionParameter*& parameterBuffer);
     void handleUserDisconnected(TransactionParameter*& parameterBuffer);
+    void handleUserJoinOrUpdate(TransactionParameter*& parameterBuffer);
 
 public slots:
     void reconnect();
