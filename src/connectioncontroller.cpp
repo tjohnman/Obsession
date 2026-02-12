@@ -632,82 +632,7 @@ void ConnectionController::onSocketData() {
             break;
 
         case 301:
-            if(m_receivedTransaction->getParameterById(toInt(Parameter::UserId))) {
-                parameterBuffer = m_receivedTransaction->getParameterById(toInt(Parameter::UserId));
-
-                if(!parameterBuffer) {
-                    break;
-                }
-
-                quint16 uid = parameterBuffer->toShort();
-
-                HotlineUser * user = getUserByUid(uid);
-                if(user) { // Update user
-                    parameterBuffer = m_receivedTransaction->getParameterById(toInt(Parameter::UserIconId));
-                    if(parameterBuffer) {
-                        quint16 newIcon = parameterBuffer->toShort();
-
-                        if(user->icon == 3520 && newIcon != 3520) {
-                            user->doesCET = true;
-                            //sendCETIdentification(user);
-                        } else {
-                            user->doesCET = false;
-                        }
-
-                        user->icon = newIcon;
-                        user->iconPath = std::make_unique<QString>(QString::fromUtf8(":/icons/") + QString::number(user->icon) + QString::fromUtf8(".png"));
-                    }
-
-                    parameterBuffer = m_receivedTransaction->getParameterById(toInt(Parameter::UserFlags));
-                    if(parameterBuffer) {
-                        user->flags = parameterBuffer->toShort();
-                    }
-
-                    parameterBuffer = m_receivedTransaction->getParameterById(toInt(Parameter::UserLogin));
-
-                    if(parameterBuffer) {
-                        QByteArray oldNameUtf8 = user->name.toUtf8();
-                        QString oldName = TextHelper::DecodeText(oldNameUtf8.constData(), oldNameUtf8.length());
-
-                        user->name = QString::fromUtf8(parameterBuffer->data(), parameterBuffer->length());
-
-                        QByteArray newNameUtf8 = user->name.toUtf8();
-                        QString newName = TextHelper::DecodeText(newNameUtf8.constData(), newNameUtf8.length());
-                        QString message = QString::fromUtf8("                <b>%1 is now known as %2</b>").arg(oldName, newName);
-
-                        if(oldName != newName)
-                        {
-                            emit userChangedName(oldName, newName);
-                            emit gotChatMessage(message);
-                        }
-                    }
-
-                } else { // New user
-                    HotlineUser * newUser = new HotlineUser();
-                    newUser->id = uid;
-
-                    parameterBuffer = m_receivedTransaction->getParameterById(toInt(Parameter::UserIconId));
-                    if(parameterBuffer) {
-                        newUser->icon = parameterBuffer->toShort();
-                        newUser->iconPath = std::make_unique<QString>(QString::fromUtf8("icons/") + QString::number(newUser->icon) + QString::fromUtf8(".png"));
-                    }
-
-                    parameterBuffer = m_receivedTransaction->getParameterById(toInt(Parameter::UserFlags));
-                    if(parameterBuffer) {
-                        newUser->flags = parameterBuffer->toShort();
-                    }
-
-                    parameterBuffer = m_receivedTransaction->getParameterById(toInt(Parameter::UserLogin));
-                    if(parameterBuffer) {
-                        newUser->name = QString::fromUtf8(parameterBuffer->data(), parameterBuffer->length());
-                    }
-
-                    m_userManager.addUser(newUser);
-                    QByteArray nameUtf8 = newUser->name.toUtf8();
-                    QString message = QString::fromUtf8("                <b>%1 has joined</b>").arg(TextHelper::DecodeText(nameUtf8.constData(), nameUtf8.length()));
-                    emit gotChatMessage(message);
-                }
-            }
+            handleUserJoinOrUpdate(parameterBuffer);
             break;
         case 302:
             handleUserDisconnected(parameterBuffer);
@@ -882,6 +807,85 @@ void ConnectionController::handleUserDisconnected(TransactionParameter*& paramet
         QString message = QString::fromUtf8("                <b>%1 has left</b>").arg(TextHelper::DecodeText(nameUtf8.constData(), nameUtf8.length()));
         emit gotChatMessage(message);
         m_userManager.removeUser(uid);
+    }
+}
+
+void ConnectionController::handleUserJoinOrUpdate(TransactionParameter*& parameterBuffer) {
+    if(m_receivedTransaction->getParameterById(toInt(Parameter::UserId))) {
+        parameterBuffer = m_receivedTransaction->getParameterById(toInt(Parameter::UserId));
+
+        if(!parameterBuffer) {
+            return;
+        }
+
+        quint16 uid = parameterBuffer->toShort();
+
+        HotlineUser * user = getUserByUid(uid);
+        if(user) { // Update user
+            parameterBuffer = m_receivedTransaction->getParameterById(toInt(Parameter::UserIconId));
+            if(parameterBuffer) {
+                quint16 newIcon = parameterBuffer->toShort();
+
+                if(user->icon == 3520 && newIcon != 3520) {
+                    user->doesCET = true;
+                    //sendCETIdentification(user);
+                } else {
+                    user->doesCET = false;
+                }
+
+                user->icon = newIcon;
+                user->iconPath = std::make_unique<QString>(QString::fromUtf8(":/icons/") + QString::number(user->icon) + QString::fromUtf8(".png"));
+            }
+
+            parameterBuffer = m_receivedTransaction->getParameterById(toInt(Parameter::UserFlags));
+            if(parameterBuffer) {
+                user->flags = parameterBuffer->toShort();
+            }
+
+            parameterBuffer = m_receivedTransaction->getParameterById(toInt(Parameter::UserLogin));
+
+            if(parameterBuffer) {
+                QByteArray oldNameUtf8 = user->name.toUtf8();
+                QString oldName = TextHelper::DecodeText(oldNameUtf8.constData(), oldNameUtf8.length());
+
+                user->name = QString::fromUtf8(parameterBuffer->data(), parameterBuffer->length());
+
+                QByteArray newNameUtf8 = user->name.toUtf8();
+                QString newName = TextHelper::DecodeText(newNameUtf8.constData(), newNameUtf8.length());
+                QString message = QString::fromUtf8("                <b>%1 is now known as %2</b>").arg(oldName, newName);
+
+                if(oldName != newName)
+                {
+                    emit userChangedName(oldName, newName);
+                    emit gotChatMessage(message);
+                }
+            }
+
+        } else { // New user
+            HotlineUser * newUser = new HotlineUser();
+            newUser->id = uid;
+
+            parameterBuffer = m_receivedTransaction->getParameterById(toInt(Parameter::UserIconId));
+            if(parameterBuffer) {
+                newUser->icon = parameterBuffer->toShort();
+                newUser->iconPath = std::make_unique<QString>(QString::fromUtf8("icons/") + QString::number(newUser->icon) + QString::fromUtf8(".png"));
+            }
+
+            parameterBuffer = m_receivedTransaction->getParameterById(toInt(Parameter::UserFlags));
+            if(parameterBuffer) {
+                newUser->flags = parameterBuffer->toShort();
+            }
+
+            parameterBuffer = m_receivedTransaction->getParameterById(toInt(Parameter::UserLogin));
+            if(parameterBuffer) {
+                newUser->name = QString::fromUtf8(parameterBuffer->data(), parameterBuffer->length());
+            }
+
+            m_userManager.addUser(newUser);
+            QByteArray nameUtf8 = newUser->name.toUtf8();
+            QString message = QString::fromUtf8("                <b>%1 has joined</b>").arg(TextHelper::DecodeText(nameUtf8.constData(), nameUtf8.length()));
+            emit gotChatMessage(message);
+        }
     }
 }
 
