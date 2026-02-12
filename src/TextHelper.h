@@ -1,7 +1,7 @@
 #ifndef TEXTHELPER_H
 #define TEXTHELPER_H
 
-#include <QSettings>
+#include "SettingsManager.h"
 #include <QStringConverter>
 #include <optional>
 
@@ -10,7 +10,7 @@ class TextHelper
 public:
     static QString DecodeText(const char * str, int length)
     {
-        QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
+        auto& settings = SettingsManager::instance();
         QString encodingName = settings.value(QString::fromUtf8("Encoding"), QString::fromUtf8("Apple Roman")).toString();
         
         // Try to create decoder with ICU support (provides Apple Roman, Shift-JIS, etc.)
@@ -26,7 +26,7 @@ public:
 
     static QString DecodeTextAutoUTF8(const char * str, int length)
     {
-        QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
+        auto& settings = SettingsManager::instance();
         QString encodingName = settings.value(QString::fromUtf8("Encoding"), QString::fromUtf8("Apple Roman")).toString();
         
         auto decoder = QStringDecoder(encodingName.toUtf8().constData());
@@ -54,7 +54,7 @@ public:
 
     static QByteArray EncodeText(QString str)
     {
-        QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
+        auto& settings = SettingsManager::instance();
         QString encodingName = settings.value(QString::fromUtf8("Encoding"), QString::fromUtf8("Apple Roman")).toString();
         
         auto encoder = QStringEncoder(encodingName.toUtf8().constData());

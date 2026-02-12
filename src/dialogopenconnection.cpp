@@ -3,6 +3,7 @@
 #include "mainwindow.h"
 #include <QSettings>
 #include <QMessageBox>
+#include "SettingsManager.h"
 
 DialogOpenConnection::DialogOpenConnection(QWidget *parent, ConnectionController * c) :
     QDialog(parent),
@@ -75,7 +76,7 @@ void DialogOpenConnection::bookmarkCurrent() {
         return;
     }
 
-    QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
+    auto& settings = SettingsManager::instance();
     qint32 bookmarkCount = settings.value("bookmarkCount", 0).toInt();
     settings.setValue(QString::fromUtf8("bookmarkname")+QString::number(bookmarkCount), ui->lineEdit->text().trimmed());
     settings.setValue(QString::fromUtf8("bookmarkaddress")+QString::number(bookmarkCount), ui->lineEdit->text().trimmed());
@@ -88,7 +89,7 @@ void DialogOpenConnection::bookmarkCurrent() {
 }
 
 void DialogOpenConnection::choseBookmark(int selectedIndex) {
-    QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
+    auto& settings = SettingsManager::instance();
 
     if (selectedIndex == 0) {
         this->_clearFields();
@@ -113,7 +114,7 @@ void DialogOpenConnection::choseBookmark(int selectedIndex) {
 
 void DialogOpenConnection::updateAutoConnectStatus()
 {
-    QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
+    auto& settings = SettingsManager::instance();
     if(ui->autoConnectCheckbox->isChecked()) {
         settings.setValue("autoBookmark", ui->lineEdit->text());
     } else {
@@ -122,7 +123,7 @@ void DialogOpenConnection::updateAutoConnectStatus()
 }
 
 void DialogOpenConnection::updateBookmarkList() {
-    QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
+    auto& settings = SettingsManager::instance();
 
     ui->comboBox->clear();
     ui->comboBox->addItem(QString::fromUtf8(""));

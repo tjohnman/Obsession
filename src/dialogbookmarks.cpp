@@ -1,6 +1,7 @@
 #include "dialogbookmarks.h"
 #include "ui_dialogbookmarks.h"
 #include <QDebug>
+#include "SettingsManager.h"
 
 DialogBookmarks::DialogBookmarks(QWidget *parent) :
     QDialog(parent),
@@ -53,7 +54,7 @@ void DialogBookmarks::clearFields() {
 }
 
 void DialogBookmarks::selectedBookmark() {
-    QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
+    auto& settings = SettingsManager::instance();
     if(ui->listWidget->currentItem()) {
         ui->lineEdit->setText(settings.value(QString::fromUtf8("bookmarkname")+QString::number(ui->listWidget->currentRow()),  QString::fromUtf8("")).toString());
         ui->lineEdit_2->setText(settings.value(QString::fromUtf8("bookmarkaddress")+QString::number(ui->listWidget->currentRow()),  QString::fromUtf8("")).toString());
@@ -72,7 +73,7 @@ void DialogBookmarks::selectedBookmark() {
 }
 
 void DialogBookmarks::loadBookmarks() {
-    QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
+    auto& settings = SettingsManager::instance();
     ui->listWidget->clear();
     qint32 bookmarkCount = settings.value("bookmarkCount", 0).toInt();
     for(qint32 i=0; i<bookmarkCount; i++) {
@@ -90,7 +91,7 @@ void DialogBookmarks::loadBookmarks() {
 }
 
 void DialogBookmarks::newBookmark() {
-    QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
+    auto& settings = SettingsManager::instance();
     qint32 bookmarkCount = settings.value("bookmarkCount", 0).toInt();
     ui->lineEdit->setText(QString::fromUtf8("New bookmark"));
     ui->lineEdit_2->clear();
@@ -109,7 +110,7 @@ void DialogBookmarks::newBookmark() {
 }
 
 void DialogBookmarks::deleteBookmark() {
-    QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
+    auto& settings = SettingsManager::instance();
     if(ui->listWidget->currentItem()) {
         qint32 row = ui->listWidget->currentRow();
         qint32 bookmarkCount = settings.value("bookmarkCount", 0).toInt();
@@ -135,7 +136,7 @@ void DialogBookmarks::deleteBookmark() {
 }
 
 void DialogBookmarks::saveBookmark() {
-    QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
+    auto& settings = SettingsManager::instance();
     if(ui->listWidget->currentItem()) {
         settings.setValue(QString::fromUtf8("bookmarkname")+QString::number(ui->listWidget->currentRow()), ui->lineEdit->text());
         settings.setValue(QString::fromUtf8("bookmarkaddress")+QString::number(ui->listWidget->currentRow()), ui->lineEdit_2->text());
@@ -147,7 +148,7 @@ void DialogBookmarks::saveBookmark() {
 }
 
 void DialogBookmarks::changedAutoConnect(bool checked) {
-    QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
+    auto& settings = SettingsManager::instance();
 
     if(checked) {
         settings.setValue("autoBookmark", ui->lineEdit_2->text());

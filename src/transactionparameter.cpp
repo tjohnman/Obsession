@@ -3,6 +3,7 @@
 #include <QtEndian>
 #include <QStringConverter>
 #include <QSettings>
+#include "SettingsManager.h"
 
 TransactionParameter::TransactionParameter(s_parameter parameterData) {
     QObject();
@@ -35,7 +36,7 @@ QString TransactionParameter::toString() {
     memcpy(buff, pData, pLength);
     buff[pLength] = '\0';
 
-    QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
+    auto& settings = SettingsManager::instance();
     QString encodingName = settings.value(QString::fromUtf8("Encoding"), QString::fromUtf8("Apple Roman")).toString();
     
     auto decoder = QStringDecoder(encodingName.toUtf8().constData());

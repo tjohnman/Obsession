@@ -3,6 +3,7 @@
 #include "ThemeManager.h"
 #include <QSettings>
 #include <QStringConverter>
+#include "SettingsManager.h"
 
 DialogPreferences::DialogPreferences(QWidget *parent) :
     QDialog(parent),
@@ -10,7 +11,7 @@ DialogPreferences::DialogPreferences(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
+    auto& settings = SettingsManager::instance();
     ui->lineEdit->setText(settings.value(QString::fromUtf8("nick"), QString::fromUtf8("unnamed")).toString());
 
     QString encoding = settings.value(QString::fromUtf8("Encoding"), QString::fromUtf8("Apple Roman")).toString();
@@ -81,7 +82,7 @@ void DialogPreferences::openBookmarks() {
 
 void DialogPreferences::changeFont() {
     bool ok;
-    QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
+    auto& settings = SettingsManager::instance();
     QFont font = QFontDialog::getFont(
                     &ok, ui->sampleEdit->font(), this );
     if ( ok ) {
@@ -131,7 +132,7 @@ QString DialogPreferences::selectedEncoding()
 }
 
 void DialogPreferences::acceptSettings() {
-    QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
+    auto& settings = SettingsManager::instance();
     settings.setValue(QString::fromUtf8("nick"), ui->lineEdit->text());
 
     switch(ui->encodingCombo->currentIndex())

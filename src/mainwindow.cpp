@@ -14,6 +14,7 @@
 #include "dialogbroadcast.h"
 #include "TextHelper.h"
 #include "ThemeManager.h"
+#include "SettingsManager.h"
 
 MainWindow::MainWindow(QWidget *parent, bool checkForUpdates) :
     QMainWindow(parent),
@@ -157,7 +158,7 @@ void MainWindow::log(QString t) {
 
 void MainWindow::autoConnect() {
     bool auto_connected = false;
-    QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
+    auto& settings = SettingsManager::instance();
 
     QString auto_bookmark = settings.value(QString::fromUtf8("autoBookmark"), QString::fromUtf8("")).toString();
     int bookmark_count = settings.value("bookmarkCount", 0).toInt();
@@ -179,7 +180,7 @@ void MainWindow::autoConnect() {
 void MainWindow::onConnected() {
     setStatus(QString::fromUtf8("Connected"));
 
-    QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
+    auto& settings = SettingsManager::instance();
     if(settings.value("connectionKeepAlive", true).toBool())
     {
         connect(&keepAliveTimer, SIGNAL(timeout()), connection, SLOT(requestUserList()));
@@ -190,14 +191,14 @@ void MainWindow::onConnected() {
 }
 
 void MainWindow::playChatSound() {
-    QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
+    auto& settings = SettingsManager::instance();
     if(settings.value("soundsEnabled", true).toBool()) {
         chatSound->play();
     }
 }
 
 void MainWindow::playPMSound() {
-    QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
+    auto& settings = SettingsManager::instance();
     if(settings.value("soundsEnabled", true).toBool()) {
         pmSound->play();
     }
@@ -420,7 +421,7 @@ void MainWindow::onClickCreateAccount()
 }
 
 void MainWindow::onUserListChanged() {
-    QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
+    auto& settings = SettingsManager::instance();
 
     std::vector<s_user*> * users = connection->getUserList();
     clearUserList();
@@ -504,7 +505,7 @@ void MainWindow::openBookmarksDialog()
 
 void MainWindow::onPreferencesSaved() {
     QFont font;
-    QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
+    auto& settings = SettingsManager::instance();
     font.setFamily(settings.value(QString::fromUtf8("fontFamily"), QString::fromUtf8("MS Shell Dlg2")).toString());
     qint32 style = settings.value("fontStyle", 0).toInt();
     switch(style) {

@@ -3,6 +3,7 @@
 #include <QStandardPaths>
 #include "dialogerror.h"
 #include "TextHelper.h"
+#include "SettingsManager.h"
 
 DownloadManager::DownloadManager(ConnectionController * c)
 {
@@ -63,7 +64,7 @@ void DownloadManager::onDownloadFinished() {
         }
     }
 
-    QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
+    auto& settings = SettingsManager::instance();
     qint32 dlqueue = settings.value("dlqueue", 1).toInt();
 
     qint32 free;

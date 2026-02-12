@@ -1,6 +1,7 @@
 #include "dialogiconviewer.h"
 #include "ui_dialogiconviewer.h"
 #include "threadiconloader.h"
+#include "SettingsManager.h"
 
 DialogIconViewer::DialogIconViewer(QWidget *parent) :
     QDialog(parent),
@@ -24,7 +25,7 @@ DialogIconViewer::DialogIconViewer(QWidget *parent) :
 }
 
 void DialogIconViewer::onClicked(QModelIndex model) {
-    QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
+    auto& settings = SettingsManager::instance();
     QString name = model.data(0).toString();
     if(name.endsWith(QString::fromUtf8(".png"))) {
         name = name.left(name.length()-4);

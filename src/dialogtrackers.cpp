@@ -8,6 +8,7 @@
 #include <QTextStream>
 #include <QHostAddress>
 #include <QMessageBox>
+#include "SettingsManager.h"
 
 DialogTrackers::DialogTrackers(ConnectionController * c, QWidget *parent) :
     QDialog(parent),
@@ -104,7 +105,7 @@ void DialogTrackers::deleteTracker() {
 }
 
 void DialogTrackers::saveTrackerList() {
-    QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
+    auto& settings = SettingsManager::instance();
     settings.setValue("numtrackers", (qint32)pTrackerAddresses.size());
     qint32 numTrackers = settings.value("numtrackers").toInt();
 
@@ -115,7 +116,7 @@ void DialogTrackers::saveTrackerList() {
 }
 
 void DialogTrackers::updateTrackerList() {
-    QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
+    auto& settings = SettingsManager::instance();
     qint32 numTrackers = settings.value("numtrackers").toInt();
 
     pTrackerNames.clear();

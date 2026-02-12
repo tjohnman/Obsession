@@ -11,6 +11,7 @@
 #include "transactionparameter.h"
 #include "version.h"
 #include "TextHelper.h"
+#include "SettingsManager.h"
 
 ConnectionController::ConnectionController()
 {
@@ -22,7 +23,7 @@ ConnectionController::ConnectionController()
     pServerAgreement = QString();
 
     // TODO: Preferences
-    QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
+    auto& settings = SettingsManager::instance();
     pNickname = settings.value(QString::fromUtf8("nick"), QString::fromUtf8("unnamed")).toString();
     pIconID = (quint16) settings.value("icon", 25096).toString().toShort();
 
@@ -139,14 +140,14 @@ void ConnectionController::sendEmote(QString text) {
 
 void ConnectionController::toggleAFK() {
     if(pAFK) {
-        QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
+        auto& settings = SettingsManager::instance();
         pNickname = settings.value(QString::fromUtf8("nick"), QString::fromUtf8("unnamed")).toString();
         sendUserInfo();
         sendEmote(QString::fromUtf8("is back"));
         pAFK = false;
     } else {
         sendEmote(QString::fromUtf8("is AFK"));
-        QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
+        auto& settings = SettingsManager::instance();
         pNickname = settings.value(QString::fromUtf8("nick"), QString::fromUtf8("unnamed")).toString() + QString::fromUtf8(" (AFK)");
         pAFK = true;
         sendUserInfo();
@@ -158,7 +159,7 @@ bool ConnectionController::isAFK() {
 }
 
 void ConnectionController::sendUserInfo() {
-    QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
+    auto& settings = SettingsManager::instance();
     pNickname = settings.value(QString::fromUtf8("nick"), QString::fromUtf8("unnamed")).toString();
     pIconID = settings.value("icon", 25096).toString().toShort();
     CTransaction * uinfoTransaction = new CTransaction(304, pTaskIDCounter++);
@@ -380,7 +381,7 @@ void ConnectionController::onSocketError(QAbstractSocket::SocketError e) {
     }
 
 
-    QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
+    auto& settings = SettingsManager::instance();
     if(e == 1 && settings.value("autoReconnect", false).toBool() && pReconnectionAttempts < 3)
     {
         emit socketError(string+ QString::fromUtf8("<br>Reconnecting..."));
@@ -395,7 +396,7 @@ void ConnectionController::onSocketError(QAbstractSocket::SocketError e) {
 
 void ConnectionController::onConnectionTimedOut()
 {
-    QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
+    auto& settings = SettingsManager::instance();
     if(settings.value("autoReconnect", false).toBool() && pReconnectionAttempts < 3)
     {
         emit socketError(QString::fromUtf8("Connection timed out.<br>Reconnecting..."));
@@ -457,7 +458,7 @@ void ConnectionController::onSocketData() {
                     break;
                 case 107:
                     {
-                    QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
+                    auto& settings = SettingsManager::instance();
                     pNickname = settings.value(QString::fromUtf8("nick"), QString::fromUtf8("unnamed")).toString();
 
                     sendUserInfo();

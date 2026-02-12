@@ -107,6 +107,7 @@ set(HEADERS
     src/version.h
     src/threaduploader.h
     src/TextHelper.h
+    src/SettingsManager.h
     src/dialogprivileges.h
     src/dialogrequestaccount.h
     src/dialogcreateaccount.h

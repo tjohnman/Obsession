@@ -4,6 +4,7 @@
 #include <QSettings>
 #include "TextHelper.h"
 #include "dialognewnewsmessage.h"
+#include "SettingsManager.h"
 
 WidgetNews::WidgetNews(ConnectionController * c, QWidget *parent) :
     QWidget(parent),
@@ -127,13 +128,13 @@ QString WidgetNews::getItemPath(QTreeWidgetItem * item) {
 }
 
 void WidgetNews::setRead(QTreeWidgetItem * item, bool set) {
-    QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
+    auto& settings = SettingsManager::instance();
     QString key = item->data(0, 0).toString()+item->data(1, 0).toString()+item->data(2, 0).toString()+item->data(3, 0).toString();
     settings.setValue(key, set);
 }
 
 bool WidgetNews::checkIfRead(QTreeWidgetItem * item) {
-    QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
+    auto& settings = SettingsManager::instance();
     QString key = item->data(0, 0).toString()+item->data(1, 0).toString()+item->data(2, 0).toString()+item->data(3, 0).toString();
     return settings.value(key, false).toBool();
 }

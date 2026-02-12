@@ -2,6 +2,7 @@
 #include "ui_dialogprivatemessaging.h"
 #include <QSettings>
 #include "TextHelper.h"
+#include "SettingsManager.h"
 
 DialogPrivateMessaging::DialogPrivateMessaging(qint16 id, ConnectionController * c, QWidget * parent) :
     QDialog(parent),
@@ -42,7 +43,7 @@ void DialogPrivateMessaging::changeEvent(QEvent *e)
 
 void DialogPrivateMessaging::sendMessage() {
     if(!ui->lineEdit->text().isEmpty()) {
-        QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
+        auto& settings = SettingsManager::instance();
         connection->sendPMToUser(uid, ui->lineEdit->text());
         ui->textEdit->moveCursor(QTextCursor::End);
         QString formatted = TextHelper::FormatMessageToHTML(ui->lineEdit->text());
@@ -70,7 +71,7 @@ void DialogPrivateMessaging::gotMessage(QString m) {
 
 void DialogPrivateMessaging::onPreferencesSaved() {
     QFont font;
-    QSettings settings(QString::fromUtf8("mir"), QString::fromUtf8("Contra"));
+    auto& settings = SettingsManager::instance();
     font.setFamily(settings.value(QString::fromUtf8("fontFamily"), QString::fromUtf8("MS Shell Dlg2")).toString());
     qint32 style = settings.value("fontStyle", 0).toInt();
     switch(style) {
