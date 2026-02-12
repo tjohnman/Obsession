@@ -1,5 +1,6 @@
 #include "connectioncontroller.h"
 #include "HotlineProtocol.h"
+#include "DateTimeParser.h"
 #include <QSettings>
 #include <QStringList>
 #include <QDir>
@@ -850,135 +851,7 @@ void ConnectionController::onSocketData() {
                         }
                         parameterBuffer = receivedTransaction->getParameterById(toInt(Parameter::NewsArticleParent));
                         if(parameterBuffer) {
-                            quint16 year;
-                            memcpy(&year, parameterBuffer->data(), 2);
-                            year = qFromBigEndian(year);
-                            quint16 millis;
-                            memcpy(&millis, parameterBuffer->data()+2, 2);
-                            millis = qFromBigEndian(millis);
-                            quint32 seconds;
-                            memcpy(&seconds, parameterBuffer->data()+4, 4);
-                            seconds = qFromBigEndian(seconds);
-
-                            quint32 d = 1, M = 1, h = 0, m = 0, s = 0;
-                            s = seconds + millis/1000;
-
-                            quint32 secondsInDay = 86400;
-
-                            while(s > secondsInDay) {
-                                d++;
-                                s -= secondsInDay;
-                            }
-
-                            bool isLeap;
-
-                            if(year%4 == 0) {
-                                if(year%100 == 0 && year%400 != 0) {
-                                    isLeap = false;
-                                } else {
-                                    isLeap = true;
-                                }
-                            } else {
-                                isLeap = false;
-                            }
-
-                            quint32 daysInMonth;
-
-                            for(qint32 i=0; i<12 ; i++) {
-                                if(i==0 || i==2 || i==4 || i==6 || i==7 || i==9 || i==11) {
-                                    daysInMonth = 31;
-                                } else {
-                                    if(i==1) {
-                                        if(isLeap) {
-                                            daysInMonth = 29;
-                                        } else {
-                                            daysInMonth = 28;
-                                        }
-                                    } else {
-                                        daysInMonth = 30;
-                                    }
-                                }
-
-                                if(d > daysInMonth) {
-                                    M++;
-                                    d -= daysInMonth;
-                                } else {
-                                    break;
-                                }
-                            }
-
-                            timestamp = QString::number(d)+ QString::fromUtf8(" ");
-
-                            switch(M) {
-                            case 1:
-                                timestamp += QString::fromUtf8("January ");
-                                break;
-                            case 2:
-                                timestamp += QString::fromUtf8("February ");
-                                break;
-                            case 3:
-                                timestamp += QString::fromUtf8("March ");
-                                break;
-                            case 4:
-                                timestamp += QString::fromUtf8("April ");
-                                break;
-                            case 5:
-                                timestamp += QString::fromUtf8("May ");
-                                break;
-                            case 6:
-                                timestamp += QString::fromUtf8("June ");
-                                break;
-                            case 7:
-                                timestamp += QString::fromUtf8("July ");
-                                break;
-                            case 8:
-                                timestamp += QString::fromUtf8("August ");
-                                break;
-                            case 9:
-                                timestamp += QString::fromUtf8("September ");
-                                break;
-                            case 10:
-                                timestamp += QString::fromUtf8("October ");
-                                break;
-                            case 11:
-                                timestamp += QString::fromUtf8("November ");
-                                break;
-                            case 12:
-                                timestamp += QString::fromUtf8("December ");
-                                break;
-                            }
-
-                            timestamp += QString::number(year);
-                            timestamp += QString::fromUtf8(" at ");
-
-                            while(s > 3600) {
-                                h++;
-                                s -= 3600;
-                            }
-                            while(s > 60) {
-                                m++;
-                                s -= 60;
-                            }
-
-                            if(h < 10) {
-                                timestamp += QString::fromUtf8("0")+QString::number(h)+ QString::fromUtf8(":");
-                            } else {
-                                timestamp += QString::number(h)+ QString::fromUtf8(":");
-                            }
-                            if(m < 10) {
-                                timestamp += QString::fromUtf8("0")+QString::number(m)+ QString::fromUtf8(":");
-                            } else {
-                                timestamp += QString::number(m)+ QString::fromUtf8(":");
-                            }
-                            if(s < 10) {
-                                timestamp += QString::fromUtf8("0")+QString::number(s);
-                            } else {
-                                timestamp += QString::number(s);
-                            }
-
-                            if(d > 31) {
-                                timestamp = QString::fromUtf8("Unknown");
-                            }
+                            timestamp = DateTimeParser::parseAndFormat(parameterBuffer->data());
                         }
 
                         emit gotNewsArticleText(text, poster, timestamp);
