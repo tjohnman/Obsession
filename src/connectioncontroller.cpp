@@ -22,7 +22,7 @@ ConnectionController::ConnectionController()
     pSocket.open(QIODevice::ReadWrite);
     connect(&pSocket, SIGNAL(connected()), this, SLOT(onSocketConnected()));
     connect(&pSocket, SIGNAL(errorOccurred(QAbstractSocket::SocketError)), this, SLOT(onSocketError(QAbstractSocket::SocketError)));
-    connect(&pTimeoutTimer, SIGNAL(timeout()), this, SLOT(onConnectionTimedOut()));
+    connect(&m_connectionState.timeoutTimer(), SIGNAL(timeout()), this, SLOT(onConnectionTimedOut()));
     
     // Connect UserManager signals
     connect(&m_userManager, &UserManager::userListChanged, this, &ConnectionController::userListChanged);
@@ -38,13 +38,10 @@ ConnectionController::ConnectionController()
 
     m_clientState.setClientVersion(190);
 
-    pTaskIDCounter = 0;
+    m_taskIdGenerator.reset();
 
-    pReconnectionAttempts = 0;
+    m_connectionState.resetReconnectionAttempts();
     receivedTransaction = nullptr;
-
-    pTimeoutTimer.setSingleShot(true);
-    pTimeoutTimer.setInterval(10000);
 }
 
 bool ConnectionController::isConnected() {
@@ -58,11 +55,11 @@ qint32 ConnectionController::connectToServer(QString address, QString login, QSt
 
     if(resetAutoReconnect)
     {
-        pReconnectionAttempts = 0;
+        m_connectionState.resetReconnectionAttempts();
     }
     else
     {
-        ++pReconnectionAttempts;
+        m_connectionState.incrementReconnectionAttempts();
     }
 
     emit connecting();
@@ -93,7 +90,7 @@ qint32 ConnectionController::connectToServer(QString address, QString login, QSt
     }
     m_clientState.setEncodedPassword(encodedPassword);
 
-    pTimeoutTimer.start();
+    m_connectionState.startTimeout();
     pSocket.connectToHost(addr, port);
 
     serverIdent = addr;
@@ -133,13 +130,13 @@ QString ConnectionController::serverName() {
 }
 
 void ConnectionController::sendChatText(QString text) {
-    CTransaction * chatTransaction = new CTransaction(Transaction::SendChat, pTaskIDCounter++);
+    CTransaction * chatTransaction = new CTransaction(Transaction::SendChat, m_taskIdGenerator.next());
     chatTransaction->addParameter(toInt(Parameter::ChatMessage), TextHelper::EncodeText(text).size(), TextHelper::EncodeText(text).data());
     sendTransaction(chatTransaction);
 }
 
 void ConnectionController::sendEmote(QString text) {
-    CTransaction * chatTransaction = new CTransaction(Transaction::SendChat, pTaskIDCounter++);
+    CTransaction * chatTransaction = new CTransaction(Transaction::SendChat, m_taskIdGenerator.next());
     chatTransaction->addParameter(toInt(Parameter::ChatMessage), TextHelper::EncodeText(text).size(), TextHelper::EncodeText(text).data());
     chatTransaction->addParameter(toInt(Parameter::ChatOptions), 1);
     sendTransaction(chatTransaction);
@@ -169,7 +166,7 @@ void ConnectionController::sendUserInfo() {
     auto& settings = SettingsManager::instance();
     m_clientState.setNickname(settings.value(QString::fromUtf8("nick"), QString::fromUtf8("unnamed")).toString());
     m_clientState.setIconID(settings.value("icon", 25096).toString().toShort());
-    CTransaction * uinfoTransaction = new CTransaction(Transaction::SetUserInfo, pTaskIDCounter++);
+    CTransaction * uinfoTransaction = new CTransaction(Transaction::SetUserInfo, m_taskIdGenerator.next());
     uinfoTransaction->addParameter(toInt(Parameter::UserLogin), TextHelper::EncodeText(m_clientState.nickname()).size(), TextHelper::EncodeText(m_clientState.nickname()).data());
     uinfoTransaction->addParameter(toInt(Parameter::UserIconId), m_clientState.iconID());
     sendTransaction(uinfoTransaction);
@@ -193,7 +190,7 @@ QString ConnectionController::serverAgreement() {
 
 void ConnectionController::requestUserInfo(quint16 id)
 {
-    qint32 task = pTaskIDCounter++;
+    qint32 task = m_taskIdGenerator.next();
     m_UserInfoTaskMap[task] = id;
     CTransaction * PMTransaction = new CTransaction(Transaction::UserChange, task);
     PMTransaction->addParameter(toInt(Parameter::UserId), id);
@@ -201,7 +198,7 @@ void ConnectionController::requestUserInfo(quint16 id)
 }
 
 void ConnectionController::sendPMToUser(quint16 uid, QString message, bool automatic) {
-    CTransaction * PMTransaction = new CTransaction(Transaction::SendPrivateMessage, pTaskIDCounter++);
+    CTransaction * PMTransaction = new CTransaction(Transaction::SendPrivateMessage, m_taskIdGenerator.next());
     PMTransaction->addParameter(toInt(Parameter::UserId), uid);
     if(automatic) {
         PMTransaction->addParameter(toInt(Parameter::ChatSubject), 4);
@@ -225,7 +222,7 @@ void ConnectionController::closeConnection(bool silent) {
 }
 
 CTransaction * ConnectionController::createTransaction(qint16 id) {
-    return new CTransaction(id, pTaskIDCounter++);
+    return new CTransaction(id, m_taskIdGenerator.next());
 }
 
 /************
@@ -234,14 +231,14 @@ CTransaction * ConnectionController::createTransaction(qint16 id) {
 
 void ConnectionController::requestUserList()
 {
-    CTransaction * requestUserListTransaction = new CTransaction(300, pTaskIDCounter++);
+    CTransaction * requestUserListTransaction = new CTransaction(300, m_taskIdGenerator.next());
     sendTransaction(requestUserListTransaction, true);
 }
 
 void ConnectionController::onSocketConnected() {
     pSocket.setSocketOption(QAbstractSocket::KeepAliveOption, 1);
 
-    pTimeoutTimer.stop();
+    m_connectionState.stopTimeout();
     emit connected();
 
     ProtocolExtensions protocol_extensions = this->checkForProtocolExtensions();
@@ -269,7 +266,7 @@ void ConnectionController::onSocketConnected() {
 
     quint16 serverVersion = ((quint16)serverMagicBytes[6] << 8) | (quint16)serverMagicBytes[7];
 
-    CTransaction * loginTransaction = new CTransaction(Transaction::Login, pTaskIDCounter++);
+    CTransaction * loginTransaction = new CTransaction(Transaction::Login, m_taskIdGenerator.next());
     loginTransaction->addParameter(toInt(Parameter::PrivateChat), m_clientState.encodedLogin().length(), m_clientState.encodedLogin().data());
     if(m_clientState.encodedPassword().length() > 0) {
         loginTransaction->addParameter(toInt(Parameter::UserPassword), m_clientState.encodedPassword().length(), m_clientState.encodedPassword().data());
@@ -381,7 +378,7 @@ void ConnectionController::onSocketError(QAbstractSocket::SocketError e) {
 
 
     auto& settings = SettingsManager::instance();
-    if(e == 1 && settings.value("autoReconnect", false).toBool() && pReconnectionAttempts < 3)
+    if(e == 1 && settings.value("autoReconnect", false).toBool() && m_connectionState.reconnectionAttempts() < 3)
     {
         emit socketError(string+ QString::fromUtf8("<br>Reconnecting..."));
         closeConnection();
@@ -396,7 +393,7 @@ void ConnectionController::onSocketError(QAbstractSocket::SocketError e) {
 void ConnectionController::onConnectionTimedOut()
 {
     auto& settings = SettingsManager::instance();
-    if(settings.value("autoReconnect", false).toBool() && pReconnectionAttempts < 3)
+    if(settings.value("autoReconnect", false).toBool() && m_connectionState.reconnectionAttempts() < 3)
     {
         emit socketError(QString::fromUtf8("Connection timed out.<br>Reconnecting..."));
         closeConnection();

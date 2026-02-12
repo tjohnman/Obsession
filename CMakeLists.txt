@@ -117,6 +117,8 @@ set(HEADERS
     src/TransactionQueue.h
     src/ClientState.h
     src/ProtocolExtensions.h
+    src/ConnectionState.h
+    src/TaskIdGenerator.h
     src/dialogprivileges.h
     src/dialogrequestaccount.h
     src/dialogcreateaccount.h

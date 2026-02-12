@@ -10,6 +10,8 @@
 #include "TransactionQueue.h"
 #include "ClientState.h"
 #include "ProtocolExtensions.h"
+#include "ConnectionState.h"
+#include "TaskIdGenerator.h"
 #include <QtEndian>
 #include <QDate>
 #include <QTimer>
@@ -59,12 +61,8 @@ private:
     ServerInfo m_serverInfo;
     ClientState m_clientState;
     ProtocolExtensions m_protocolExtensions;
-
-    QTimer pTimeoutTimer;
-
-    qint32 pTaskIDCounter;
-
-    quint8 pReconnectionAttempts;
+    ConnectionState m_connectionState;
+    TaskIdGenerator m_taskIdGenerator;
 
     void sendUserInfo();
 
